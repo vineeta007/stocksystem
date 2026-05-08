@@ -1,43 +1,37 @@
 'use client';
 
+/**
+ * LowStockAlert
+ * Props:
+ *   alerts  {Array}  – [{ id, name, quantity, status: 'low'|'out' }]
+ *   onOrder {fn}     – callback(alert) when Order is clicked
+ */
 export default function LowStockAlert({ alerts = [], onOrder }) {
   if (alerts.length === 0) {
-    return <div style={{ padding: '20px 0', fontSize: '14px', color: '#B8D4F0', textAlign: 'center' }}>All stock levels are healthy.</div>;
+    return (
+      <div style={styles.empty}>All stock levels are healthy.</div>
+    );
   }
+
   return (
-    <div>
+    <div style={styles.list}>
       {alerts.map((alert) => {
         const isOut = alert.status === 'out' || alert.quantity <= 0;
         return (
-          <div key={alert.id} style={{
-            display: 'flex', alignItems: 'center', gap: '12px',
-            padding: '13px 0', borderBottom: '1px solid #1E3A5F',
-            fontFamily: "'Sora', sans-serif",
-          }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '14px', fontWeight: 600, color: '#FFFFFF' }}>{alert.name}</div>
-              <div style={{ fontSize: '12px', color: '#B8D4F0', marginTop: '3px' }}>
+          <div key={alert.id} style={styles.row}>
+            <div style={styles.info}>
+              <div style={styles.name}>{alert.name}</div>
+              <div style={styles.qty}>
                 {isOut ? 'Depleted — restock needed' : `Qty: ${alert.quantity} remaining`}
               </div>
             </div>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
-              <span style={{
-                padding: '4px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: 700,
-                background: isOut ? 'rgba(239,68,68,.25)' : 'rgba(245,158,11,.25)',
-                color: isOut ? '#FCA5A5' : '#FCD34D',
-              }}>
+            <div style={styles.actions}>
+              <span className={isOut ? 'tag tag-out' : 'tag tag-low'}>
                 {isOut ? 'OUT' : 'LOW'}
               </span>
               <button
+                style={styles.orderBtn}
                 onClick={() => onOrder?.(alert)}
-                style={{
-                  padding: '5px 14px', borderRadius: '7px', fontSize: '13px', fontWeight: 600,
-                  border: '1.5px solid #1E3A5F', background: '#0F1F3D',
-                  color: '#FFFFFF', cursor: 'pointer', fontFamily: "'Sora', sans-serif",
-                  transition: 'border-color .15s',
-                }}
-                onMouseEnter={e => e.target.style.borderColor = '#2E90FA'}
-                onMouseLeave={e => e.target.style.borderColor = '#1E3A5F'}
               >
                 Order
               </button>
@@ -48,3 +42,54 @@ export default function LowStockAlert({ alerts = [], onOrder }) {
     </div>
   );
 }
+
+const styles = {
+  list: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  row: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    padding: '12px 0',
+    borderBottom: '1px solid var(--border)',
+  },
+  info: {
+    flex: 1,
+  },
+  name: {
+    fontSize: '13.5px',
+    fontWeight: 600,
+    color: 'var(--text)',
+  },
+  qty: {
+    fontSize: '12px',
+    color: 'var(--text-muted)',
+    marginTop: '2px',
+  },
+  actions: {
+    display: 'flex',
+    gap: '7px',
+    alignItems: 'center',
+    flexShrink: 0,
+  },
+  orderBtn: {
+    padding: '4px 12px',
+    borderRadius: '6px',
+    fontSize: '12px',
+    fontWeight: 600,
+    border: '1.5px solid var(--border)',
+    background: 'transparent',
+    color: 'var(--text-muted)',
+    cursor: 'pointer',
+    fontFamily: 'var(--font)',
+    transition: 'border-color .15s, color .15s',
+  },
+  empty: {
+    padding: '20px 0',
+    fontSize: '13.5px',
+    color: 'var(--text-muted)',
+    textAlign: 'center',
+  },
+};
