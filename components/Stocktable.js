@@ -3,9 +3,16 @@ export default function StockTable({ items = [] }) {
     <div>
       {items.map((item, i) => {
         const qty = item.qty ?? item.stock ?? 0;
-        const pct = Math.min(100, (qty / (item.maxQty || 50)) * 100);
-        const isIn  = item.status === 'IN STOCK';
-        const isLow = item.status === 'LOW STOCK';
+        const pct = Math.min(100, (qty / ((item.minStock || 5) * 5)) * 100);
+        const status =
+  qty === 0
+    ? 'OUT OF STOCK'
+    : qty <= (item.minStock || 2)
+    ? 'LOW STOCK'
+    : 'IN STOCK';
+
+const isIn = status === 'IN STOCK';
+const isLow = status === 'LOW STOCK';
 
         return (
           <div key={i} style={{
@@ -31,7 +38,7 @@ export default function StockTable({ items = [] }) {
               {qty}
             </div>
 
-            <StatusBadge status={item.status} />
+            <StatusBadge status={status} />
           </div>
         );
       })}
