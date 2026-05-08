@@ -1,9 +1,11 @@
-export default function Statcard({ label, value }) {
+export default function StatCard({ title, value, subtitle }) {
   return (
-    <div className="dashboard-card">
-      <div className="dashboard-card-label">{label}</div>
+    <div className="stat-card">
+      <p className="card-title">{title}</p>
 
-      <div className="dashboard-card-value">{value}</div>
+      <h2>{value}</h2>
+
+      <p className="card-subtitle">{subtitle}</p>
     </div>
   );
 }

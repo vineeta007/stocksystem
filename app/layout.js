@@ -1,20 +1,22 @@
-import './globals.css';
-import Sidebar from '../components/Sidebar';
+import "./globals.css";
+import Sidebar from "../components/Sidebar";
 
 export const metadata = {
-  title: 'StockSystem',
-  description: 'Inventory Management System',
+  title: "StockVault",
+  description: "Inventory Dashboard",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <Sidebar />
+        <div className="layout">
+          <Sidebar />
 
-        <main className="main-layout">
-          {children}
-        </main>
+          <main className="main-content">
+            {children}
+          </main>
+        </div>
       </body>
     </html>
   );
