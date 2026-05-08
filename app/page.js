@@ -1,6 +1,6 @@
 'use client';
 import StatCard from '@/components/StatCard';
-import StockTable from '@/components/Stocktable';
+import StockTable from '@/components/StockTable';
 import LowStockAlert from '@/components/LowStockAlert';
 import Link from 'next/link';
 
