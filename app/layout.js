@@ -1,10 +1,9 @@
 import './globals.css';
-
 import Sidebar from '../components/Sidebar';
 
 export const metadata = {
   title: 'StockSystem',
-  description: 'Luxury Inventory Dashboard',
+  description: 'Inventory Management System',
 };
 
 export default function RootLayout({ children }) {
