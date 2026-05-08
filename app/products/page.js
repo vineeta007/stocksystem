@@ -97,7 +97,7 @@ export default function ProductsPage() {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
           <thead>
             <tr style={{ borderBottom: `0.5px solid ${BORDER}` }}>
-              {['#', 'Product Name', 'Category', 'Stock', 'Min Stock', 'Status'].map(h => (
+              {['#', 'Product Name', 'Category', 'Stock', 'Min Stock', 'Status', 'Photos'].map(h => (
                 <th key={h} style={{
                   padding: '12px 10px', textAlign: 'left',
                   fontSize: 8, letterSpacing: '0.2em', color: FAINT,
@@ -107,38 +107,145 @@ export default function ProductsPage() {
             </tr>
           </thead>
           <tbody>
-            {filtered.length === 0 ? (
-              <tr><td colSpan={6} style={{ padding: '40px', textAlign: 'center', color: FAINT, fontSize: 11 }}>No products found.</td></tr>
-            ) : filtered.map((p, i) => {
-              const s = getStockStatus(p);
-              const st = statusStyle(s);
-              return (
-                <tr key={p.id} style={{
-                  borderBottom: `0.5px solid #16150f`,
-                  background: i % 2 === 0 ? 'transparent' : '#111109',
-                }}>
-                  <td style={{ padding: '11px 10px', color: FAINT, fontFamily: 'Space Mono, monospace', fontSize: 10 }}>{p.id}</td>
-                  <td style={{ padding: '11px 10px', color: TEXT, fontWeight: 500 }}>{p.name}</td>
-                  <td style={{ padding: '11px 10px' }}>
-                    <span style={{
-                      fontSize: 9, padding: '2px 7px', borderRadius: 2,
-                      background: '#1a1915', color: MUTED, border: `0.5px solid ${BORDER}`,
-                      letterSpacing: '0.05em',
-                    }}>{p.category}</span>
-                  </td>
-                  <td style={{ padding: '11px 10px', fontFamily: 'Space Mono, monospace', fontWeight: 700, color: TEXT }}>{p.stock}</td>
-                  <td style={{ padding: '11px 10px', color: FAINT, fontFamily: 'Space Mono, monospace' }}>{p.minStock}</td>
-                  <td style={{ padding: '11px 10px' }}>
-                    <span style={{
-                      fontSize: 8, padding: '3px 7px', borderRadius: 2,
-                      background: st.bg, color: st.color, border: `0.5px solid ${st.border}`,
-                      fontWeight: 700, letterSpacing: '0.08em',
-                    }}>{st.label}</span>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
+  {filtered.length === 0 ? (
+    <tr>
+      <td
+        colSpan={7}
+        style={{
+          padding: '40px',
+          textAlign: 'center',
+          color: FAINT,
+          fontSize: 11,
+        }}
+      >
+        No products found.
+      </td>
+    </tr>
+  ) : (
+    filtered.map((p, i) => {
+      const s = getStockStatus(p);
+      const st = statusStyle(s);
+
+      return (
+        <tr
+          key={p.id}
+          style={{
+            borderBottom: `0.5px solid #16150f`,
+            background: i % 2 === 0 ? 'transparent' : '#111109',
+          }}
+        >
+          {/* ID */}
+          <td
+            style={{
+              padding: '11px 10px',
+              color: FAINT,
+              fontFamily: 'Space Mono, monospace',
+              fontSize: 10,
+            }}
+          >
+            {p.id}
+          </td>
+
+          {/* Product Name */}
+          <td
+            style={{
+              padding: '11px 10px',
+              color: TEXT,
+              fontWeight: 500,
+            }}
+          >
+            {p.name}
+          </td>
+
+          {/* Category */}
+          <td style={{ padding: '11px 10px' }}>
+            <span
+              style={{
+                fontSize: 9,
+                padding: '2px 7px',
+                borderRadius: 2,
+                background: '#1a1915',
+                color: MUTED,
+                border: `0.5px solid ${BORDER}`,
+                letterSpacing: '0.05em',
+              }}
+            >
+              {p.category}
+            </span>
+          </td>
+
+          {/* Stock */}
+          <td
+            style={{
+              padding: '11px 10px',
+              fontFamily: 'Space Mono, monospace',
+              fontWeight: 700,
+              color: TEXT,
+            }}
+          >
+            {p.stock}
+          </td>
+
+          {/* Min Stock */}
+          <td
+            style={{
+              padding: '11px 10px',
+              color: FAINT,
+              fontFamily: 'Space Mono, monospace',
+            }}
+          >
+            {p.minStock}
+          </td>
+
+          {/* Status */}
+          <td style={{ padding: '11px 10px' }}>
+            <span
+              style={{
+                fontSize: 8,
+                padding: '3px 7px',
+                borderRadius: 2,
+                background: st.bg,
+                color: st.color,
+                border: `0.5px solid ${st.border}`,
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+              }}
+            >
+              {st.label}
+            </span>
+          </td>
+
+          {/* Photos Button */}
+          <td style={{ padding: '11px 10px' }}>
+            <button
+              onClick={() =>
+                window.open(
+                  `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(
+                    p.name
+                  )}`,
+                  '_blank'
+                )
+              }
+              style={{
+                background: '#13294B',
+                border: '1px solid #1E3A5F',
+                color: '#7EA8D4',
+                padding: '5px 10px',
+                borderRadius: '6px',
+                fontSize: '10px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                letterSpacing: '0.04em',
+              }}
+            >
+              Photos+
+            </button>
+          </td>
+        </tr>
+      );
+    })
+  )}
+</tbody>
         </table>
       </div>
     </div>
