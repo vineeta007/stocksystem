@@ -48,16 +48,25 @@ const isLow = status === 'LOW STOCK';
 
 function StatusBadge({ status }) {
   const map = {
-    'IN STOCK':     { bg: '#f0fdf4', color: '#166534', border: '#bbf7d0', short: 'In Stock'     },
-    'LOW STOCK':    { bg: '#fffbeb', color: '#92400e', border: '#fde68a', short: 'Low Stock'    },
-    'OUT OF STOCK': { bg: '#fef2f2', color: '#991b1b', border: '#fecaca', short: 'Out of Stock' },
-  };
-  const c = map[status] || map['IN STOCK'];
-  return (
-    <div style={{
-      background: c.bg, color: c.color, border: `1px solid ${c.border}`,
-      borderRadius: '5px', padding: '3px 8px', fontSize: '10px', fontWeight: 600,
-      letterSpacing: '0.03em', whiteSpace: 'nowrap', flexShrink: 0,
-    }}>{c.short}</div>
-  );
+  'IN STOCK': {
+    bg: '#DCFCE7',
+    color: '#166534',
+    border: '#86EFAC',
+    short: 'In Stock',
+  },
+
+  'LOW STOCK': {
+    bg: '#FEF3C7',
+    color: '#92400E',
+    border: '#FCD34D',
+    short: 'Low Stock',
+  },
+
+  'OUT OF STOCK': {
+    bg: '#FEE2E2',
+    color: '#991B1B',
+    border: '#FCA5A5',
+    short: 'Out of Stock',
+  },
+};
 }
