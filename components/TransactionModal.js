@@ -1,63 +1,171 @@
 'use client';
 
-const G      = '#c8a96e';
-const BORDER = '#1e1e16';
-const TEXT   = '#d8d4c8';
-const MUTED  = '#6a6658';
-const FAINT  = '#3a3830';
+import { useState } from 'react';
 
-export default function TransactionModal({ product, type, onClose }) {
-  if (!product) return null;
+/**
+ * TransactionModal
+ * Props:
+ *   type      {'in'|'out'}  – Stock In or Stock Out
+ *   products  {Array}       – [{ id, name }]
+ *   onSubmit  {fn}          – callback({ productId, quantity, note, type })
+ *   onClose   {fn}
+ */
+export default function TransactionModal({ type = 'in', products = [], onSubmit, onClose }) {
+  const [productId, setProductId] = useState('');
+  const [quantity, setQuantity]   = useState('');
+  const [note, setNote]           = useState('');
+  const [error, setError]         = useState('');
+
+  const isIn = type === 'in';
+  const title = isIn ? '+ Stock In' : '+ Stock Out';
+  const accentColor = isIn ? 'var(--green)' : 'var(--red)';
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (!productId)       return setError('Please select a product.');
+    if (!quantity || +quantity <= 0) return setError('Enter a valid quantity.');
+    setError('');
+    onSubmit?.({ productId, quantity: +quantity, note, type });
+  }
 
   return (
-    <div style={{
-      position: 'fixed', inset: 0, zIndex: 200,
-      background: 'rgba(0,0,0,0.7)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-    }} onClick={onClose}>
-      <div style={{
-        background: '#111109', border: `0.5px solid ${BORDER}`,
-        borderRadius: 4, padding: '28px 32px', width: 360,
-        boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-      }} onClick={e => e.stopPropagation()}>
-        <div style={{ fontSize: 8, letterSpacing: '0.28em', color: FAINT, textTransform: 'uppercase', marginBottom: 6 }}>
-          {type === 'in' ? 'Stock In' : 'Stock Out'}
-        </div>
-        <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, fontWeight: 400, color: TEXT, marginBottom: 20 }}>
-          {product.name}
+    <div style={styles.overlay} onClick={(e) => e.target === e.currentTarget && onClose?.()}>
+      <div style={styles.modal}>
+        {/* Header */}
+        <div style={styles.header}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ ...styles.accent, background: accentColor }} />
+            <h2 style={styles.title}>{title}</h2>
+          </div>
+          <button style={styles.close} onClick={onClose}>✕</button>
         </div>
 
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ fontSize: 9, letterSpacing: '0.2em', color: FAINT, textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>Quantity</label>
-          <input type="number" min="1" defaultValue="1" style={{
-            width: '100%', background: '#0e0e0a', border: `0.5px solid ${BORDER}`,
-            borderRadius: 2, padding: '8px 12px', color: TEXT, fontSize: 13,
-            outline: 'none',
-          }} />
-        </div>
+        {/* Form */}
+        <form onSubmit={handleSubmit} style={styles.form}>
+          <div style={styles.field}>
+            <label style={styles.label}>Product</label>
+            <select value={productId} onChange={(e) => setProductId(e.target.value)}>
+              <option value="">Select a product…</option>
+              {products.map((p) => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+          </div>
 
-        <div style={{ marginBottom: 20 }}>
-          <label style={{ fontSize: 9, letterSpacing: '0.2em', color: FAINT, textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>Note (optional)</label>
-          <input type="text" placeholder="Site / supplier / reason" style={{
-            width: '100%', background: '#0e0e0a', border: `0.5px solid ${BORDER}`,
-            borderRadius: 2, padding: '8px 12px', color: TEXT, fontSize: 12,
-            outline: 'none',
-          }} />
-        </div>
+          <div style={styles.field}>
+            <label style={styles.label}>Quantity</label>
+            <input
+              type="number"
+              min="1"
+              placeholder="e.g. 10"
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+            />
+          </div>
 
-        <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={onClose} style={{
-            flex: 1, fontFamily: 'inherit', fontSize: 10, letterSpacing: '0.18em',
-            textTransform: 'uppercase', padding: '9px', borderRadius: 2,
-            border: `0.5px solid ${BORDER}`, background: 'transparent', color: MUTED,
-          }}>Cancel</button>
-          <button style={{
-            flex: 1, fontFamily: 'inherit', fontSize: 10, letterSpacing: '0.18em',
-            textTransform: 'uppercase', padding: '9px', borderRadius: 2,
-            border: `0.5px solid ${G}`, background: G, color: '#0a0a07', fontWeight: 500,
-          }}>Confirm</button>
-        </div>
+          <div style={styles.field}>
+            <label style={styles.label}>Note <span style={{ color: 'var(--text-dim)', fontWeight: 400 }}>(optional)</span></label>
+            <input
+              type="text"
+              placeholder="e.g. Supplier name, reason…"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            />
+          </div>
+
+          {error && <div style={styles.error}>{error}</div>}
+
+          <div style={styles.footer}>
+            <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
+            <button
+              type="submit"
+              className="btn"
+              style={{ background: accentColor, color: '#fff' }}
+            >
+              Confirm {isIn ? 'Stock In' : 'Stock Out'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
 }
+
+const styles = {
+  overlay: {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(0,0,0,.6)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 50,
+    padding: '20px',
+  },
+  modal: {
+    background: 'var(--navy2)',
+    border: '1px solid var(--border)',
+    borderRadius: '16px',
+    width: '100%',
+    maxWidth: '460px',
+    overflow: 'hidden',
+  },
+  header: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '20px 24px 18px',
+    borderBottom: '1px solid var(--border)',
+  },
+  accent: {
+    width: '4px',
+    height: '20px',
+    borderRadius: '2px',
+  },
+  title: {
+    fontSize: '17px',
+    fontWeight: 700,
+    color: 'var(--text)',
+    letterSpacing: '-0.3px',
+  },
+  close: {
+    background: 'transparent',
+    border: 'none',
+    color: 'var(--text-dim)',
+    fontSize: '16px',
+    cursor: 'pointer',
+    padding: '4px 6px',
+    borderRadius: '6px',
+    transition: 'color .15s',
+  },
+  form: {
+    padding: '20px 24px 24px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+  },
+  field: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '6px',
+  },
+  label: {
+    fontSize: '13px',
+    fontWeight: 600,
+    color: 'var(--text-muted)',
+  },
+  footer: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    gap: '10px',
+    marginTop: '4px',
+  },
+  error: {
+    fontSize: '13px',
+    color: '#FCA5A5',
+    background: 'rgba(239,68,68,.1)',
+    border: '1px solid rgba(239,68,68,.25)',
+    borderRadius: '8px',
+    padding: '10px 14px',
+  },
+};
