@@ -2,8 +2,6 @@
 
 import { useState } from 'react';
 import { products, CATEGORIES, getStockStatus } from '@/lib/products';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '@/lib/firebase';
 
 const BORDER = '#1e1e16';
 const TEXT = '#d8d4c8';
@@ -36,6 +34,28 @@ function statusStyle(status) {
     border: '#2a4a32',
     label: 'IN STOCK',
   };
+}
+async function uploadImage(file) {
+  const formData = new FormData();
+
+  formData.append('file', file);
+
+  formData.append(
+    'upload_preset',
+    process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
+  );
+
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+    {
+      method: 'POST',
+      body: formData,
+    }
+  );
+
+  const data = await response.json();
+
+  return data.secure_url;
 }
 
 export default function ProductsPage() {
@@ -419,40 +439,23 @@ export default function ProductsPage() {
                         accept="image/*"
                         style={{ display: 'none' }}
                         onChange={async (e) => {
-                          const file =
-                            e.target.files[0];
+  const file = e.target.files[0];
 
-                          if (!file) return;
+  if (!file) return;
 
-                          try {
-                            const storageRef = ref(
-                              storage,
-                              `products/${p.id}-${file.name}`
-                            );
+  try {
+    const imageUrl = await uploadImage(file);
 
-                            await uploadBytes(
-                              storageRef,
-                              file
-                            );
+    setProductPhotos((prev) => ({
+      ...prev,
+      [p.id]: imageUrl,
+    }));
 
-                            const url =
-                              await getDownloadURL(
-                                storageRef
-                              );
-
-                            setProductPhotos(
-                              (prev) => ({
-                                ...prev,
-                                [p.id]: url,
-                              })
-                            );
-                          } catch (err) {
-                            console.error(err);
-                            alert(
-                              'Image upload failed'
-                            );
-                          }
-                        }}
+  } catch (err) {
+    console.error(err);
+    alert('Upload failed');
+  }
+}}
                       />
 
                       {productPhotos[p.id] ? (
