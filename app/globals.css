@@ -1,48 +1,44 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  --bg-primary: #0f0e0c;
-  --bg-secondary: #1a1915;
-  --bg-card: #1e1d19;
-  --bg-hover: #252420;
-  --border: #2a2925;
-  --border-light: #333230;
-  --text-primary: #e8e4d9;
-  --text-secondary: #8a8678;
-  --text-muted: #5a5850;
-  --accent-gold: #c9a84c;
-  --accent-gold-dim: #8a6e2a;
-  --green: #4caf7a;
-  --green-bg: #1a2e22;
-  --red: #e05050;
-  --red-bg: #2e1a1a;
-  --orange: #d97b3a;
-  --orange-bg: #2e1e10;
-  --sidebar-width: 140px;
+  --bg-primary:    #f4f6f9;
+  --bg-secondary:  #ffffff;
+  --bg-card:       #ffffff;
+  --border:        #e2e6ed;
+  --border-light:  #edf0f4;
+  --text-primary:  #0f1623;
+  --text-secondary:#4a5568;
+  --text-muted:    #8a96a8;
+  --accent:        #1d4ed8;
+  --accent-hover:  #1e40af;
+  --green:         #16a34a;
+  --green-bg:      #f0fdf4;
+  --green-border:  #bbf7d0;
+  --red:           #dc2626;
+  --red-bg:        #fef2f2;
+  --red-border:    #fecaca;
+  --orange:        #d97706;
+  --orange-bg:     #fffbeb;
+  --orange-border: #fde68a;
+  --sidebar-width: 200px;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  line-height: 1.4;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
-::-webkit-scrollbar {
-  width: 4px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg-primary);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border-light);
-  border-radius: 2px;
-}
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+input, select, textarea { font-family: inherit; }

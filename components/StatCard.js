@@ -1,40 +1,19 @@
-const DOT_COLORS = {
-  green:  '#4caf7a',
-  orange: '#d97b3a',
-  red:    '#e05050',
-  blue:   '#5a8fd4',
-};
+const DOT = { green: '#16a34a', orange: '#d97706', red: '#dc2626', blue: '#1d4ed8' };
 
-export default function StatCard({ label, value, sublabel, dotColor = 'green' }) {
-  const dot = DOT_COLORS[dotColor] || dotColor;
-
+export default function StatCard({ label, value, sublabel, dotColor = 'blue' }) {
   return (
     <div style={{
-      flex: 1,
-      background: '#1a1915',
-      border: '0.5px solid #2a2925',
-      borderRadius: '4px',
-      padding: '14px 16px',
-      minWidth: 0,
+      flex: 1, background: '#fff',
+      border: '1px solid #e2e6ed',
+      borderRadius: '10px', padding: '18px 20px',
+      boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
     }}>
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '8px',
-      }}>
-        <div style={{
-          width: '5px', height: '5px', borderRadius: '50%', background: dot, flexShrink: 0,
-        }} />
-        <div style={{
-          fontSize: '8px', color: '#5a5850', letterSpacing: '0.2em', textTransform: 'uppercase',
-        }}>{label}</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+        <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: DOT[dotColor] || dotColor }} />
+        <span style={{ fontSize: '11px', fontWeight: 600, color: '#8a96a8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{label}</span>
       </div>
-      <div style={{
-        fontFamily: 'Space Mono, monospace',
-        fontSize: '26px', fontWeight: 700,
-        color: '#e8e4d9', lineHeight: 1, marginBottom: '4px',
-      }}>{value}</div>
-      {sublabel && (
-        <div style={{ fontSize: '9px', color: '#3a3830', letterSpacing: '0.05em' }}>{sublabel}</div>
-      )}
+      <div style={{ fontSize: '30px', fontWeight: 700, color: '#0f1623', lineHeight: 1, marginBottom: '5px' }}>{value}</div>
+      {sublabel && <div style={{ fontSize: '12px', color: '#8a96a8' }}>{sublabel}</div>}
     </div>
   );
 }

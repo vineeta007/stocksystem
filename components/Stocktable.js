@@ -1,74 +1,56 @@
 export default function StockTable({ items = [] }) {
   return (
     <div>
-      {items.map((item, i) => (
-        <div key={i} style={{
-          display: 'flex',
-          alignItems: 'center',
-          padding: '10px 0',
-          borderBottom: i < items.length - 1 ? '1px solid #222120' : 'none',
-          gap: '10px',
-        }}>
-          {/* Name + category */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: '12px', color: '#e8e4d9', fontWeight: 500, marginBottom: '2px' }}>
-              {item.name}
+      {items.map((item, i) => {
+        const qty = item.qty ?? item.stock ?? 0;
+        const pct = Math.min(100, (qty / (item.maxQty || 50)) * 100);
+        const isIn  = item.status === 'IN STOCK';
+        const isLow = item.status === 'LOW STOCK';
+
+        return (
+          <div key={i} style={{
+            display: 'flex', alignItems: 'center', padding: '11px 0',
+            borderBottom: i < items.length - 1 ? '1px solid #f1f5f9' : 'none',
+            gap: '12px',
+          }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#0f1623', marginBottom: '1px' }}>{item.name}</div>
+              {item.category && <div style={{ fontSize: '11px', color: '#8a96a8' }}>{item.category}</div>}
             </div>
-            {item.category && (
-              <div style={{ fontSize: '9px', color: '#5a5850' }}>{item.category}</div>
-            )}
-          </div>
 
-          {/* Progress bar */}
-          <div style={{ width: '60px' }}>
-            <div style={{
-              height: '3px', background: '#2a2925', borderRadius: '2px', overflow: 'hidden',
-            }}>
-              <div style={{
-                height: '100%',
-                width: `${Math.min(100, ((item.qty ?? item.stock ?? 0) / (item.maxQty || 50)) * 100)}%`,
-                background: item.status === 'IN STOCK' ? '#4caf7a'
-                           : item.status === 'LOW STOCK' ? '#d97b3a'
-                           : '#e05050',
-                borderRadius: '2px',
-              }} />
+            <div style={{ width: '70px' }}>
+              <div style={{ height: '4px', background: '#e2e6ed', borderRadius: '2px', overflow: 'hidden' }}>
+                <div style={{
+                  height: '100%', width: `${pct}%`, borderRadius: '2px',
+                  background: isIn ? '#16a34a' : isLow ? '#d97706' : '#dc2626',
+                }} />
+              </div>
             </div>
+
+            <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f1623', width: '28px', textAlign: 'right', flexShrink: 0 }}>
+              {qty}
+            </div>
+
+            <StatusBadge status={item.status} />
           </div>
-
-          {/* Qty */}
-          <div style={{
-            fontSize: '13px',
-            fontFamily: 'Space Mono, monospace',
-            color: '#e8e4d9',
-            width: '24px',
-            textAlign: 'right',
-            flexShrink: 0,
-          }}>{item.qty ?? item.stock ?? 0}</div>
-
-          <StatusBadge status={item.status} />
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
 
 function StatusBadge({ status }) {
-  const configs = {
-    'IN STOCK':    { bg: '#1a2e22', color: '#4caf7a', border: '#2a4a32', short: 'IN\nSTOCK'     },
-    'LOW STOCK':   { bg: '#2e1e10', color: '#d97b3a', border: '#4a3010', short: 'LOW\nSTOCK'    },
-    'OUT OF STOCK':{ bg: '#2e1a1a', color: '#e05050', border: '#4a2020', short: 'OUT OF\nSTOCK' },
+  const map = {
+    'IN STOCK':     { bg: '#f0fdf4', color: '#166534', border: '#bbf7d0', short: 'In Stock'     },
+    'LOW STOCK':    { bg: '#fffbeb', color: '#92400e', border: '#fde68a', short: 'Low Stock'    },
+    'OUT OF STOCK': { bg: '#fef2f2', color: '#991b1b', border: '#fecaca', short: 'Out of Stock' },
   };
-  const c = configs[status] || configs['IN STOCK'];
-
+  const c = map[status] || map['IN STOCK'];
   return (
     <div style={{
-      background: c.bg, color: c.color,
-      border: `1px solid ${c.border}`,
-      borderRadius: '3px', padding: '3px 5px',
-      fontSize: '7.5px', fontWeight: 700,
-      letterSpacing: '0.05em', textAlign: 'center',
-      whiteSpace: 'pre-line', lineHeight: 1.2,
-      width: '40px', flexShrink: 0,
+      background: c.bg, color: c.color, border: `1px solid ${c.border}`,
+      borderRadius: '5px', padding: '3px 8px', fontSize: '10px', fontWeight: 600,
+      letterSpacing: '0.03em', whiteSpace: 'nowrap', flexShrink: 0,
     }}>{c.short}</div>
   );
 }
