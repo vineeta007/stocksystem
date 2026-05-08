@@ -21,15 +21,11 @@ export default function LowStockAlert({ alerts = [], onOrder }) {
               </div>
             </div>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
-             <span style={{
-  padding: '4px 10px',
-  borderRadius: '20px',
-  fontSize: '12px',
-  fontWeight: 700,
-  background: isOut ? '#FEE2E2' : '#FEF3C7',
-  color: isOut ? '#991B1B' : '#92400E',
-  border: isOut ? '1px solid #FCA5A5' : '1px solid #FCD34D',
-}}>
+              <span style={{
+                padding: '4px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: 700,
+                background: isOut ? 'rgba(239,68,68,.25)' : 'rgba(245,158,11,.25)',
+                color: isOut ? '#FCA5A5' : '#FCD34D',
+              }}>
                 {isOut ? 'OUT' : 'LOW'}
               </span>
               <button
