@@ -1,19 +1,99 @@
-const DOT = { green: '#16a34a', orange: '#d97706', red: '#dc2626', blue: '#1d4ed8' };
+'use client';
 
-export default function StatCard({ label, value, sublabel, dotColor = 'blue' }) {
+const COLORS = {
+  green: { accent: '#22C55E', dot: '#22C55E' },
+  amber: { accent: '#F59E0B', dot: '#F59E0B' },
+  red: { accent: '#EF4444', dot: '#EF4444' },
+  teal: { accent: '#06B6D4', dot: '#06B6D4' },
+};
+
+export default function StatCard({
+  label,
+  value,
+  sub,
+  color = 'teal',
+}) {
+  const { accent, dot } = COLORS[color] || COLORS.teal;
+
   return (
-    <div style={{
-      flex: 1, background: '#fff',
-      border: '1px solid #e2e6ed',
-      borderRadius: '10px', padding: '18px 20px',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-        <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: DOT[dotColor] || dotColor }} />
-        <span style={{ fontSize: '11px', fontWeight: 600, color: '#8a96a8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{label}</span>
+    <div
+      style={{
+        background: '#152847',
+        border: '1px solid #1E3A5F',
+        borderRadius: '14px',
+        padding: '22px 24px',
+        position: 'relative',
+        overflow: 'hidden',
+        flex: 1,
+        minHeight: '130px',
+        fontFamily: "'Sora', sans-serif",
+      }}
+    >
+      {/* Top Accent Bar */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '4px',
+          background: accent,
+        }}
+      />
+
+      {/* Label */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '7px',
+          marginTop: '4px',
+          marginBottom: '12px',
+          fontSize: '11px',
+          fontWeight: 600,
+          color: '#334155',
+          letterSpacing: '1px',
+          textTransform: 'uppercase',
+        }}
+      >
+        <span
+          style={{
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            background: dot,
+            flexShrink: 0,
+          }}
+        />
+
+        {label}
       </div>
-      <div style={{ fontSize: '30px', fontWeight: 700, color: '#0f1623', lineHeight: 1, marginBottom: '5px' }}>{value}</div>
-      {sublabel && <div style={{ fontSize: '12px', color: '#8a96a8' }}>{sublabel}</div>}
+
+      {/* Main Value */}
+      <div
+        style={{
+          fontSize: '38px',
+          fontWeight: 700,
+          color: '#000000',
+          letterSpacing: '-1.5px',
+          lineHeight: 1,
+        }}
+      >
+        {value}
+      </div>
+
+      {/* Subtitle */}
+      {sub && (
+        <div
+          style={{
+            marginTop: '8px',
+            fontSize: '13px',
+            color: '#475569',
+          }}
+        >
+          {sub}
+        </div>
+      )}
     </div>
   );
 }
