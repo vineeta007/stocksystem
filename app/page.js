@@ -1,4 +1,4 @@
-import Statcard from '@/components/Statcard';
+import StatCard from '@/components/StatCard';
 
 export default function DashboardPage() {
   return (
@@ -6,10 +6,10 @@ export default function DashboardPage() {
       <h1 className="page-title">Dashboard</h1>
 
       <div className="card-grid">
-        <Statcard label="Total Products" value={18} />
-        <Statcard label="Low Stock Items" value={5} />
-        <Statcard label="Out Of Stock" value={2} />
-        <Statcard label="Transactions" value={47} />
+        <StatCard label="Total Products" value={18} />
+        <StatCard label="Low Stock Items" value={5} />
+        <StatCard label="Out Of Stock" value={2} />
+        <StatCard label="Transactions" value={47} />
       </div>
 
       <div className="section-grid">
