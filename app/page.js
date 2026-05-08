@@ -29,11 +29,36 @@ const categoryStock = [
 ];
 
 const lowStockAlerts = [
-  { name: 'Flexa Par 100', sublabel: 'Qty: 3 remaining', status: 'LOW' },
-  { name: 'Modular E. 300', sublabel: 'Qty: 3 remaining', status: 'LOW' },
-  { name: 'Emergency Key', sublabel: 'Qty: 2 remaining', status: 'LOW' },
-  { name: 'Solarcraft Coil', sublabel: 'Depleted — restock needed', status: 'OUT' },
-  { name: 'Roller Valve', sublabel: 'Qty: 1 remaining', status: 'LOW' },
+  {
+    id: 1,
+    name: 'Swift S-Hook',
+    quantity: 3,
+    status: 'low',
+  },
+  {
+    id: 2,
+    name: 'Modular Elbow',
+    quantity: 3,
+    status: 'low',
+  },
+  {
+    id: 3,
+    name: 'D-Shackle 8mm',
+    quantity: 2,
+    status: 'low',
+  },
+  {
+    id: 4,
+    name: 'Chain Warranty',
+    quantity: 0,
+    status: 'out',
+  },
+  {
+    id: 5,
+    name: 'Flexa Par 130',
+    quantity: 1,
+    status: 'low',
+  },
 ];
 
 export default function Dashboard() {
@@ -166,7 +191,7 @@ export default function Dashboard() {
 
         {/* Low Stock Alerts */}
         <Card title="Low Stock Alerts" actionLabel="Manage" actionHref="/products">
-          <LowStockAlert items={lowStockAlerts} />
+          <LowStockAlert alerts={lowStockAlerts} />
         </Card>
       </div>
     </div>
