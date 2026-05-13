@@ -2,19 +2,33 @@ import dbConnect from '@/lib/mongodb';
 import Product from '@/models/Product';
 
 export async function GET() {
-  await dbConnect();
+  try {
+    await dbConnect();
 
-  const products = await Product.find();
+    const products = await Product.find();
 
-  return Response.json(products);
+    return Response.json(products);
+  } catch (error) {
+    return Response.json(
+      { error: error.message },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(req) {
-  await dbConnect();
+  try {
+    await dbConnect();
 
-  const body = await req.json();
+    const body = await req.json();
 
-  const product = await Product.create(body);
+    const product = await Product.create(body);
 
-  return Response.json(product);
+    return Response.json(product);
+  } catch (error) {
+    return Response.json(
+      { error: error.message },
+      { status: 500 }
+    );
+  }
 }

@@ -1,88 +1,86 @@
 'use client';
-import Link from 'next/link';
+
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 
 const NAV = [
-  { href: '/',             label: 'Dashboard'    },
-  { href: '/products',     label: 'Products'     },
-  { href: '/transactions', label: 'Transactions' },
-];
-const CATALOGUE = [
-  { href: '/products?cat=Swift',   label: 'Swift Parts'    },
-  { href: '/products?cat=Lifting', label: 'Lifting'        },
-  { href: '/products?cat=PPE',     label: 'PPE / Health'   },
-  { href: '/products?cat=Chain',   label: 'Chain Warranty' },
-];
-const SYSTEM = [
-  { href: '/reports',  label: 'Reports'  },
-  { href: '/settings', label: 'Settings' },
+  { items: [
+    { label: 'Dashboard',    href: '/' },
+    { label: 'Products',     href: '/products' },
+    { label: 'Transactions', href: '/transactions' },
+  ]},
+  { group: 'Catalogue', items: [
+    { label: 'Swift Parts',    href: '/products?cat=swift-parts' },
+    { label: 'Lifting',        href: '/products?cat=lifting' },
+    { label: 'PPE / Health',   href: '/products?cat=ppe-health' },
+    { label: 'Chain Warranty', href: '/products?cat=chain-warranty' },
+  ]},
+  { group: 'System', items: [
+    { label: 'Reports',  href: '/reports' },
+    { label: 'Settings', href: '/settings' },
+  ]},
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
-
-  const active = (href) => pathname === href;
-
   return (
     <aside style={{
-      width: '200px', minHeight: '100vh',
-      background: '#1a2332',
-      position: 'fixed', top: 0, left: 0,
+      width: '190px', flexShrink: 0,
+      background: '#0F1F3D',
+      borderRight: '1px solid #1E3A5F',
       display: 'flex', flexDirection: 'column',
-      zIndex: 100,
+      minHeight: '100vh', position: 'sticky', top: 0,
+      fontFamily: "'Sora', sans-serif",
     }}>
       {/* Logo */}
-      <div style={{ padding: '22px 20px 18px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-        <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: '5px' }}>
-          Inventory Management
-        </div>
-        <div style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '-0.3px' }}>
-          <span style={{ color: '#fff' }}>Stock</span>
-          <span style={{ color: '#60a5fa' }}>Vault</span>
-        </div>
+      <div style={{ padding: '24px 20px 20px', fontSize: '20px', fontWeight: 700, letterSpacing: '-0.3px' }}>
+        <span style={{ color: '#FFFFFF' }}>Stock</span>
+        <span style={{ color: '#4EAAFF' }}>Vault</span>
       </div>
 
       {/* Nav */}
-      <nav style={{ flex: 1, padding: '14px 10px', overflowY: 'auto' }}>
-        {NAV.map(({ href, label }) => (
-          <Link key={href} href={href} style={{
-            display: 'block', padding: '9px 12px', borderRadius: '6px',
-            marginBottom: '2px', fontSize: '13px', fontWeight: active(href) ? 600 : 400,
-            color: active(href) ? '#fff' : 'rgba(255,255,255,0.45)',
-            background: active(href) ? 'rgba(96,165,250,0.15)' : 'transparent',
-            borderLeft: active(href) ? '2px solid #60a5fa' : '2px solid transparent',
-          }}>{label}</Link>
-        ))}
-
-        <div style={{ padding: '14px 12px 5px', fontSize: '10px', color: 'rgba(255,255,255,0.25)', letterSpacing: '0.18em', textTransform: 'uppercase' }}>
-          Catalogue
-        </div>
-        {CATALOGUE.map(({ href, label }) => (
-          <Link key={href} href={href} style={{
-            display: 'block', padding: '7px 12px', borderRadius: '6px',
-            marginBottom: '1px', fontSize: '12px',
-            color: 'rgba(255,255,255,0.38)',
-          }}>{label}</Link>
-        ))}
-
-        <div style={{ padding: '14px 12px 5px', fontSize: '10px', color: 'rgba(255,255,255,0.25)', letterSpacing: '0.18em', textTransform: 'uppercase' }}>
-          System
-        </div>
-        {SYSTEM.map(({ href, label }) => (
-          <Link key={href} href={href} style={{
-            display: 'block', padding: '9px 12px', borderRadius: '6px',
-            marginBottom: '2px', fontSize: '13px', fontWeight: active(href) ? 600 : 400,
-            color: active(href) ? '#fff' : 'rgba(255,255,255,0.45)',
-            background: active(href) ? 'rgba(96,165,250,0.15)' : 'transparent',
-            borderLeft: active(href) ? '2px solid #60a5fa' : '2px solid transparent',
-          }}>{label}</Link>
+      <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px', paddingBottom: '12px' }}>
+        {NAV.map((section, i) => (
+          <div key={i}>
+            {section.group && (
+              <div style={{
+                fontSize: '10px', fontWeight: 600, color: '#4A7BAF',
+                letterSpacing: '1.2px', textTransform: 'uppercase',
+                padding: '14px 20px 6px',
+              }}>{section.group}</div>
+            )}
+            {section.items.map((item) => {
+              const active = pathname === item.href;
+              return (
+                <Link key={item.href} href={item.href} style={{
+                  display: 'block', padding: '10px 20px',
+                  fontSize: '14px', fontWeight: active ? 600 : 500,
+                  color: active ? '#4EAAFF' : '#B8D4F0',
+                  textDecoration: 'none',
+                  borderLeft: `3px solid ${active ? '#2E90FA' : 'transparent'}`,
+                  background: active ? 'rgba(46,144,250,.14)' : 'transparent',
+                  transition: 'all .15s',
+                }}>
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
         ))}
       </nav>
 
       {/* User */}
-      <div style={{ padding: '14px 20px', borderTop: '1px solid rgba(255,255,255,0.07)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: '#2d4a6b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', color: '#93c5fd', fontWeight: 600, flexShrink: 0 }}>SA</div>
-        <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)' }}>Studio Admin</div>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: '10px',
+        padding: '16px 20px', borderTop: '1px solid #1E3A5F',
+      }}>
+        <div style={{
+          width: '34px', height: '34px', borderRadius: '50%',
+          background: '#1A6DB5', display: 'flex', alignItems: 'center',
+          justifyContent: 'center', fontSize: '12px', fontWeight: 700,
+          color: '#FFFFFF', flexShrink: 0,
+        }}>SA</div>
+        <span style={{ fontSize: '13px', fontWeight: 500, color: '#B8D4F0' }}>Studio Admin</span>
       </div>
     </aside>
   );
