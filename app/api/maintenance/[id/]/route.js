@@ -1,67 +1,42 @@
-// app/api/maintenance/[id]/route.js
+import { NextResponse } from 'next/server'
+import dbConnect from '@/lib/dbConnect'
+import Maintenance from '@/models/Maintenance'
 
-import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
-import Maintenance from '@/models/Maintenance';
+// PATCH /api/maintenance/[id] — update customer, or record a new visit
+export async function PATCH(request, { params }) {
+  await dbConnect()
+  const body = await request.json()
+  const { id } = await params
 
-// ── GET: detail satu customer maintenance ─────────────────────────────────────
-export async function GET(request, { params }) {
-  try {
-    await dbConnect();
-    const data = await Maintenance.findById(params.id);
-    if (!data) return NextResponse.json({ success: false, error: 'Not found' }, { status: 404 });
-    return NextResponse.json({ success: true, data });
-  } catch (err) {
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+  // Jika action = 'recordVisit', increment visitCount dan update lastVisitDate
+  if (body.action === 'recordVisit') {
+    const customer = await Maintenance.findById(id)
+    if (!customer) return NextResponse.json({ success: false }, { status: 404 })
+
+    customer.visitCount    += 1
+    customer.lastVisitDate  = new Date()
+    // nextVisitDate = lastVisitDate + 90 hari
+    customer.nextVisitDate  = new Date(customer.lastVisitDate.getTime() + 90 * 24 * 60 * 60 * 1000)
+    customer.status         = 'Active'
+    await customer.save()
+
+    return NextResponse.json({ success: true, data: customer })
   }
+
+  // Update biasa
+  if (body.lastVisitDate && !body.nextVisitDate) {
+    const last = new Date(body.lastVisitDate)
+    body.nextVisitDate = new Date(last.getTime() + 90 * 24 * 60 * 60 * 1000)
+  }
+
+  const updated = await Maintenance.findByIdAndUpdate(id, body, { new: true })
+  return NextResponse.json({ success: true, data: updated })
 }
 
-// ── PUT: update data maintenance / tambah kunjungan baru ─────────────────────
-export async function PUT(request, { params }) {
-  try {
-    await dbConnect();
-    const body = await request.json();
-
-    const existing = await Maintenance.findById(params.id);
-    if (!existing) return NextResponse.json({ success: false, error: 'Not found' }, { status: 404 });
-
-    // Jika ada kunjungan baru yang dikirim, push ke array
-    if (body.kunjunganBaru) {
-      const kv = body.kunjunganBaru;
-      existing.kunjungan.push(kv);
-
-      // Update kunjunganTerakhir ke tanggal kunjungan baru
-      if (kv.tanggal) {
-        existing.kunjunganTerakhir = new Date(kv.tanggal);
-        // Hitung jatuh tempo baru
-        const jt = new Date(kv.tanggal);
-        jt.setDate(jt.getDate() + (existing.intervalMaintenance || 90));
-        existing.jatuhTempo = jt;
-      }
-
-      // Reset reminder flag karena sudah dikunjungi
-      existing.reminderTerkirim = false;
-
-      delete body.kunjunganBaru;
-    }
-
-    // Update field lainnya
-    Object.assign(existing, body);
-    await existing.save();
-
-    return NextResponse.json({ success: true, data: existing });
-  } catch (err) {
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
-  }
-}
-
-// ── DELETE: hapus data maintenance ───────────────────────────────────────────
+// DELETE /api/maintenance/[id]
 export async function DELETE(request, { params }) {
-  try {
-    await dbConnect();
-    await Maintenance.findByIdAndDelete(params.id);
-    return NextResponse.json({ success: true, message: 'Deleted' });
-  } catch (err) {
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
-  }
+  await dbConnect()
+  const { id } = await params
+  await Maintenance.findByIdAndDelete(id)
+  return NextResponse.json({ success: true })
 }
