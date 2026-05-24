@@ -15,6 +15,10 @@ const NAV = [
     { label: 'PPE / Health',   href: '/products?cat=ppe-health' },
     { label: 'Chain Warranty', href: '/products?cat=chain-warranty' },
   ]},
+  { group: 'Maintenance', items: [
+    { label: '🔧 Data Maintenance', href: '/maintenance' },
+    { label: '📦 Klaim Sparepart',  href: '/klaim' },
+  ]},
   { group: 'Client Details', items: [
     { label: 'Data Garansi', href: '/clients' },
   ]},
@@ -53,7 +57,7 @@ export default function Sidebar() {
               }}>{section.group}</div>
             )}
             {section.items.map((item) => {
-              const active = pathname === item.href || pathname.startsWith(item.href + '?');
+              const active = pathname === item.href || pathname.startsWith(item.href + '/');
               return (
                 <Link key={item.href} href={item.href} style={{
                   display: 'block', padding: '10px 20px',
