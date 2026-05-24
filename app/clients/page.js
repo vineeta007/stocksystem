@@ -1,159 +1,171 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-
-function excelDateToString(val) {
-  if (!val || isNaN(val)) return val ?? '—';
-  const date = new Date(Math.round((val - 25569) * 86400 * 1000));
-  return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
-}
+'use client'
+import { useState, useEffect } from 'react'
 
 export default function ClientsPage() {
-  const [data, setData] = useState([]);
-  const [filtered, setFiltered] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [customers, setCustomers] = useState([])
+  const [loading, setLoading]     = useState(true)
+  const [filter, setFilter]       = useState('all') // all | free | berbayar | expired
 
   useEffect(() => {
-    fetch('/api/clients')
-      .then(res => res.json())
-      .then(json => { setData(json); setFiltered(json); setLoading(false); });
-  }, []);
+    fetch('/api/maintenance')
+      .then((r) => r.json())
+      .then((json) => {
+        setCustomers(json.data || [])
+        setLoading(false)
+      })
+  }, [])
 
-  useEffect(() => {
-    let result = data;
-    if (search) {
-      const q = search.toLowerCase();
-      result = result.filter(r =>
-        (r['Nama Cust'] ?? '').toLowerCase().includes(q) ||
-        (r['Code Lift'] ?? '').toString().toLowerCase().includes(q) ||
-        (r['Jenis Lift'] ?? '').toLowerCase().includes(q)
-      );
-    }
-    if (statusFilter !== 'ALL') {
-      result = result.filter(r => r['Garansi atau Tidak'] === statusFilter);
-    }
-    setFiltered(result);
-  }, [search, statusFilter, data]);
+  const withBast = customers.filter((c) => c.bastDate)
 
-  const total = data.length;
-  const aktif = data.filter(r => r['Garansi atau Tidak'] === 'Ya').length;
-  const tidak = data.filter(r => r['Garansi atau Tidak'] === 'Tidak').length;
+  const filtered = withBast.filter((c) => {
+    if (filter === 'free')     return c.warrantyStatus === 'free'
+    if (filter === 'berbayar') return c.warrantyStatus === 'berbayar'
+    if (filter === 'expired')  return !c.bastDate
+    return true
+  })
 
-  if (loading) return (
-    <div style={{ padding: '40px', color: '#B8D4F0', fontFamily: "'Sora', sans-serif" }}>
-      Loading Data Garansi...
-    </div>
-  );
+  const freeCount     = withBast.filter((c) => c.warrantyStatus === 'free').length
+  const berbayarCount = withBast.filter((c) => c.warrantyStatus === 'berbayar').length
 
   return (
-    <div style={{ padding: '32px', fontFamily: "'Sora', sans-serif", minHeight: '100vh', background: '#0a1628' }}>
-
-      {/* Header */}
-      <div style={{ marginBottom: '28px' }}>
-        <p style={{ fontSize: '11px', fontWeight: 600, color: '#4A7BAF', letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: '6px' }}>
-          Client Details
-        </p>
-        <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#FFFFFF', margin: 0 }}>
-          Data Garansi
-        </h1>
+    <div className="page-container">
+      <div className="page-header">
+        <div>
+          <h1>🛡 Data Garansi</h1>
+          <p className="subtitle">Garansi: 2 kunjungan pertama gratis setelah tanggal BAST</p>
+        </div>
       </div>
 
-      {/* Stat Cards */}
-      <div style={{ display: 'flex', gap: '16px', marginBottom: '28px', flexWrap: 'wrap' }}>
-        {[
-          { label: 'Total Clients', value: total, color: '#4EAAFF' },
-          { label: 'Aktif Garansi', value: aktif, color: '#2EFA64' },
-          { label: 'Tidak Garansi', value: tidak, color: '#FA4646' },
-        ].map(card => (
-          <div key={card.label} style={{
-            background: '#0F1F3D', border: '1px solid #1E3A5F',
-            borderRadius: '10px', padding: '18px 24px', minWidth: '150px',
-          }}>
-            <div style={{ fontSize: '28px', fontWeight: 700, color: card.color }}>{card.value}</div>
-            <div style={{ fontSize: '12px', color: '#4A7BAF', marginTop: '4px' }}>{card.label}</div>
-          </div>
-        ))}
+      {/* Summary cards */}
+      <div className="summary-row">
+        <div className="summary-card" onClick={() => setFilter('all')} data-active={filter === 'all'}>
+          <div className="sum-label">Total Customer</div>
+          <div className="sum-num">{withBast.length}</div>
+        </div>
+        <div className="summary-card green" onClick={() => setFilter('free')} data-active={filter === 'free'}>
+          <div className="sum-label">Masih Garansi (Free)</div>
+          <div className="sum-num">{freeCount}</div>
+        </div>
+        <div className="summary-card amber" onClick={() => setFilter('berbayar')} data-active={filter === 'berbayar'}>
+          <div className="sum-label">Sudah Berbayar</div>
+          <div className="sum-num">{berbayarCount}</div>
+        </div>
       </div>
 
-      {/* Search & Filter */}
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap', alignItems: 'center' }}>
-        <input
-          type="text"
-          placeholder="Search by name, code, or type..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={{
-            padding: '9px 14px', borderRadius: '8px', border: '1px solid #1E3A5F',
-            background: '#0F1F3D', color: '#B8D4F0', fontSize: '13px',
-            fontFamily: "'Sora', sans-serif", outline: 'none', width: '260px',
-          }}
-        />
-        {['ALL', 'Ya', 'Tidak'].map(s => (
-          <button key={s} onClick={() => setStatusFilter(s)} style={{
-            padding: '9px 18px', borderRadius: '8px', fontSize: '13px', fontWeight: 600,
-            cursor: 'pointer', border: '1px solid #1E3A5F', fontFamily: "'Sora', sans-serif",
-            background: statusFilter === s ? 'rgba(46,144,250,.2)' : '#0F1F3D',
-            color: statusFilter === s ? '#4EAAFF' : '#B8D4F0',
-          }}>
-            {s === 'ALL' ? 'All' : s === 'Ya' ? 'Aktif' : 'Tidak'}
-          </button>
-        ))}
-        <span style={{ fontSize: '13px', color: '#4A7BAF', marginLeft: 'auto' }}>
-          {filtered.length} results
-        </span>
-      </div>
-
-      {/* Table */}
-      <div style={{ overflowX: 'auto', borderRadius: '10px', border: '1px solid #1E3A5F' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-          <thead>
-            <tr style={{ background: '#1A3A5C' }}>
-              {['No', 'Jenis Lift', 'Code Lift', 'Tgl BAST', 'Nama Cust', 'Masa Garansi (Days)', 'Days From BAST', 'Status', 'Free Maintenance'].map(col => (
-                <th key={col} style={{
-                  padding: '12px 14px', textAlign: 'left', color: '#4EAAFF',
-                  fontWeight: 600, whiteSpace: 'nowrap', borderBottom: '1px solid #1E3A5F',
-                  fontSize: '11px', letterSpacing: '0.5px', textTransform: 'uppercase',
-                }}>
-                  {col}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((row, i) => (
-              <tr key={i} style={{
-                background: i % 2 === 0 ? '#0F1F3D' : '#0d1b35',
-                borderBottom: '1px solid #1E3A5F',
-                transition: 'background .15s',
-              }}
-                onMouseEnter={e => e.currentTarget.style.background = '#162a4a'}
-                onMouseLeave={e => e.currentTarget.style.background = i % 2 === 0 ? '#0F1F3D' : '#0d1b35'}
-              >
-                <td style={{ padding: '10px 14px', color: '#4A7BAF' }}>{row.No}</td>
-                <td style={{ padding: '10px 14px', color: '#B8D4F0' }}>{row['Jenis Lift']}</td>
-                <td style={{ padding: '10px 14px', color: '#B8D4F0', fontWeight: 600 }}>{row['Code Lift']}</td>
-                <td style={{ padding: '10px 14px', color: '#B8D4F0', whiteSpace: 'nowrap' }}>{excelDateToString(row['Tgl BAST'])}</td>
-                <td style={{ padding: '10px 14px', color: '#FFFFFF', fontWeight: 500 }}>{row['Nama Cust']}</td>
-                <td style={{ padding: '10px 14px', color: '#B8D4F0', textAlign: 'center' }}>{row['Masa Garansi ( Days )']}</td>
-                <td style={{ padding: '10px 14px', color: '#B8D4F0', textAlign: 'center' }}>{row['Days From BAST']}</td>
-                <td style={{ padding: '10px 14px' }}>
-                  <span style={{
-                    padding: '4px 12px', borderRadius: '20px', fontSize: '11px', fontWeight: 700,
-                    background: row['Garansi atau Tidak'] === 'Ya' ? 'rgba(46,250,100,.15)' : 'rgba(250,70,70,.15)',
-                    color: row['Garansi atau Tidak'] === 'Ya' ? '#2EFA64' : '#FA4646',
-                    border: `1px solid ${row['Garansi atau Tidak'] === 'Ya' ? 'rgba(46,250,100,.3)' : 'rgba(250,70,70,.3)'}`,
-                  }}>
-                    {row['Garansi atau Tidak'] === 'Ya' ? 'Aktif' : 'Tidak'}
-                  </span>
-                </td>
-                <td style={{ padding: '10px 14px', color: '#B8D4F0', textAlign: 'center' }}>{row['Free Maintenance Sisa'] ?? '—'}</td>
+      {loading ? (
+        <p className="loading-text">Memuat Data Garansi...</p>
+      ) : filtered.length === 0 ? (
+        <div className="empty-state">Belum ada data garansi. Tambahkan customer di halaman Maintenance.</div>
+      ) : (
+        <div className="table-wrapper">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Customer</th>
+                <th>Kota</th>
+                <th>Unit / Serial</th>
+                <th>Tanggal BAST</th>
+                <th>Kunjungan ke-1</th>
+                <th>Kunjungan ke-2</th>
+                <th>Total Kunjungan</th>
+                <th>Status Garansi</th>
+                <th>Keterangan</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {filtered.map((c, i) => {
+                const isWarranty = c.warrantyStatus === 'free'
+                const remaining  = Math.max(0, 2 - c.visitCount)
+                return (
+                  <tr key={c._id}>
+                    <td>{i + 1}</td>
+                    <td>
+                      <div className="customer-name">{c.customerName}</div>
+                      <div className="text-muted">{c.phone}</div>
+                    </td>
+                    <td>{c.kota}</td>
+                    <td>
+                      <div>{c.unitType}</div>
+                      <div className="text-muted">{c.serialNumber}</div>
+                    </td>
+                    <td>
+                      {c.bastDate
+                        ? new Date(c.bastDate).toLocaleDateString('id-ID')
+                        : <span className="text-muted">—</span>}
+                    </td>
+                    <td>
+                      <VisitCell visitNumber={1} visitCount={c.visitCount} lastVisitDate={c.lastVisitDate} />
+                    </td>
+                    <td>
+                      <VisitCell visitNumber={2} visitCount={c.visitCount} lastVisitDate={c.lastVisitDate} />
+                    </td>
+                    <td className="text-center">
+                      <strong>{c.visitCount}</strong>
+                    </td>
+                    <td>
+                      {isWarranty ? (
+                        <span className="badge badge-info">Free ({remaining} sisa)</span>
+                      ) : (
+                        <span className="badge badge-amber">Berbayar</span>
+                      )}
+                    </td>
+                    <td className="text-muted" style={{fontSize:'0.78rem'}}>
+                      {isWarranty
+                        ? `${remaining} kunjungan gratis tersisa`
+                        : `Kunjungan ke-${c.visitCount} sudah berbayar`}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <style jsx>{`
+        .page-container { padding: 1.5rem; max-width: 1400px; }
+        .page-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.25rem; }
+        h1 { font-size:1.5rem; font-weight:600; margin:0; }
+        .subtitle { color:#666; margin:4px 0 0; font-size:0.875rem; }
+        .summary-row { display:flex; gap:12px; margin-bottom:1.5rem; flex-wrap:wrap; }
+        .summary-card {
+          background:#f9f9f9; border:1px solid #e5e5e5; border-radius:10px;
+          padding:14px 20px; min-width:160px; cursor:pointer; transition:box-shadow .15s;
+        }
+        .summary-card:hover { box-shadow:0 2px 8px rgba(0,0,0,.1); }
+        .summary-card[data-active="true"] { border-color:#111; background:#fff; }
+        .summary-card.green { border-left:3px solid #10b981; }
+        .summary-card.amber { border-left:3px solid #f59e0b; }
+        .sum-label { font-size:0.78rem; color:#666; margin-bottom:4px; }
+        .sum-num { font-size:1.5rem; font-weight:700; }
+        .table-wrapper { overflow-x:auto; }
+        .data-table { width:100%; border-collapse:collapse; font-size:0.83rem; }
+        .data-table th { background:#f5f5f5; padding:8px 10px; text-align:left; font-weight:600; border-bottom:2px solid #e5e5e5; white-space:nowrap; }
+        .data-table td { padding:8px 10px; border-bottom:1px solid #f0f0f0; vertical-align:middle; }
+        .customer-name { font-weight:500; }
+        .text-muted { font-size:0.78rem; color:#888; }
+        .text-center { text-align:center; }
+        .badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.75rem; font-weight:600; }
+        .badge-info  { background:#dbeafe; color:#1e40af; }
+        .badge-amber { background:#fef3c7; color:#92400e; }
+        .loading-text { color:#888; padding:2rem; text-align:center; }
+        .empty-state { text-align:center; padding:3rem; color:#888; background:#fafafa; border-radius:10px; }
+      `}</style>
     </div>
-  );
+  )
+}
+
+// Helper component: show visit checkmark if done
+function VisitCell({ visitNumber, visitCount, lastVisitDate }) {
+  const done = visitCount >= visitNumber
+  return done ? (
+    <span style={{color:'#10b981', fontWeight:600, fontSize:'0.8rem'}}>
+      ✓ {visitNumber === visitCount && lastVisitDate
+        ? new Date(lastVisitDate).toLocaleDateString('id-ID')
+        : 'Selesai'}
+    </span>
+  ) : (
+    <span style={{color:'#d1d5db', fontSize:'0.8rem'}}>—</span>
+  )
 }
