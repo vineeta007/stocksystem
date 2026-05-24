@@ -287,9 +287,9 @@ export default function MaintenancePage() {
         .filter-row select { padding:6px 10px; border:1px solid #ddd; border-radius:6px; font-size:0.85rem; }
         .table-wrapper { overflow-x:auto; }
         .data-table { width:100%; border-collapse:collapse; font-size:0.83rem; }
-        .data-table th { background:#f5f5f5; padding:8px 10px; text-align:left; font-weight:600; border-bottom:2px solid #e5e5e5; white-space:nowrap; }
-        .data-table td { padding:8px 10px; border-bottom:1px solid #f0f0f0; vertical-align:middle; color:#111111; }
-        .data-table tr:hover td { background:#fafafa; }
+        .data-table th { background:#f5f5f5; color:#333333; padding:8px 10px; text-align:left; font-weight:600; border-bottom:2px solid #e5e5e5; white-space:nowrap; }
+        .data-table td { padding:8px 10px; border-bottom:1px solid #f0f0f0; vertical-align:middle; color:#111111 !important; }
+        .data-table tr:hover td { background:#f0f0f0; color:#111111 !important; }
         .row-warning td { background:#fffbea !important; }
         .customer-name { font-weight:500; color:#111111; }
         .customer-addr, .text-muted { font-size:0.78rem; color:#888; }
