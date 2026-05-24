@@ -288,10 +288,10 @@ export default function MaintenancePage() {
         .table-wrapper { overflow-x:auto; }
         .data-table { width:100%; border-collapse:collapse; font-size:0.83rem; }
         .data-table th { background:#f5f5f5; padding:8px 10px; text-align:left; font-weight:600; border-bottom:2px solid #e5e5e5; white-space:nowrap; }
-        .data-table td { padding:8px 10px; border-bottom:1px solid #f0f0f0; vertical-align:middle; }
+        .data-table td { padding:8px 10px; border-bottom:1px solid #f0f0f0; vertical-align:middle; color:#111111; }
         .data-table tr:hover td { background:#fafafa; }
         .row-warning td { background:#fffbea !important; }
-        .customer-name { font-weight:500; }
+        .customer-name { font-weight:500; color:#111111; }
         .customer-addr, .text-muted { font-size:0.78rem; color:#888; }
         .text-center { text-align:center; }
         .badge { display:inline-block; padding:2px 8px; border-radius:12px; font-size:0.75rem; font-weight:600; }
