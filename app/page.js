@@ -2,6 +2,7 @@
 import StatCard from '@/components/StatCard';
 import StockTable from '@/components/StockTable';
 import LowStockAlert from '@/components/LowStockAlert';
+import ReminderWidget from '@/components/ReminderWidget';
 import Link from 'next/link';
 
 const stockItems = [
@@ -29,36 +30,11 @@ const categoryStock = [
 ];
 
 const lowStockAlerts = [
-  {
-    id: 1,
-    name: 'Swift S-Hook',
-    quantity: 3,
-    status: 'low',
-  },
-  {
-    id: 2,
-    name: 'Modular Elbow',
-    quantity: 3,
-    status: 'low',
-  },
-  {
-    id: 3,
-    name: 'D-Shackle 8mm',
-    quantity: 2,
-    status: 'low',
-  },
-  {
-    id: 4,
-    name: 'Chain Warranty',
-    quantity: 0,
-    status: 'out',
-  },
-  {
-    id: 5,
-    name: 'Flexa Par 130',
-    quantity: 1,
-    status: 'low',
-  },
+  { id: 1, name: 'Swift S-Hook',  quantity: 3, status: 'low' },
+  { id: 2, name: 'Modular Elbow', quantity: 3, status: 'low' },
+  { id: 3, name: 'D-Shackle 8mm', quantity: 2, status: 'low' },
+  { id: 4, name: 'Chain Warranty', quantity: 0, status: 'out' },
+  { id: 5, name: 'Flexa Par 130', quantity: 1, status: 'low' },
 ];
 
 export default function Dashboard() {
@@ -66,12 +42,8 @@ export default function Dashboard() {
     <div style={{ padding: '0 24px 32px' }}>
       {/* Header */}
       <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '24px 0 20px',
-        borderBottom: '1px solid #2a2925',
-        marginBottom: '20px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '24px 0 20px', borderBottom: '1px solid #2a2925', marginBottom: '20px',
       }}>
         <div>
           <div style={{ fontSize: '9px', color: '#5a5850', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '2px' }}>Overview</div>
@@ -83,7 +55,6 @@ export default function Dashboard() {
             background: '#1e1d19', border: '1px solid #333230',
             color: '#e8e4d9', padding: '8px 14px', borderRadius: '5px',
             fontSize: '12px', fontWeight: 600, textDecoration: 'none',
-            cursor: 'pointer',
           }}>
             <span style={{ fontSize: '10px' }}>↓</span> STOCK IN
           </Link>
@@ -100,10 +71,15 @@ export default function Dashboard() {
 
       {/* Stat Cards Row */}
       <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
-        <StatCard label="Total Products" value="18" sublabel="Active lines" dotColor="green" />
-        <StatCard label="Low Stock" value="5" sublabel="Need attention" dotColor="orange" />
-        <StatCard label="Out of Stock" value="2" sublabel="Depleted items" dotColor="red" />
-        <StatCard label="Transactions" value="47" sublabel="This month" dotColor="blue" />
+        <StatCard label="Total Products" value="18" sublabel="Active lines"   dotColor="green"  />
+        <StatCard label="Low Stock"      value="5"  sublabel="Need attention" dotColor="orange" />
+        <StatCard label="Out of Stock"   value="2"  sublabel="Depleted items" dotColor="red"    />
+        <StatCard label="Transactions"   value="47" sublabel="This month"     dotColor="blue"   />
+      </div>
+
+      {/* 🔔 Reminder Maintenance Widget */}
+      <div style={{ marginBottom: '12px' }}>
+        <ReminderWidget />
       </div>
 
       {/* Middle Row */}
@@ -118,18 +94,15 @@ export default function Dashboard() {
           <div>
             {recentTransactions.map((tx, i) => (
               <div key={i} style={{
-                display: 'flex',
-                alignItems: 'flex-start',
+                display: 'flex', alignItems: 'flex-start',
                 padding: '9px 0',
                 borderBottom: i < recentTransactions.length - 1 ? '1px solid #222120' : 'none',
                 gap: '8px',
               }}>
                 <span style={{
-                  width: '6px', height: '6px',
-                  borderRadius: '50%',
+                  width: '6px', height: '6px', borderRadius: '50%',
                   background: tx.type === 'in' ? '#4caf7a' : '#e05050',
-                  marginTop: '4px',
-                  flexShrink: 0,
+                  marginTop: '4px', flexShrink: 0,
                 }} />
                 <div style={{ flex: 1, fontSize: '11px', color: '#a8a498', lineHeight: 1.4 }}>
                   <span style={{ color: '#8a8678', fontWeight: 500, fontSize: '10px' }}>
@@ -139,11 +112,8 @@ export default function Dashboard() {
                   <div style={{ fontSize: '9px', color: '#4a4840', marginTop: '1px' }}>{tx.time}</div>
                 </div>
                 <span style={{
-                  fontSize: '12px',
-                  fontFamily: 'Space Mono, monospace',
-                  fontWeight: 700,
-                  color: tx.type === 'in' ? '#4caf7a' : '#e05050',
-                  flexShrink: 0,
+                  fontSize: '12px', fontFamily: 'Space Mono, monospace', fontWeight: 700,
+                  color: tx.type === 'in' ? '#4caf7a' : '#e05050', flexShrink: 0,
                 }}>{tx.delta}</span>
               </div>
             ))}
@@ -158,31 +128,23 @@ export default function Dashboard() {
           <div>
             {categoryStock.map((cat, i) => (
               <div key={i} style={{
-                display: 'flex',
-                alignItems: 'center',
+                display: 'flex', alignItems: 'center',
                 padding: '9px 0',
                 borderBottom: i < categoryStock.length - 1 ? '1px solid #222120' : 'none',
                 gap: '10px',
               }}>
                 <div style={{ width: '120px', fontSize: '12px', color: '#a8a498' }}>{cat.name}</div>
                 <div style={{ flex: 1 }}>
-                  <div style={{
-                    height: '3px', background: '#2a2925', borderRadius: '2px', overflow: 'hidden',
-                  }}>
+                  <div style={{ height: '3px', background: '#2a2925', borderRadius: '2px', overflow: 'hidden' }}>
                     <div style={{
-                      height: '100%',
-                      width: `${(cat.qty / cat.max) * 100}%`,
-                      background: '#c9a84c',
-                      borderRadius: '2px',
+                      height: '100%', width: `${(cat.qty / cat.max) * 100}%`,
+                      background: '#c9a84c', borderRadius: '2px',
                     }} />
                   </div>
                 </div>
                 <div style={{
-                  fontSize: '13px',
-                  fontFamily: 'Space Mono, monospace',
-                  color: '#e8e4d9',
-                  width: '20px',
-                  textAlign: 'right',
+                  fontSize: '13px', fontFamily: 'Space Mono, monospace',
+                  color: '#e8e4d9', width: '20px', textAlign: 'right',
                 }}>{cat.qty}</div>
               </div>
             ))}
@@ -201,31 +163,21 @@ export default function Dashboard() {
 function Card({ title, actionLabel, actionHref, children }) {
   return (
     <div style={{
-      background: '#1e1d19',
-      border: '1px solid #2a2925',
-      borderRadius: '6px',
-      padding: '16px',
+      background: '#1e1d19', border: '1px solid #2a2925',
+      borderRadius: '6px', padding: '16px',
     }}>
       <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         marginBottom: '12px',
       }}>
         <span style={{
-          fontSize: '10px',
-          textTransform: 'uppercase',
-          letterSpacing: '0.12em',
-          color: '#8a8678',
-          fontWeight: 600,
+          fontSize: '10px', textTransform: 'uppercase',
+          letterSpacing: '0.12em', color: '#8a8678', fontWeight: 600,
         }}>{title}</span>
         {actionLabel && (
           <Link href={actionHref || '#'} style={{
-            fontSize: '9px',
-            color: '#c9a84c',
-            textDecoration: 'none',
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
+            fontSize: '9px', color: '#c9a84c', textDecoration: 'none',
+            letterSpacing: '0.08em', textTransform: 'uppercase',
           }}>{actionLabel}</Link>
         )}
       </div>
