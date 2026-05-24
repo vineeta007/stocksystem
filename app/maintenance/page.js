@@ -287,12 +287,12 @@ export default function MaintenancePage() {
         .filter-row select { padding:6px 10px; border:1px solid #ddd; border-radius:6px; font-size:0.85rem; }
         .table-wrapper { overflow-x:auto; }
         .data-table { width:100%; border-collapse:collapse; font-size:0.83rem; }
-        .data-table th { background:#f5f5f5; color:#333333; padding:8px 10px; text-align:left; font-weight:600; border-bottom:2px solid #e5e5e5; white-space:nowrap; }
-        .data-table td { padding:8px 10px; border-bottom:1px solid #f0f0f0; vertical-align:middle; color:#111111 !important; }
-        .data-table tr:hover td { background:#f0f0f0; color:#111111 !important; }
-        .row-warning td { background:#fffbea !important; }
-        .customer-name { font-weight:500; color:#111111; }
-        .customer-addr, .text-muted { font-size:0.78rem; color:#888; }
+        .data-table th { background:#1a2535; color:#a8b8d0; padding:8px 10px; text-align:left; font-weight:600; border-bottom:2px solid #2a3a50; white-space:nowrap; }
+.data-table td { padding:8px 10px; border-bottom:1px solid #1e2d40; vertical-align:middle; color:#e8e4d9 !important; }
+.data-table tr:hover td { background:#1e2d40; color:#ffffff !important; }
+.row-warning td { background:#2a2000 !important; color:#fbbf24 !important; }
+.customer-name { font-weight:500; color:#e8e4d9; }
+.customer-addr, .text-muted { font-size:0.78rem; color:#6a8aaa; }
         .text-center { text-align:center; }
         .badge { display:inline-block; padding:2px 8px; border-radius:12px; font-size:0.75rem; font-weight:600; }
         .badge-danger { background:#fee2e2; color:#b91c1c; }
