@@ -14,7 +14,7 @@ function daysBadge(days) {
 }
 
 function warrantyBadge(status) {
-  if (status === 'free')    return <span className="badge badge-info">Garansi (Free)</span>
+  if (status === 'free') return <span className="badge badge-info">Garansi (Free)</span>
   return <span className="badge badge-secondary">Berbayar</span>
 }
 
@@ -38,7 +38,6 @@ export default function MaintenancePage() {
     if (kotaFilter !== 'Semua Kota') params.set('kota', kotaFilter)
     if (statusFilter)                params.set('status', statusFilter)
     if (reminderOnly)                params.set('reminder', 'true')
-
     const res  = await fetch(`/api/maintenance?${params}`)
     const json = await res.json()
     setCustomers(json.data || [])
@@ -98,6 +97,8 @@ export default function MaintenancePage() {
 
   return (
     <div className="page-container">
+
+      {/* Header */}
       <div className="page-header">
         <div>
           <h1>🔧 Data Maintenance</h1>
@@ -184,27 +185,17 @@ export default function MaintenancePage() {
                     <div>{c.unitType}</div>
                     <div className="text-muted">{c.serialNumber}</div>
                   </td>
-                  <td>
-                    {c.lastVisitDate
-                      ? new Date(c.lastVisitDate).toLocaleDateString('id-ID')
-                      : <span className="text-muted">—</span>}
-                  </td>
-                  <td>
-                    {c.nextVisitDate
-                      ? new Date(c.nextVisitDate).toLocaleDateString('id-ID')
-                      : <span className="text-muted">—</span>}
-                  </td>
+                  <td>{c.lastVisitDate ? new Date(c.lastVisitDate).toLocaleDateString('id-ID') : <span className="text-muted">—</span>}</td>
+                  <td>{c.nextVisitDate  ? new Date(c.nextVisitDate).toLocaleDateString('id-ID')  : <span className="text-muted">—</span>}</td>
                   <td>{daysBadge(c.daysUntilNextVisit)}</td>
                   <td className="text-center">{c.visitCount}</td>
                   <td>{warrantyBadge(c.warrantyStatus)}</td>
-                  <td>
-                    <span className={`status-pill status-${c.status?.toLowerCase()}`}>{c.status}</span>
-                  </td>
+                  <td><span className={`status-pill status-${c.status?.toLowerCase()}`}>{c.status}</span></td>
                   <td>
                     <div className="action-btns">
-                      <button className="btn-sm btn-visit" onClick={() => recordVisit(c._id)} title="Catat Kunjungan">✓ Kunjungan</button>
-                      <button className="btn-sm btn-edit"  onClick={() => openEdit(c)} title="Edit">Edit</button>
-                      <button className="btn-sm btn-del"   onClick={() => deleteCustomer(c._id)} title="Hapus">Hapus</button>
+                      <button className="btn-sm btn-visit" onClick={() => recordVisit(c._id)}>✓ Kunjungan</button>
+                      <button className="btn-sm btn-edit"  onClick={() => openEdit(c)}>Edit</button>
+                      <button className="btn-sm btn-del"   onClick={() => deleteCustomer(c._id)}>Hapus</button>
                     </div>
                   </td>
                 </tr>
@@ -273,59 +264,127 @@ export default function MaintenancePage() {
       )}
 
       <style jsx>{`
-        .page-container { padding: 1.5rem; max-width: 1400px; }
-        .page-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem; }
-        h1 { font-size:1.5rem; font-weight:600; margin:0; }
-        .subtitle { color:#666; margin:4px 0 0; font-size:0.9rem; }
+        .page-container {
+          padding: 1.5rem;
+          width: 100%;
+          box-sizing: border-box;
+          min-height: 100vh;
+          background: #0B1629;
+          color: #e2e8f0;
+          font-family: 'Sora', sans-serif;
+        }
+        .page-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: 1rem;
+        }
+        h1 { font-size: 1.5rem; font-weight: 700; margin: 0; color: #f1f5f9; }
+        .subtitle { color: #64748b; margin: 4px 0 0; font-size: 0.9rem; }
+
+        /* Reminder */
         .reminder-banner {
-          background:#fffbea; border:1px solid #f6c90e; border-radius:8px;
-          padding:10px 16px; margin-bottom:1rem; font-size:0.9rem; cursor:pointer;
+          background: #1E2D45; border: 1px solid #f59e0b; border-radius: 8px;
+          padding: 10px 16px; margin-bottom: 1rem; font-size: 0.9rem;
+          cursor: pointer; color: #e2e8f0;
         }
-        .reminder-banner.active { background:#fff4e0; border-color:#f59e0b; }
-        .reminder-link { margin-left:8px; color:#b45309; font-weight:600; }
-        .filter-row { display:flex; gap:8px; margin-bottom:1rem; flex-wrap:wrap; }
-        .filter-row select { padding:6px 10px; border:1px solid #ddd; border-radius:6px; font-size:0.85rem; }
-        .table-wrapper { overflow-x:auto; }
-        .data-table { width:100%; border-collapse:collapse; font-size:0.83rem; }
-        .data-table th { background:#1a2535; color:#a8b8d0; padding:8px 10px; text-align:left; font-weight:600; border-bottom:2px solid #2a3a50; white-space:nowrap; }
-.data-table td { padding:8px 10px; border-bottom:1px solid #1e2d40; vertical-align:middle; color:#e8e4d9 !important; }
-.data-table tr:hover td { background:#1e2d40; color:#ffffff !important; }
-.row-warning td { background:#2a2000 !important; color:#fbbf24 !important; }
-.customer-name { font-weight:500; color:#e8e4d9; }
-.customer-addr, .text-muted { font-size:0.78rem; color:#6a8aaa; }
-        .text-center { text-align:center; }
-        .badge { display:inline-block; padding:2px 8px; border-radius:12px; font-size:0.75rem; font-weight:600; }
-        .badge-danger { background:#fee2e2; color:#b91c1c; }
-        .badge-warning { background:#fef3c7; color:#92400e; }
-        .badge-success { background:#d1fae5; color:#065f46; }
-        .badge-info { background:#dbeafe; color:#1e40af; }
-        .badge-secondary { background:#f3f4f6; color:#374151; }
-        .ml-2 { margin-left:8px; }
-        .status-pill { padding:2px 10px; border-radius:12px; font-size:0.75rem; font-weight:600; }
-        .status-active   { background:#d1fae5; color:#065f46; }
-        .status-inactive { background:#fee2e2; color:#b91c1c; }
-        .status-new      { background:#e0e7ff; color:#3730a3; }
-        .action-btns { display:flex; gap:4px; }
-        .btn-sm { padding:3px 8px; border-radius:5px; font-size:0.75rem; cursor:pointer; border:none; }
-        .btn-visit { background:#d1fae5; color:#065f46; }
-        .btn-edit  { background:#e0e7ff; color:#3730a3; }
-        .btn-del   { background:#fee2e2; color:#b91c1c; }
-        .btn-primary { background:#111; color:#fff; padding:8px 16px; border-radius:7px; border:none; cursor:pointer; font-size:0.875rem; }
-        .btn-ghost { background:transparent; border:1px solid #ddd; padding:8px 14px; border-radius:7px; cursor:pointer; font-size:0.875rem; }
-        .loading-text { color:#888; padding:2rem; text-align:center; }
-        .empty-state { text-align:center; padding:3rem; color:#888; }
-        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; z-index:100; }
-        .modal { background:#fff; border-radius:12px; width:680px; max-width:95vw; max-height:90vh; overflow-y:auto; }
-        .modal-header { display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid #eee; }
-        .modal-header h2 { margin:0; font-size:1.1rem; font-weight:600; }
-        .modal-header button { background:none; border:none; font-size:1.2rem; cursor:pointer; }
-        .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:20px; }
-        .form-grid label { display:flex; flex-direction:column; font-size:0.82rem; color:#555; gap:4px; }
+        .reminder-banner.active { background: #1E2D45; border-color: #f59e0b; }
+        .reminder-link { margin-left: 8px; color: #f59e0b; font-weight: 600; }
+
+        /* Filters */
+        .filter-row { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
+        .filter-row select {
+          padding: 6px 10px; border: 1px solid #1E3A5F; border-radius: 6px;
+          font-size: 0.85rem; background: #1E2D45; color: #e2e8f0;
+        }
+
+        /* Table */
+        .table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid #1E3A5F; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+        .data-table th {
+          background: #1E2D45; color: #64748b; padding: 10px 12px; text-align: left;
+          font-weight: 600; border-bottom: 1px solid #1E3A5F; white-space: nowrap;
+          font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .data-table td {
+          padding: 10px 12px; border-bottom: 1px solid #1E3A5F;
+          vertical-align: middle; color: #cbd5e1;
+        }
+        .data-table tbody tr:last-child td { border-bottom: none; }
+        .data-table tbody tr:hover td { background: #1E2D45; }
+        .row-warning td { background: rgba(245,158,11,0.08) !important; }
+        .customer-name { font-weight: 600; color: #f1f5f9; }
+        .customer-addr { font-size: 0.78rem; color: #475569; }
+        .text-muted { font-size: 0.78rem; color: #475569; }
+        .text-center { text-align: center; }
+
+        /* Badges */
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+        .badge-danger    { background: rgba(239,68,68,0.15);   color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+        .badge-warning   { background: rgba(245,158,11,0.15);  color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+        .badge-success   { background: rgba(16,185,129,0.15);  color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+        .badge-info      { background: rgba(59,130,246,0.15);  color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+        .badge-secondary { background: rgba(100,116,139,0.15); color: #94a3b8; border: 1px solid rgba(100,116,139,0.3); }
+        .ml-2 { margin-left: 8px; }
+
+        /* Status pills */
+        .status-pill { padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+        .status-active   { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+        .status-inactive { background: rgba(239,68,68,0.15);  color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+        .status-new      { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
+
+        /* Action buttons */
+        .action-btns { display: flex; gap: 4px; }
+        .btn-sm { padding: 4px 10px; border-radius: 6px; font-size: 0.72rem; cursor: pointer; border: none; font-weight: 600; }
+        .btn-visit { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+        .btn-edit  { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
+        .btn-del   { background: rgba(239,68,68,0.15);  color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+
+        /* Primary / ghost buttons */
+        .btn-primary {
+          background: #2E90FA; color: #fff; padding: 9px 18px; border-radius: 8px;
+          border: none; cursor: pointer; font-size: 0.875rem; font-weight: 600; white-space: nowrap;
+        }
+        .btn-primary:hover { background: #1d6fca; }
+        .btn-ghost {
+          background: transparent; border: 1px solid #1E3A5F; color: #94a3b8;
+          padding: 8px 14px; border-radius: 7px; cursor: pointer; font-size: 0.875rem;
+        }
+
+        /* States */
+        .loading-text { color: #475569; padding: 2rem; text-align: center; }
+        .empty-state {
+          text-align: center; padding: 3rem; color: #475569;
+          background: #1E2D45; border-radius: 10px; border: 1px solid #1E3A5F;
+        }
+        .empty-state p { margin-bottom: 1rem; }
+
+        /* Modal */
+        .modal-overlay {
+          position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+          display: flex; align-items: center; justify-content: center; z-index: 100;
+        }
+        .modal {
+          background: #1E2D45; border: 1px solid #1E3A5F; border-radius: 12px;
+          width: 680px; max-width: 95vw; max-height: 90vh; overflow-y: auto;
+        }
+        .modal-header {
+          display: flex; justify-content: space-between; align-items: center;
+          padding: 16px 20px; border-bottom: 1px solid #1E3A5F;
+        }
+        .modal-header h2 { margin: 0; font-size: 1.1rem; font-weight: 700; color: #f1f5f9; }
+        .modal-header button { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #64748b; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 20px; }
+        .form-grid label { display: flex; flex-direction: column; font-size: 0.8rem; color: #64748b; gap: 4px; font-weight: 600; }
         .form-grid input, .form-grid select, .form-grid textarea {
-          border:1px solid #ddd; border-radius:6px; padding:7px 10px; font-size:0.875rem;
+          border: 1px solid #1E3A5F; border-radius: 6px; padding: 8px 10px;
+          font-size: 0.875rem; background: #0B1629; color: #e2e8f0; outline: none;
         }
-        .full-width { grid-column:1 / -1; }
-        .form-actions { display:flex; justify-content:flex-end; gap:8px; padding-top:4px; }
+        .form-grid input:focus, .form-grid select:focus, .form-grid textarea:focus {
+          border-color: #2E90FA;
+        }
+        .full-width { grid-column: 1 / -1; }
+        .form-actions { display: flex; justify-content: flex-end; gap: 8px; padding-top: 4px; }
       `}</style>
     </div>
   )
