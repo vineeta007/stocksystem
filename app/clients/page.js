@@ -147,7 +147,7 @@ export default function ClientsPage() {
         .text-muted { font-size:0.78rem; color:#888; }
         .text-center { text-align:center; }
         .badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.75rem; font-weight:600; }
-        .badge-info  { background:#dbeafe; color:#1e40af; }
+        .badge-info  { background:#1e40af; color:#fff; }
         .badge-amber { background:#fef3c7; color:#92400e; }
         .loading-text { color:#888; padding:2rem; text-align:center; }
         .empty-state { text-align:center; padding:3rem; color:#888; background:#fafafa; border-radius:10px; }
