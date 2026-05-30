@@ -140,6 +140,7 @@ function StatusBadge({ status }) {
         fontSize: '11px',
         fontWeight: 700,
         whiteSpace: 'nowrap',
+        flexShrink: 0,
       }}
     >
       {c.short}
