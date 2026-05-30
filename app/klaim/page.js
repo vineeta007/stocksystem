@@ -56,6 +56,8 @@ export default function KlaimPage() {
 
   return (
     <div className="page-container">
+
+      {/* Header */}
       <div className="page-header">
         <div>
           <h1>📦 Klaim Sparepart</h1>
@@ -64,12 +66,12 @@ export default function KlaimPage() {
         <button className="btn-primary" onClick={() => setShowForm(true)}>+ Buat Klaim</button>
       </div>
 
-      {/* Summary */}
+      {/* Summary Cards */}
       <div className="summary-row">
         {[
-          { label:'Total Klaim', val: claims.length, color:'' },
-          { label:'Pending',     val: pendingCount,  color:'amber' },
-          { label:'Disetujui',   val: approvedCount, color:'green' },
+          { label:'Total Klaim', val: claims.length,  color:'' },
+          { label:'Pending',     val: pendingCount,   color:'amber' },
+          { label:'Disetujui',   val: approvedCount,  color:'green' },
         ].map(s => (
           <div key={s.label} className={`summary-card ${s.color}`}>
             <div className="sum-label">{s.label}</div>
@@ -87,6 +89,7 @@ export default function KlaimPage() {
         {filterStatus && <button className="btn-ghost" onClick={() => setFilterStatus('')}>Reset</button>}
       </div>
 
+      {/* Content */}
       {loading ? (
         <p className="loading-text">Memuat data...</p>
       ) : filtered.length === 0 ? (
@@ -194,49 +197,164 @@ export default function KlaimPage() {
       )}
 
       <style jsx>{`
-        .page-container { padding:1.5rem; max-width:1400px; }
-        .page-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem; }
-        h1 { font-size:1.5rem; font-weight:600; margin:0; }
-        .subtitle { color:#666; margin:4px 0 0; font-size:0.875rem; }
-        .summary-row { display:flex; gap:12px; margin-bottom:1.25rem; flex-wrap:wrap; }
-        .summary-card { background:#f9f9f9; border:1px solid #e5e5e5; border-radius:10px; padding:14px 20px; min-width:140px; }
-        .summary-card.green { border-left:3px solid #10b981; }
-        .summary-card.amber { border-left:3px solid #f59e0b; }
-        .sum-label { font-size:0.78rem; color:#666; margin-bottom:4px; }
-        .sum-num { font-size:1.5rem; font-weight:700; }
-        .filter-row { display:flex; gap:8px; margin-bottom:1rem; }
-        .filter-row select { padding:6px 10px; border:1px solid #ddd; border-radius:6px; font-size:0.85rem; }
-        .table-wrapper { overflow-x:auto; }
-        .data-table { width:100%; border-collapse:collapse; font-size:0.83rem; }
-        .data-table th { background:#f5f5f5; padding:8px 10px; text-align:left; font-weight:600; border-bottom:2px solid #e5e5e5; white-space:nowrap; }
-        .data-table td { padding:8px 10px; border-bottom:1px solid #f0f0f0; vertical-align:middle; }
-        .customer-name { font-weight:500; }
-        .text-muted { font-size:0.78rem; color:#888; }
-        .text-center { text-align:center; }
-        .badge { display:inline-block; padding:2px 9px; border-radius:12px; font-size:0.75rem; font-weight:600; }
-        .badge-amber   { background:#fef3c7; color:#92400e; }
-        .badge-green   { background:#d1fae5; color:#065f46; }
-        .badge-red     { background:#fee2e2; color:#b91c1c; }
-        .badge-gray    { background:#f3f4f6; color:#374151; }
-        .action-btns { display:flex; gap:4px; }
-        .btn-sm { padding:3px 8px; border-radius:5px; font-size:0.75rem; cursor:pointer; border:none; }
-        .btn-approve { background:#d1fae5; color:#065f46; }
-        .btn-reject  { background:#fee2e2; color:#b91c1c; }
-        .btn-done    { background:#e0e7ff; color:#3730a3; }
-        .btn-primary { background:#111; color:#fff; padding:8px 16px; border-radius:7px; border:none; cursor:pointer; font-size:0.875rem; }
-        .btn-ghost { background:transparent; border:1px solid #ddd; padding:8px 14px; border-radius:7px; cursor:pointer; font-size:0.875rem; }
-        .loading-text { color:#888; padding:2rem; text-align:center; }
-        .empty-state { text-align:center; padding:3rem; color:#888; background:#fafafa; border-radius:10px; }
-        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; z-index:100; }
-        .modal { background:#fff; border-radius:12px; width:640px; max-width:95vw; max-height:90vh; overflow-y:auto; }
-        .modal-header { display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid #eee; }
-        .modal-header h2 { margin:0; font-size:1.1rem; font-weight:600; }
-        .modal-header button { background:none; border:none; font-size:1.2rem; cursor:pointer; }
-        .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:20px; }
-        .form-grid label { display:flex; flex-direction:column; font-size:0.82rem; color:#555; gap:4px; }
-        .form-grid input, .form-grid select, .form-grid textarea { border:1px solid #ddd; border-radius:6px; padding:7px 10px; font-size:0.875rem; }
-        .full-width { grid-column:1 / -1; }
-        .form-actions { display:flex; justify-content:flex-end; gap:8px; padding-top:4px; }
+        .page-container {
+          padding: 1.5rem;
+          width: 100%;
+          box-sizing: border-box;
+          min-height: 100vh;
+          background: #0B1629;
+          color: #e2e8f0;
+          font-family: 'Sora', sans-serif;
+        }
+        .page-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: 1.25rem;
+        }
+        h1 { font-size: 1.5rem; font-weight: 700; margin: 0; color: #f1f5f9; }
+        .subtitle { color: #64748b; margin: 4px 0 0; font-size: 0.875rem; }
+
+        /* Summary Cards */
+        .summary-row { display: flex; gap: 12px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+        .summary-card {
+          background: #1E2D45;
+          border: 1px solid #1E3A5F;
+          border-radius: 10px;
+          padding: 14px 24px;
+          min-width: 150px;
+        }
+        .summary-card.amber { border-left: 3px solid #f59e0b; }
+        .summary-card.green { border-left: 3px solid #10b981; }
+        .sum-label { font-size: 0.75rem; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .sum-num { font-size: 1.75rem; font-weight: 700; color: #f1f5f9; }
+
+        /* Filter */
+        .filter-row { display: flex; gap: 8px; margin-bottom: 1rem; align-items: center; }
+        .filter-row select {
+          padding: 8px 12px;
+          border: 1px solid #1E3A5F;
+          border-radius: 7px;
+          font-size: 0.85rem;
+          background: #1E2D45;
+          color: #e2e8f0;
+          flex: 1;
+          max-width: 300px;
+        }
+
+        /* Table */
+        .table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid #1E3A5F; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+        .data-table th {
+          background: #1E2D45;
+          color: #64748b;
+          padding: 10px 12px;
+          text-align: left;
+          font-weight: 600;
+          border-bottom: 1px solid #1E3A5F;
+          white-space: nowrap;
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+        .data-table td {
+          padding: 10px 12px;
+          border-bottom: 1px solid #1E3A5F;
+          vertical-align: middle;
+          color: #cbd5e1;
+        }
+        .data-table tbody tr:last-child td { border-bottom: none; }
+        .data-table tbody tr:hover { background: #1E2D45; }
+        .customer-name { font-weight: 600; color: #f1f5f9; }
+        .text-muted { font-size: 0.78rem; color: #475569; }
+        .text-center { text-align: center; }
+
+        /* Badges */
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+        .badge-amber { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+        .badge-green { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+        .badge-red   { background: rgba(239,68,68,0.15);  color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+        .badge-gray  { background: rgba(100,116,139,0.15); color: #94a3b8; border: 1px solid rgba(100,116,139,0.3); }
+
+        /* Buttons */
+        .action-btns { display: flex; gap: 4px; }
+        .btn-sm { padding: 4px 10px; border-radius: 6px; font-size: 0.72rem; cursor: pointer; border: none; font-weight: 600; }
+        .btn-approve { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+        .btn-reject  { background: rgba(239,68,68,0.15);  color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+        .btn-done    { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
+        .btn-primary {
+          background: #2E90FA;
+          color: #fff;
+          padding: 9px 18px;
+          border-radius: 8px;
+          border: none;
+          cursor: pointer;
+          font-size: 0.875rem;
+          font-weight: 600;
+          white-space: nowrap;
+        }
+        .btn-primary:hover { background: #1d6fca; }
+        .btn-ghost {
+          background: transparent;
+          border: 1px solid #1E3A5F;
+          color: #94a3b8;
+          padding: 8px 14px;
+          border-radius: 7px;
+          cursor: pointer;
+          font-size: 0.875rem;
+        }
+
+        /* States */
+        .loading-text { color: #475569; padding: 2rem; text-align: center; }
+        .empty-state {
+          text-align: center;
+          padding: 3rem;
+          color: #475569;
+          background: #1E2D45;
+          border-radius: 10px;
+          border: 1px solid #1E3A5F;
+        }
+        .empty-state p { margin-bottom: 1rem; font-size: 0.9rem; }
+
+        /* Modal */
+        .modal-overlay {
+          position: fixed; inset: 0;
+          background: rgba(0,0,0,0.6);
+          display: flex; align-items: center; justify-content: center;
+          z-index: 100;
+        }
+        .modal {
+          background: #1E2D45;
+          border: 1px solid #1E3A5F;
+          border-radius: 14px;
+          width: 640px;
+          max-width: 95vw;
+          max-height: 90vh;
+          overflow-y: auto;
+        }
+        .modal-header {
+          display: flex; justify-content: space-between; align-items: center;
+          padding: 16px 20px;
+          border-bottom: 1px solid #1E3A5F;
+        }
+        .modal-header h2 { margin: 0; font-size: 1.1rem; font-weight: 700; color: #f1f5f9; }
+        .modal-header button { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #64748b; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 20px; }
+        .form-grid label { display: flex; flex-direction: column; font-size: 0.8rem; color: #64748b; gap: 5px; font-weight: 600; letter-spacing: 0.03em; }
+        .form-grid input, .form-grid select, .form-grid textarea {
+          border: 1px solid #1E3A5F;
+          border-radius: 7px;
+          padding: 8px 10px;
+          font-size: 0.875rem;
+          background: #0B1629;
+          color: #e2e8f0;
+          outline: none;
+        }
+        .form-grid input:focus, .form-grid select:focus, .form-grid textarea:focus {
+          border-color: #2E90FA;
+        }
+        .full-width { grid-column: 1 / -1; }
+        .form-actions { display: flex; justify-content: flex-end; gap: 8px; padding-top: 4px; }
       `}</style>
     </div>
   )
