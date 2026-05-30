@@ -27,6 +27,11 @@ export default function StatCard({
         flex: 1,
         minHeight: '130px',
         fontFamily: "'Sora', sans-serif",
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textAlign: 'center',
       }}
     >
       {/* Top Accent Bar */}
@@ -46,12 +51,12 @@ export default function StatCard({
         style={{
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'center',
           gap: '7px',
-          marginTop: '4px',
           marginBottom: '12px',
           fontSize: '11px',
           fontWeight: 600,
-          color: '#334155',
+          color: '#06B6D4',
           letterSpacing: '1px',
           textTransform: 'uppercase',
         }}
@@ -65,16 +70,15 @@ export default function StatCard({
             flexShrink: 0,
           }}
         />
-
         {label}
       </div>
 
       {/* Main Value */}
       <div
         style={{
-          fontSize: '38px',
+          fontSize: '52px',
           fontWeight: 700,
-          color: '#000000',
+          color: '#FFFFFF',
           letterSpacing: '-1.5px',
           lineHeight: 1,
         }}
