@@ -124,21 +124,21 @@ export default function ClientsPage() {
       )}
 
       <style jsx>{`
-        .page-container { padding: 1.5rem; max-width: 1400px; }
+        .page-container { padding: 1.5rem; width: 100%; }
         .page-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.25rem; }
         h1 { font-size:1.5rem; font-weight:600; margin:0; }
         .subtitle { color:#666; margin:4px 0 0; font-size:0.875rem; }
         .summary-row { display:flex; gap:12px; margin-bottom:1.5rem; flex-wrap:wrap; }
         .summary-card {
-          background:#f9f9f9; border:1px solid #e5e5e5; border-radius:10px;
-          padding:14px 20px; min-width:160px; cursor:pointer; transition:box-shadow .15s;
-        }
-        .summary-card:hover { box-shadow:0 2px 8px rgba(0,0,0,.1); }
-        .summary-card[data-active="true"] { border-color:#111; background:#fff; }
-        .summary-card.green { border-left:3px solid #10b981; }
-        .summary-card.amber { border-left:3px solid #f59e0b; }
-        .sum-label { font-size:0.78rem; color:#666; margin-bottom:4px; }
-        .sum-num { font-size:1.5rem; font-weight:700; }
+  background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.15); border-radius:10px;
+  padding:14px 20px; min-width:160px; cursor:pointer; transition:box-shadow .15s;
+}
+.summary-card:hover { box-shadow:0 2px 8px rgba(0,0,0,.3); }
+.summary-card[data-active="true"] { border-color:rgba(255,255,255,0.5); background:rgba(255,255,255,0.12); }
+.summary-card.green { border-left:3px solid #10b981; }
+.summary-card.amber { border-left:3px solid #f59e0b; }
+.sum-label { font-size:0.78rem; color:rgba(255,255,255,0.6); margin-bottom:4px; }
+.sum-num { font-size:1.5rem; font-weight:700; color:#fff; }
         .table-wrapper { overflow-x:auto; }
         .data-table { width:100%; border-collapse:collapse; font-size:0.83rem; }
         .data-table th { background:#f5f5f5; padding:8px 10px; text-align:left; font-weight:600; border-bottom:2px solid #e5e5e5; white-space:nowrap; }
