@@ -218,12 +218,13 @@ export default function KlaimPage() {
         /* Summary Cards */
         .summary-row { display: flex; gap: 12px; margin-bottom: 1.25rem; flex-wrap: wrap; }
         .summary-card {
-          background: #1E2D45;
-          border: 1px solid #1E3A5F;
-          border-radius: 10px;
-          padding: 14px 24px;
-          min-width: 150px;
-        }
+  background: #1E2D45;
+  border: 1px solid #1E3A5F;
+  border-radius: 10px;
+  padding: 14px 24px;
+  min-width: 150px;
+  text-align: center;
+}
         .summary-card.amber { border-left: 3px solid #f59e0b; }
         .summary-card.green { border-left: 3px solid #10b981; }
         .sum-label { font-size: 0.75rem; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
