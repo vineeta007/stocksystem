@@ -137,7 +137,7 @@ function StatusBadge({ status }) {
         border: `1px solid ${c.border}`,
         borderRadius: '6px',
         padding: '4px 10px',
-        fontSize: '11px',
+        fontSize: '9px',
         fontWeight: 700,
         whiteSpace: 'nowrap',
         flexShrink: 0,
