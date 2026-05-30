@@ -106,23 +106,23 @@ export default function StockTable({ items = [] }) {
 function StatusBadge({ status }) {
   const map = {
     'IN STOCK': {
-      bg: '#DCFCE7',
-      color: '#166534',
-      border: '#86EFAC',
+      bg: '#166534',
+      color: '#DCFCE7',
+      border: '#16a34a',
       short: 'In Stock',
     },
 
     'LOW STOCK': {
-      bg: '#FEF3C7',
-      color: '#92400E',
-      border: '#FCD34D',
+      bg: '#92400E',
+      color: '#FEF3C7',
+      border: '#d97706',
       short: 'Low Stock',
     },
 
     'OUT OF STOCK': {
-      bg: '#FEE2E2',
-      color: '#991B1B',
-      border: '#FCA5A5',
+      bg: '#991B1B',
+      color: '#FEE2E2',
+      border: '#dc2626',
       short: 'Out of Stock',
     },
   };
@@ -141,6 +141,8 @@ function StatusBadge({ status }) {
         fontWeight: 700,
         whiteSpace: 'nowrap',
         flexShrink: 0,
+        width: '90px',
+        textAlign: 'center',
       }}
     >
       {c.short}
