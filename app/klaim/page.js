@@ -216,7 +216,7 @@ export default function KlaimPage() {
         .subtitle { color: #64748b; margin: 4px 0 0; font-size: 0.875rem; }
 
         /* Summary Cards */
-        .summary-row { display: flex; gap: 12px; margin-bottom: 1.25rem; flex-wrap: wrap; justify-content: center; }
+        .summary-row { display: flex; gap: 24px; margin-bottom: 1.25rem; flex-wrap: wrap; justify-content: center; }
         .summary-card {
   background: #1E2D45;
   border: 1px solid #1E3A5F;
