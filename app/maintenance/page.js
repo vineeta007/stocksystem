@@ -294,9 +294,11 @@ export default function MaintenancePage() {
         /* Filters */
         .filter-row { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
         .filter-row select {
-          padding: 6px 10px; border: 1px solid #1E3A5F; border-radius: 6px;
-          font-size: 0.85rem; background: #1E2D45; color: #e2e8f0;
-        }
+  padding: 6px 10px; border: 1px solid #1E3A5F; border-radius: 6px;
+  font-size: 0.85rem; background: #1E2D45; color: #e2e8f0;
+  width: auto;
+  min-width: 160px;
+}
 
         /* Table */
         .table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid #1E3A5F; }
