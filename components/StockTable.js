@@ -141,8 +141,7 @@ function StatusBadge({ status }) {
         fontWeight: 700,
         whiteSpace: 'nowrap',
         flexShrink: 0,
-        width: '100px',
-        textAlign: 'center',
+        minWidth: 'max-content',
       }}
     >
       {c.short}
