@@ -32,7 +32,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   return (
     <aside style={{
-      width: '190px', flexShrink: 0,
+      width: '220px', flexShrink: 0,
       background: '#0F1F3D',
       borderRight: '1px solid #1E3A5F',
       display: 'flex', flexDirection: 'column',
