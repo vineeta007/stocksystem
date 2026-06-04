@@ -2,7 +2,6 @@
 // Run with: node seedProducts.js
 // Make sure MONGODB_URI is in your .env.local
 
-require('dotenv').config({ path: '.env.local' });
 const mongoose = require('mongoose');
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://vineetadevnani_db_user:vdevnani007@cluster0.ksvbtfj.mongodb.net/stocksystem';
