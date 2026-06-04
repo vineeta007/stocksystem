@@ -9,8 +9,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-      - run: npm install mongoose
       - name: Run seed
         env:
           MONGODB_URI: mongodb+srv://vineetadevnani_db_user:vdevnani007@cluster0.ksvbtfj.mongodb.net/stocksystem
-        run: node seedProducts.js
+        run: |
+          mkdir seedrun
+          cp seedProducts.js seedrun/
+          cd seedrun
+          npm init -y
+          npm install mongoose
+          node seedProducts.js
