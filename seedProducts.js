@@ -5,7 +5,7 @@
 require('dotenv').config({ path: '.env.local' });
 const mongoose = require('mongoose');
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://vineetadevnani_db_user:vdevnani007@cluster0.ksvbtfj.mongodb.net/stocksystem';
 
 const ProductSchema = new mongoose.Schema({
   name:        { type: String, required: true },
