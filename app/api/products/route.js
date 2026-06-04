@@ -1,65 +1,41 @@
-// app/api/products/klaim/route.js
-// POST: ajukan klaim sparepart
-// GET:  lihat semua klaim yang pending
-
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import Product from '@/models/Product';
 
-// ── GET: semua klaim pending ──────────────────────────────────────────────────
+// GET all products
 export async function GET() {
   try {
     await dbConnect();
-
-    // Cari produk yang punya riwayat klaim belum disetujui
-    const products = await Product.find({ 'riwayatKlaim.disetujui': false }).lean();
-
-    const klaimList = [];
-    for (const p of products) {
-      const pending = (p.riwayatKlaim || []).filter(k => !k.disetujui);
-      for (const k of pending) {
-        klaimList.push({
-          productId:    p._id,
-          productName:  p.name,
-          sku:          p.sku,
-          stokSekarang: p.quantity,
-          klaim:        k,
-        });
-      }
-    }
-
-    return NextResponse.json({ success: true, count: klaimList.length, data: klaimList });
+    const products = await Product.find({ isActive: true }).lean();
+    return NextResponse.json({ success: true, data: products });
   } catch (err) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }
 
-// ── POST: ajukan klaim sparepart ──────────────────────────────────────────────
+// POST create new product
 export async function POST(request) {
   try {
     await dbConnect();
-    const { productId, jumlah, alasan, customerId, namaCustomer } = await request.json();
+    const body = await request.json();
 
-    const product = await Product.findById(productId);
-    if (!product) return NextResponse.json({ success: false, error: 'Produk tidak ditemukan' }, { status: 404 });
+    // only pick the fields you want to allow
+    const product = await Product.create({
+      name:         body.name,
+      category:     body.category,
+      quantity:     Number(body.quantity) || 0,
+      minStock:     Number(body.minStock) || 0,
+      unit:         body.unit || 'pcs',
+      price:        Number(body.price) || 0,
+      sku:          body.sku || '',
+      supplier:     body.supplier || '',
+      description:  body.description || '',
+      tipeItem:     body.tipeItem || 'Other',
+      lokasiGudang: body.lokasiGudang || '',
+      bisaDiklaim:  body.bisaDiklaim || false,
+    });
 
-    if (!product.bisaDiklaim) {
-      return NextResponse.json({ success: false, error: 'Produk ini tidak bisa diklaim' }, { status: 400 });
-    }
-
-    if (product.stokTersedia < jumlah) {
-      return NextResponse.json({ success: false, error: `Stok tidak cukup. Tersedia: ${product.stokTersedia}` }, { status: 400 });
-    }
-
-    // Tambah ke riwayat klaim
-    product.riwayatKlaim.push({ jumlah, alasan, customerId, namaCustomer, disetujui: false });
-
-    // Hold stok sementara
-    product.stokDiHold = (product.stokDiHold || 0) + jumlah;
-
-    await product.save();
-
-    return NextResponse.json({ success: true, message: 'Klaim diajukan, menunggu persetujuan admin', data: product });
+    return NextResponse.json({ success: true, data: product }, { status: 201 });
   } catch (err) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }

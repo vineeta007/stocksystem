@@ -11,6 +11,7 @@ export async function GET() {
     const sheet = workbook.Sheets['Data Garansi'];
     const data = XLSX.utils.sheet_to_json(sheet);
     return NextResponse.json(data);
+    
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
