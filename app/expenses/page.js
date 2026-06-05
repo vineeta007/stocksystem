@@ -36,30 +36,18 @@ export default function ExpensesPage() {
 
   function openEdit(e) {
     setEditExpense(e);
-    setForm({
-      date: e.date?.slice(0, 10) || '',
-      name: e.name,
-      amount: String(e.amount),
-      details: e.details || '',
-    });
+    setForm({ date: e.date?.slice(0, 10) || '', name: e.name, amount: String(e.amount), details: e.details || '' });
     setShowModal(true);
   }
 
   async function handleSave() {
     if (!form.name.trim() || !form.date || !form.amount) return alert('Date, name and amount are required');
     setSaving(true);
-    const payload = {
-      date: form.date,
-      name: form.name,
-      amount: Number(form.amount) || 0,
-      details: form.details,
-    };
+    const payload = { date: form.date, name: form.name, amount: Number(form.amount) || 0, details: form.details };
 
     if (editExpense) {
       const res = await fetch(`/api/expenses/${editExpense._id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
       });
       const json = await res.json();
       setSaving(false);
@@ -67,9 +55,7 @@ export default function ExpensesPage() {
       else alert('Failed: ' + json.error);
     } else {
       const res = await fetch('/api/expenses', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
       });
       const json = await res.json();
       setSaving(false);
@@ -85,21 +71,18 @@ export default function ExpensesPage() {
   }
 
   const months = ['All', ...new Set(expenses.map(e => e.date?.slice(0, 7)).filter(Boolean))].sort().reverse();
-
   const filtered = expenses.filter(e => {
     const matchSearch = e.name.toLowerCase().includes(search.toLowerCase()) || (e.details || '').toLowerCase().includes(search.toLowerCase());
     const matchMonth = monthFilter === 'All' || e.date?.startsWith(monthFilter);
     return matchSearch && matchMonth;
   });
-
   const total = filtered.reduce((sum, e) => sum + (e.amount || 0), 0);
 
   function fmt(n) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n); }
-  function fmtDate(d) { if (!d) return '—'; const dt = new Date(d); return dt.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }); }
+  function fmtDate(d) { if (!d) return '—'; return new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }); }
 
   return (
     <div style={{ minHeight: '100vh', color: TEXT }}>
-
       {/* Header */}
       <div style={{ padding: '18px 28px 14px', borderBottom: `0.5px solid ${BORDER}`, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
         <div>
@@ -154,15 +137,17 @@ export default function ExpensesPage() {
                   <td style={{ padding: '11px 10px', color: TEXT, fontWeight: 500 }}>{e.name}</td>
                   <td style={{ padding: '11px 10px', fontFamily: 'Space Mono, monospace', fontWeight: 700, color: '#e05050', fontSize: 9 }}>{fmt(e.amount)}</td>
                   <td style={{ padding: '11px 10px', color: MUTED, fontSize: 9, maxWidth: 260, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.details || '—'}</td>
-                  <td style={{ padding: '11px 10px', display: 'flex', gap: 6 }}>
-                    <button onClick={() => openEdit(e)}
-                      style={{ padding: '4px 10px', fontSize: 9, letterSpacing: '0.08em', textTransform: 'uppercase', background: 'transparent', color: GOLD, border: `0.5px solid ${GOLD}`, borderRadius: 3, cursor: 'pointer', fontWeight: 600 }}>
-                      Edit
-                    </button>
-                    <button onClick={() => handleDelete(e._id)}
-                      style={{ padding: '4px 10px', fontSize: 9, letterSpacing: '0.08em', textTransform: 'uppercase', background: 'transparent', color: '#e05050', border: '0.5px solid #4a2020', borderRadius: 3, cursor: 'pointer' }}>
-                      Del
-                    </button>
+                  <td style={{ padding: '11px 10px' }}>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <button onClick={() => openEdit(e)}
+                        style={{ padding: '4px 10px', fontSize: 9, letterSpacing: '0.08em', textTransform: 'uppercase', background: 'transparent', color: GOLD, border: `0.5px solid ${GOLD}`, borderRadius: 3, cursor: 'pointer', fontWeight: 600 }}>
+                        Edit
+                      </button>
+                      <button onClick={() => handleDelete(e._id)}
+                        style={{ padding: '4px 10px', fontSize: 9, letterSpacing: '0.08em', textTransform: 'uppercase', background: 'transparent', color: '#e05050', border: '0.5px solid #4a2020', borderRadius: 3, cursor: 'pointer' }}>
+                        Del
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -200,8 +185,7 @@ export default function ExpensesPage() {
                 <div style={{ fontSize: 9, letterSpacing: '0.15em', color: MUTED, textTransform: 'uppercase', marginBottom: 5 }}>{f.label}</div>
                 <input type={f.type || 'text'} placeholder={f.placeholder} value={form[f.key]}
                   onChange={ev => setForm(prev => ({ ...prev, [f.key]: ev.target.value }))}
-                  style={{ width: '100%', background: '#0d0d0b', border: `0.5px solid ${BORDER}`, borderRadius: 3, padding: '8px 12px', color: TEXT, fontSize: 12, outline: 'none', boxSizing: 'border-box',
-                    colorScheme: 'dark' }} />
+                  style={{ width: '100%', background: '#0d0d0b', border: `0.5px solid ${BORDER}`, borderRadius: 3, padding: '8px 12px', color: TEXT, fontSize: 12, outline: 'none', boxSizing: 'border-box', colorScheme: 'dark' }} />
               </div>
             ))}
             <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
