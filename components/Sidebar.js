@@ -30,19 +30,21 @@ const NAV = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+
   return (
     <aside style={{
       width: '220px', flexShrink: 0,
-      background: '#0F1F3D',
-      borderRight: '1px solid #1E3A5F',
+      background: '#1E293B',
+      borderRight: '1px solid rgba(148,163,184,0.1)',
       display: 'flex', flexDirection: 'column',
       minHeight: '100vh', position: 'sticky', top: 0,
       fontFamily: "'Sora', sans-serif",
     }}>
+
       {/* Logo */}
-      <div style={{ padding: '24px 20px 20px', fontSize: '20px', fontWeight: 700, letterSpacing: '-0.3px' }}>
-        <span style={{ color: '#FFFFFF' }}>Stock</span>
-        <span style={{ color: '#4EAAFF' }}>Vault</span>
+      <div style={{ padding: '24px 20px 20px', fontSize: '19px', fontWeight: 700, letterSpacing: '-0.3px' }}>
+        <span style={{ color: '#F1F5F9' }}>Stock</span>
+        <span style={{ color: '#34D399' }}>Vault</span>
       </div>
 
       {/* Nav */}
@@ -51,7 +53,8 @@ export default function Sidebar() {
           <div key={i}>
             {section.group && (
               <div style={{
-                fontSize: '10px', fontWeight: 600, color: '#4A7BAF',
+                fontSize: '10px', fontWeight: 600,
+                color: '#475569',
                 letterSpacing: '1.2px', textTransform: 'uppercase',
                 padding: '14px 20px 6px',
               }}>{section.group}</div>
@@ -60,12 +63,12 @@ export default function Sidebar() {
               const active = pathname === item.href || pathname.startsWith(item.href + '/');
               return (
                 <Link key={item.href} href={item.href} style={{
-                  display: 'block', padding: '10px 20px',
-                  fontSize: '14px', fontWeight: active ? 600 : 500,
-                  color: active ? '#4EAAFF' : '#B8D4F0',
+                  display: 'block', padding: '9px 20px',
+                  fontSize: '14px', fontWeight: active ? 600 : 400,
+                  color: active ? '#34D399' : '#94A3B8',
                   textDecoration: 'none',
-                  borderLeft: `3px solid ${active ? '#2E90FA' : 'transparent'}`,
-                  background: active ? 'rgba(46,144,250,.14)' : 'transparent',
+                  borderLeft: `3px solid ${active ? '#1D9E75' : 'transparent'}`,
+                  background: active ? 'rgba(29,158,117,0.12)' : 'transparent',
                   transition: 'all .15s',
                 }}>
                   {item.label}
@@ -79,15 +82,18 @@ export default function Sidebar() {
       {/* User */}
       <div style={{
         display: 'flex', alignItems: 'center', gap: '10px',
-        padding: '16px 20px', borderTop: '1px solid #1E3A5F',
+        padding: '16px 20px',
+        borderTop: '1px solid rgba(148,163,184,0.1)',
       }}>
         <div style={{
-          width: '34px', height: '34px', borderRadius: '50%',
-          background: '#1A6DB5', display: 'flex', alignItems: 'center',
-          justifyContent: 'center', fontSize: '12px', fontWeight: 700,
-          color: '#FFFFFF', flexShrink: 0,
+          width: '32px', height: '32px', borderRadius: '50%',
+          background: 'rgba(29,158,117,0.2)',
+          border: '1px solid rgba(29,158,117,0.4)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: '11px', fontWeight: 700,
+          color: '#34D399', flexShrink: 0,
         }}>SA</div>
-        <span style={{ fontSize: '13px', fontWeight: 500, color: '#B8D4F0' }}>Studio Admin</span>
+        <span style={{ fontSize: '13px', fontWeight: 500, color: '#94A3B8' }}>Studio Admin</span>
       </div>
     </aside>
   );
