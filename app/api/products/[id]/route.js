@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import Product from '@/models/Product';
 
-// GET single product
 export async function GET(request, { params }) {
   try {
     await dbConnect();
@@ -14,7 +13,6 @@ export async function GET(request, { params }) {
   }
 }
 
-// PATCH update product
 export async function PATCH(request, { params }) {
   try {
     await dbConnect();
@@ -39,7 +37,6 @@ export async function PATCH(request, { params }) {
   }
 }
 
-// DELETE product
 export async function DELETE(request, { params }) {
   try {
     await dbConnect();
