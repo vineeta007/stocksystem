@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
 
 const NAV = [
   { items: [
@@ -28,8 +29,22 @@ const NAV = [
   ]},
 ];
 
+function getInitials(name = '') {
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join('');
+}
+
 export default function Sidebar() {
   const pathname = usePathname();
+  const { user, logout } = useAuth();
+
+  const displayName = user?.name || user?.username || 'User';
+  const role = user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : '';
+  const initials = getInitials(displayName);
 
   return (
     <aside style={{
@@ -79,21 +94,43 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* User */}
+      {/* User section */}
       <div style={{
-        display: 'flex', alignItems: 'center', gap: '10px',
-        padding: '16px 20px',
+        padding: '14px 20px',
         borderTop: '1px solid rgba(148,163,184,0.1)',
       }}>
-        <div style={{
-          width: '32px', height: '32px', borderRadius: '50%',
-          background: 'rgba(29,158,117,0.2)',
-          border: '1px solid rgba(29,158,117,0.4)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '11px', fontWeight: 700,
-          color: '#34D399', flexShrink: 0,
-        }}>SA</div>
-        <span style={{ fontSize: '13px', fontWeight: 500, color: '#94A3B8' }}>Studio Admin</span>
+        {/* Avatar + name */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+          <div style={{
+            width: '34px', height: '34px', borderRadius: '50%', flexShrink: 0,
+            background: 'rgba(29,158,117,0.2)',
+            border: '1px solid rgba(29,158,117,0.4)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '11px', fontWeight: 700, color: '#34D399',
+          }}>{initials}</div>
+
+          <div style={{ minWidth: 0 }}>
+            <div style={{
+              fontSize: '13px', fontWeight: 600, color: '#F1F5F9',
+              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+            }}>{displayName}</div>
+            {role && (
+              <div style={{ fontSize: '11px', color: '#64748B', marginTop: '1px' }}>{role}</div>
+            )}
+          </div>
+        </div>
+
+        {/* Sign out */}
+        <button onClick={logout} style={{
+          width: '100%', padding: '7px 0',
+          background: 'transparent',
+          border: '1px solid rgba(239,68,68,0.3)',
+          borderRadius: '7px',
+          color: '#FCA5A5', fontSize: '12px', fontWeight: 600,
+          cursor: 'pointer', fontFamily: "'Sora', sans-serif",
+        }}>
+          Sign out
+        </button>
       </div>
     </aside>
   );
