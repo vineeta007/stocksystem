@@ -64,7 +64,7 @@ export default function Sidebar() {
         <img
           src="/kreativlogo.png"
           alt="Kreativ Lift"
-          style={{ width: '200px', height: 'auto', objectFit: 'contain', mixBlendMode: 'lighten' }}
+          style={{ width: '200px', height: 'auto', objectFit: 'contain', mixBlendMode: 'screen', filter: 'brightness(1.1) contrast(1.2)' }}
         />
       </div>
 
