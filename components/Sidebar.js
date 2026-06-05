@@ -18,7 +18,7 @@ const NAV = [
     { label: 'Chain Warranty', href: '/products?cat=chain-warranty' },
   ]},
   { group: 'Maintenance', items: [
-    { label: '🔧 Data Maintenance', href: '/maintenance' },
+    { label: '👥 Customer List', href: '/maintenance' },
     { label: '📦 Klaim Sparepart',  href: '/klaim' },
   ]},
   { group: 'Client Details', items: [
