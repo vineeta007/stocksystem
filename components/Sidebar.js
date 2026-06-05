@@ -64,7 +64,7 @@ export default function Sidebar() {
         <img
           src="/kreativlogo1.png"
           alt="Kreativ Lift"
-          style={{ width: '100%', height: '80px', objectFit: 'contain', borderRadius: '8px' }}
+          style={{ width: '100%', height: '120px', objectFit: 'contain', borderRadius: '8px' }}
         />
       </div>
 
