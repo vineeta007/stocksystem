@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -39,7 +39,8 @@
   --red:         #EF4444;
   --red-dim:     rgba(239,68,68,0.15);
 
-  --font: 'Sora', sans-serif;
+  --font:       'Sora', sans-serif;
+  --font-serif: 'Playfair Display', serif;
 }
 
 /* ── Reset ── */
@@ -318,3 +319,8 @@ button { font-family: var(--font) !important; cursor: pointer !important; font-s
 .rounded    { border-radius: 8px !important; }
 .rounded-lg { border-radius: 14px !important; }
 .shadow-teal { box-shadow: 0 0 0 3px var(--teal-dim) !important; }
+
+/* ── Serif font utility (Playfair Display) ── */
+.font-serif {
+  font-family: var(--font-serif) !important;
+}
