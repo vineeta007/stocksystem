@@ -4,7 +4,7 @@
 
 const mongoose = require('mongoose');
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://vineetadevnani_db_user:vdevnani007@cluster0.ksvbtfj.mongodb.net/stocksystem';
+const MONGODB_URI = 'mongodb+srv://tasha_db_user:kreativlift1234@cluster0.nph5g5d.mongodb.net/stockvault?appName=Cluster0';
 
 const ProductSchema = new mongoose.Schema({
   name:        { type: String, required: true },
