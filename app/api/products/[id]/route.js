@@ -21,16 +21,8 @@ export async function PATCH(request, context) {
     const body = await request.json();
     const updated = await Product.findByIdAndUpdate(
       id,
-      {
-        $set: {
-          name:     body.name,
-          category: body.category,
-          quantity: Number(body.quantity) || 0,
-          minStock: Number(body.minStock) || 0,
-          sku:      body.sku || '',
-        }
-      },
-      { new: true, runValidators: true }
+      { $set: { name: body.name, category: body.category, quantity: Number(body.quantity) || 0, minStock: Number(body.minStock) || 0, sku: body.sku || '' } },
+      { new: true }
     );
     if (!updated) return NextResponse.json({ success: false, error: 'Not found' }, { status: 404 });
     return NextResponse.json({ success: true, data: updated });
