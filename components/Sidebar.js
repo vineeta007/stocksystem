@@ -15,10 +15,11 @@ const NAV = [
     { label: '👥 Customer List',   href: '/maintenance' },
     { label: '📦 Klaim Sparepart', href: '/klaim' },
   ]},
-  { items: [
+ { items: [
     { label: '🛡️ Data Garansi',    href: '/clients' },
+    { label: '💸 Expenses',         href: '/expenses' },
   ]},
-  { items: [
+    { items: [
     { label: '📊 Reports',         href: '/reports' },
     { label: '⚙️ Settings',        href: '/settings' },
   ]},
