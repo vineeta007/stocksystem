@@ -60,7 +60,7 @@ export default function Sidebar() {
     }}>
 
       {/* Logo */}
-      <div style={{ padding: '16px 16px 8px', display: 'flex', alignItems: 'center' }}>
+      <div style={{ padding: '0', display: 'flex', alignItems: 'center' }}>
         <img
           src="/kreativlogo1.png"
           alt="Kreativ Lift"
