@@ -9,7 +9,7 @@ const NAV = [
   { items: [
     { label: 'Dashboard',    href: '/' },
     { label: 'Products',     href: '/products' },
-    { label: 'Vendor List', href: '/transactions' },
+    { label: 'Vendor List', href: '/vendors' },
   ]},
   { group: 'Catalogue', items: [
     { label: 'Swift Parts',    href: '/products?cat=swift-parts' },
