@@ -14,62 +14,89 @@ const stockItems = [
 ];
 
 const recentTransactions = [
-  { type: 'in', label: 'Swift S-Hook — Paleo Enclosures', delta: '+15', time: '6 hours ago' },
-  { type: 'out', label: 'Modular E. stock in', delta: '-3', time: '5 hours ago' },
-  { type: 'in', label: 'D-Shackle — Forty Cities Pvt Ltd', delta: '+20', time: 'Yesterday' },
-  { type: 'out', label: 'Solarcraft Coil stock in', delta: '-8', time: 'Yesterday' },
-  { type: 'in', label: 'Flexa Par 180 — Online Minimum', delta: '+10', time: '2 days ago' },
+  { type: 'in',  label: 'Swift S-Hook — Paleo Enclosures',   delta: '+15', time: '6 hours ago' },
+  { type: 'out', label: 'Modular E. stock in',               delta: '-3',  time: '5 hours ago' },
+  { type: 'in',  label: 'D-Shackle — Forty Cities Pvt Ltd',  delta: '+20', time: 'Yesterday' },
+  { type: 'out', label: 'Solarcraft Coil stock in',          delta: '-8',  time: 'Yesterday' },
+  { type: 'in',  label: 'Flexa Par 180 — Online Minimum',    delta: '+10', time: '2 days ago' },
 ];
 
 const categoryStock = [
-  { name: 'Swift Parts', qty: 0, max: 30 },
-  { name: 'Lifting (Purchased)', qty: 0, max: 30 },
-  { name: 'Lifting (ODM)', qty: 12, max: 30 },
-  { name: 'PPE / Health', qty: 20, max: 30 },
-  { name: 'Station Buttons', qty: 24, max: 30 },
+  { name: 'Swift Parts',        qty: 0,  max: 30 },
+  { name: 'Lifting (Purchased)', qty: 0,  max: 30 },
+  { name: 'Lifting (ODM)',      qty: 12, max: 30 },
+  { name: 'PPE / Health',       qty: 20, max: 30 },
+  { name: 'Station Buttons',    qty: 24, max: 30 },
 ];
 
 const lowStockAlerts = [
-  { id: 1, name: 'Swift S-Hook',  quantity: 3, status: 'low' },
-  { id: 2, name: 'Modular Elbow', quantity: 3, status: 'low' },
+  { id: 1, name: 'Swift S-Hook',   quantity: 3, status: 'low' },
+  { id: 2, name: 'Modular Elbow',  quantity: 3, status: 'low' },
   { id: 3, name: 'D-Shackle 8mm', quantity: 2, status: 'low' },
   { id: 4, name: 'Chain Warranty', quantity: 0, status: 'out' },
-  { id: 5, name: 'Flexa Par 130', quantity: 1, status: 'low' },
+  { id: 5, name: 'Flexa Par 130',  quantity: 1, status: 'low' },
 ];
+
+// ── colour tokens (Midnight Slate) ──────────────────────────────────────────
+const C = {
+  base:       '#0F172A',
+  card:       '#1E293B',
+  hover:      '#263548',
+  border:     'rgba(148,163,184,0.1)',
+  teal:       '#1D9E75',
+  tealLight:  '#34D399',
+  tealDim:    'rgba(29,158,117,0.15)',
+  text:       '#F1F5F9',
+  muted:      '#94A3B8',
+  dim:        '#64748B',
+  green:      '#4ADE80',
+  greenDim:   'rgba(34,197,94,0.15)',
+  amber:      '#FCD34D',
+  amberDim:   'rgba(245,158,11,0.15)',
+  red:        '#FCA5A5',
+  redDim:     'rgba(239,68,68,0.15)',
+};
 
 export default function Dashboard() {
   return (
-    <div style={{ padding: '0 24px 32px' }}>
-      {/* Header */}
+    <div style={{ padding: '0 24px 32px', background: C.base, minHeight: '100vh' }}>
+
+      {/* ── Header ── */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '24px 0 20px', borderBottom: '1px solid #2a2925', marginBottom: '20px',
+        padding: '24px 0 20px',
+        borderBottom: `1px solid ${C.border}`,
+        marginBottom: '20px',
       }}>
         <div>
-          <div style={{ fontSize: '9px', color: '#5a5850', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '2px' }}>Overview</div>
-          <h1 style={{ fontSize: '24px', fontFamily: 'Space Mono, monospace', fontWeight: 700, color: '#e8e4d9', letterSpacing: '-0.5px' }}>Dashboard</h1>
+          <div style={{ fontSize: '10px', color: C.dim, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '4px' }}>
+            Overview
+          </div>
+          <h1 style={{ fontSize: '24px', fontWeight: 700, color: C.text, letterSpacing: '-0.3px', margin: 0 }}>
+            Dashboard
+          </h1>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
           <Link href="/transactions?type=in" style={{
             display: 'flex', alignItems: 'center', gap: '6px',
-            background: '#1e1d19', border: '1px solid #333230',
-            color: '#e8e4d9', padding: '8px 14px', borderRadius: '5px',
+            background: C.tealDim, border: `1px solid ${C.teal}`,
+            color: C.tealLight, padding: '8px 16px', borderRadius: '8px',
             fontSize: '12px', fontWeight: 600, textDecoration: 'none',
           }}>
-            <span style={{ fontSize: '10px' }}>↓</span> STOCK IN
+            ↓ STOCK IN
           </Link>
           <Link href="/transactions?type=out" style={{
             display: 'flex', alignItems: 'center', gap: '6px',
-            background: '#1e1d19', border: '1px solid #333230',
-            color: '#e8e4d9', padding: '8px 14px', borderRadius: '5px',
+            background: C.redDim, border: '1px solid rgba(239,68,68,0.4)',
+            color: C.red, padding: '8px 16px', borderRadius: '8px',
             fontSize: '12px', fontWeight: 600, textDecoration: 'none',
           }}>
-            <span style={{ fontSize: '10px' }}>↑</span> STOCK OUT
+            ↑ STOCK OUT
           </Link>
         </div>
       </div>
 
-      {/* Stat Cards Row */}
+      {/* ── Stat Cards ── */}
       <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
         <StatCard label="Total Products" value="18" sublabel="Active lines"   dotColor="green"  />
         <StatCard label="Low Stock"      value="5"  sublabel="Need attention" dotColor="orange" />
@@ -77,81 +104,79 @@ export default function Dashboard() {
         <StatCard label="Transactions"   value="47" sublabel="This month"     dotColor="blue"   />
       </div>
 
-      {/* 🔔 Reminder Maintenance Widget */}
+      {/* ── Reminder Widget ── */}
       <div style={{ marginBottom: '12px' }}>
         <ReminderWidget />
       </div>
 
-      {/* Middle Row */}
+      {/* ── Middle Row ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-        {/* Current Stock Levels */}
+
         <Card title="Current Stock Levels" actionLabel="View All →" actionHref="/products">
           <StockTable items={stockItems} />
         </Card>
 
-        {/* Recent Transactions */}
         <Card title="Recent Transactions" actionLabel="View All" actionHref="/transactions">
-          <div>
-            {recentTransactions.map((tx, i) => (
-              <div key={i} style={{
-                display: 'flex', alignItems: 'flex-start',
-                padding: '9px 0',
-                borderBottom: i < recentTransactions.length - 1 ? '1px solid #222120' : 'none',
-                gap: '8px',
-              }}>
-                <span style={{
-                  width: '6px', height: '6px', borderRadius: '50%',
-                  background: tx.type === 'in' ? '#4caf7a' : '#e05050',
-                  marginTop: '4px', flexShrink: 0,
-                }} />
-                <div style={{ flex: 1, fontSize: '11px', color: '#a8a498', lineHeight: 1.4 }}>
-                  <span style={{ color: '#8a8678', fontWeight: 500, fontSize: '10px' }}>
-                    {tx.type === 'in' ? 'In: ' : 'Out: '}
-                  </span>
-                  {tx.label}
-                  <div style={{ fontSize: '9px', color: '#4a4840', marginTop: '1px' }}>{tx.time}</div>
-                </div>
-                <span style={{
-                  fontSize: '12px', fontFamily: 'Space Mono, monospace', fontWeight: 700,
-                  color: tx.type === 'in' ? '#4caf7a' : '#e05050', flexShrink: 0,
-                }}>{tx.delta}</span>
+          {recentTransactions.map((tx, i) => (
+            <div key={i} style={{
+              display: 'flex', alignItems: 'flex-start',
+              padding: '10px 0',
+              borderBottom: i < recentTransactions.length - 1 ? `1px solid ${C.border}` : 'none',
+              gap: '10px',
+            }}>
+              <span style={{
+                width: '7px', height: '7px', borderRadius: '50%', flexShrink: 0,
+                marginTop: '4px',
+                background: tx.type === 'in' ? C.teal : '#EF4444',
+              }} />
+              <div style={{ flex: 1, fontSize: '12px', color: C.muted, lineHeight: 1.5 }}>
+                <span style={{ color: C.dim, fontWeight: 500, fontSize: '11px' }}>
+                  {tx.type === 'in' ? 'In: ' : 'Out: '}
+                </span>
+                {tx.label}
+                <div style={{ fontSize: '10px', color: C.dim, marginTop: '2px' }}>{tx.time}</div>
               </div>
-            ))}
-          </div>
+              <span style={{
+                fontSize: '13px', fontWeight: 700,
+                color: tx.type === 'in' ? C.tealLight : C.red, flexShrink: 0,
+              }}>{tx.delta}</span>
+            </div>
+          ))}
         </Card>
       </div>
 
-      {/* Bottom Row */}
+      {/* ── Bottom Row ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-        {/* Stock By Category */}
+
         <Card title="Stock By Category">
-          <div>
-            {categoryStock.map((cat, i) => (
-              <div key={i} style={{
-                display: 'flex', alignItems: 'center',
-                padding: '9px 0',
-                borderBottom: i < categoryStock.length - 1 ? '1px solid #222120' : 'none',
-                gap: '10px',
-              }}>
-                <div style={{ width: '120px', fontSize: '12px', color: '#a8a498' }}>{cat.name}</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ height: '3px', background: '#2a2925', borderRadius: '2px', overflow: 'hidden' }}>
-                    <div style={{
-                      height: '100%', width: `${(cat.qty / cat.max) * 100}%`,
-                      background: '#c9a84c', borderRadius: '2px',
-                    }} />
-                  </div>
+          {categoryStock.map((cat, i) => (
+            <div key={i} style={{
+              display: 'flex', alignItems: 'center',
+              padding: '10px 0',
+              borderBottom: i < categoryStock.length - 1 ? `1px solid ${C.border}` : 'none',
+              gap: '12px',
+            }}>
+              <div style={{ width: '130px', fontSize: '12px', color: C.muted, flexShrink: 0 }}>{cat.name}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ height: '4px', background: C.hover, borderRadius: '4px', overflow: 'hidden' }}>
+                  <div style={{
+                    height: '100%',
+                    width: `${(cat.qty / cat.max) * 100}%`,
+                    background: cat.qty === 0 ? C.redDim : C.teal,
+                    borderRadius: '4px',
+                    transition: 'width 0.4s ease',
+                  }} />
                 </div>
-                <div style={{
-                  fontSize: '13px', fontFamily: 'Space Mono, monospace',
-                  color: '#e8e4d9', width: '20px', textAlign: 'right',
-                }}>{cat.qty}</div>
               </div>
-            ))}
-          </div>
+              <div style={{
+                fontSize: '13px', fontWeight: 600,
+                color: cat.qty === 0 ? C.red : C.text,
+                width: '24px', textAlign: 'right',
+              }}>{cat.qty}</div>
+            </div>
+          ))}
         </Card>
 
-        {/* Low Stock Alerts */}
         <Card title="Low Stock Alerts" actionLabel="Manage" actionHref="/products">
           <LowStockAlert alerts={lowStockAlerts} />
         </Card>
@@ -160,24 +185,27 @@ export default function Dashboard() {
   );
 }
 
+// ── Card component ───────────────────────────────────────────────────────────
 function Card({ title, actionLabel, actionHref, children }) {
   return (
     <div style={{
-      background: '#1e1d19', border: '1px solid #2a2925',
-      borderRadius: '6px', padding: '16px',
+      background: C.card,
+      border: `1px solid ${C.border}`,
+      borderRadius: '12px',
+      padding: '18px',
     }}>
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        marginBottom: '12px',
+        marginBottom: '14px',
       }}>
         <span style={{
           fontSize: '10px', textTransform: 'uppercase',
-          letterSpacing: '0.12em', color: '#8a8678', fontWeight: 600,
+          letterSpacing: '0.12em', color: C.dim, fontWeight: 600,
         }}>{title}</span>
         {actionLabel && (
           <Link href={actionHref || '#'} style={{
-            fontSize: '9px', color: '#c9a84c', textDecoration: 'none',
-            letterSpacing: '0.08em', textTransform: 'uppercase',
+            fontSize: '11px', color: C.tealLight, textDecoration: 'none',
+            fontWeight: 600,
           }}>{actionLabel}</Link>
         )}
       </div>
