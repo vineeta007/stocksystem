@@ -14,15 +14,6 @@ function statusStyle(quantity, minStock) {
   return { bg: '#1a2e22', color: '#4caf7a', border: '#2a4a32', label: 'IN STOCK' };
 }
 
-async function uploadImage(file) {
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET);
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, { method: 'POST', body: formData });
-  const data = await res.json();
-  return data.secure_url;
-}
-
 const EMPTY_FORM = { name: '', category: '', stock: '', minStock: '', sku: '' };
 
 export default function ProductsPage() {
@@ -32,6 +23,7 @@ export default function ProductsPage() {
   const [category, setCategory] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [showModal, setShowModal] = useState(false);
+  const [editProduct, setEditProduct] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
 
@@ -45,42 +37,54 @@ export default function ProductsPage() {
 
   useEffect(() => { fetchProducts(); }, []);
 
-  async function handleAdd() {
-    if (!form.name.trim() || !form.category.trim()) return alert('Name and category are required');
-    setSaving(true);
-    const res = await fetch('/api/products', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: form.name,
-        category: form.category,
-        quantity: Number(form.stock) || 0,
-        minStock: Number(form.minStock) || 0,
-        sku: form.sku,
-      }),
-    });
-    const json = await res.json();
-    setSaving(false);
-    if (json.success) {
-      setShowModal(false);
-      setForm(EMPTY_FORM);
-      fetchProducts();
-    } else {
-      alert('Failed: ' + json.error);
-    }
+  function openAdd() {
+    setEditProduct(null);
+    setForm(EMPTY_FORM);
+    setShowModal(true);
   }
 
-  async function handlePhotoUpload(productId, file) {
-    try {
-      const imageUrl = await uploadImage(file);
-      await fetch(`/api/products/${productId}`, {
+  function openEdit(p) {
+    setEditProduct(p);
+    setForm({ name: p.name, category: p.category, stock: String(p.quantity ?? 0), minStock: String(p.minStock ?? 0), sku: p.sku || '' });
+    setShowModal(true);
+  }
+
+  async function handleSave() {
+    if (!form.name.trim() || !form.category.trim()) return alert('Name and category are required');
+    setSaving(true);
+
+    if (editProduct) {
+      const res = await fetch(`/api/products/${editProduct._id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrl }),
+        body: JSON.stringify({
+          name: form.name,
+          category: form.category,
+          quantity: Number(form.stock) || 0,
+          minStock: Number(form.minStock) || 0,
+          sku: form.sku,
+        }),
       });
-      fetchProducts();
-    } catch (err) {
-      alert('Upload failed');
+      const json = await res.json();
+      setSaving(false);
+      if (json.success) { setShowModal(false); fetchProducts(); }
+      else alert('Failed: ' + json.error);
+    } else {
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          category: form.category,
+          quantity: Number(form.stock) || 0,
+          minStock: Number(form.minStock) || 0,
+          sku: form.sku,
+        }),
+      });
+      const json = await res.json();
+      setSaving(false);
+      if (json.success) { setShowModal(false); setForm(EMPTY_FORM); fetchProducts(); }
+      else alert('Failed: ' + json.error);
     }
   }
 
@@ -114,7 +118,7 @@ export default function ProductsPage() {
             <span style={{ color: '#d97b3a', fontFamily: 'Space Mono, monospace', fontWeight: 700 }}>{low}</span> low &nbsp;·&nbsp;
             <span style={{ color: '#e05050', fontFamily: 'Space Mono, monospace', fontWeight: 700 }}>{out}</span> out
           </div>
-          <button onClick={() => setShowModal(true)}
+          <button onClick={openAdd}
             style={{ padding: '7px 14px', fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', background: GOLD, color: '#0a0a07', border: 'none', borderRadius: 3, cursor: 'pointer', fontWeight: 700 }}>
             + Add Product
           </button>
@@ -155,8 +159,8 @@ export default function ProductsPage() {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
             <thead>
               <tr style={{ borderBottom: `0.5px solid ${BORDER}` }}>
-                {['#', 'Product Name', 'Category', 'Stock', 'Min Stock', 'Status', 'Photo'].map(h => (
-                  <th key={h} style={{ padding: '12px 10px', textAlign: 'left', fontSize: 8, letterSpacing: '0.2em', color: FAINT, textTransform: 'uppercase', fontWeight: 600 }}>{h}</th>
+                {['#', 'Product Name', 'Category', 'Stock', 'Min Stock', 'Status', ''].map((h, idx) => (
+                  <th key={idx} style={{ padding: '12px 10px', textAlign: 'left', fontSize: 8, letterSpacing: '0.2em', color: FAINT, textTransform: 'uppercase', fontWeight: 600 }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -176,15 +180,10 @@ export default function ProductsPage() {
                       <span style={{ fontSize: 8, padding: '3px 7px', borderRadius: 2, background: st.bg, color: st.color, border: `0.5px solid ${st.border}`, fontWeight: 700, letterSpacing: '0.08em' }}>{st.label}</span>
                     </td>
                     <td style={{ padding: '11px 10px' }}>
-                      <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <input type="file" accept="image/*" style={{ display: 'none' }}
-                          onChange={e => { const file = e.target.files[0]; if (file) handlePhotoUpload(p._id, file); }} />
-                        {p.imageUrl ? (
-                          <img src={p.imageUrl} alt={p.name} style={{ width: 52, height: 52, objectFit: 'cover', borderRadius: 8, border: '1px solid #1E3A5F' }} />
-                        ) : (
-                          <div style={{ width: 52, height: 52, borderRadius: 8, border: '1px dashed #2E4C75', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#7EA8D4', fontSize: 10, background: '#13294B', fontWeight: 700 }}>Add</div>
-                        )}
-                      </label>
+                      <button onClick={() => openEdit(p)}
+                        style={{ padding: '4px 10px', fontSize: 9, letterSpacing: '0.08em', textTransform: 'uppercase', background: 'transparent', color: GOLD, border: `0.5px solid ${GOLD}`, borderRadius: 3, cursor: 'pointer', fontWeight: 600 }}>
+                        Edit
+                      </button>
                     </td>
                   </tr>
                 );
@@ -197,11 +196,13 @@ export default function ProductsPage() {
         )}
       </div>
 
-      {/* Add Product Modal */}
+      {/* Add / Edit Modal */}
       {showModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
           <div style={{ background: '#13120e', border: `1px solid ${BORDER}`, borderRadius: 6, width: '100%', maxWidth: 480, padding: 28 }}>
-            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, color: TEXT, marginBottom: 24 }}>Add Product</div>
+            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, color: TEXT, marginBottom: 24 }}>
+              {editProduct ? 'Edit Product' : 'Add Product'}
+            </div>
             {[
               { label: 'Product Name *', key: 'name', placeholder: 'e.g. Fuse Pec 150' },
               { label: 'Category *', key: 'category', placeholder: 'e.g. Swift' },
@@ -212,16 +213,16 @@ export default function ProductsPage() {
               <div key={f.key} style={{ marginBottom: 14 }}>
                 <div style={{ fontSize: 9, letterSpacing: '0.15em', color: MUTED, textTransform: 'uppercase', marginBottom: 5 }}>{f.label}</div>
                 <input type={f.type || 'text'} placeholder={f.placeholder} value={form[f.key]}
-                  onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
+                  onChange={e => setForm(prev => ({ ...prev, [f.key]: e.target.value }))}
                   style={{ width: '100%', background: '#0d0d0b', border: `0.5px solid ${BORDER}`, borderRadius: 3, padding: '8px 12px', color: TEXT, fontSize: 12, outline: 'none', boxSizing: 'border-box' }} />
               </div>
             ))}
             <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
-              <button onClick={handleAdd} disabled={saving}
+              <button onClick={handleSave} disabled={saving}
                 style={{ flex: 1, padding: '9px 0', background: GOLD, color: '#0a0a07', border: 'none', borderRadius: 3, fontWeight: 700, fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}>
-                {saving ? 'Saving...' : 'Create Product'}
+                {saving ? 'Saving...' : editProduct ? 'Save Changes' : 'Create Product'}
               </button>
-              <button onClick={() => { setShowModal(false); setForm(EMPTY_FORM); }}
+              <button onClick={() => { setShowModal(false); setForm(EMPTY_FORM); setEditProduct(null); }}
                 style={{ padding: '9px 20px', background: 'transparent', color: MUTED, border: `0.5px solid ${BORDER}`, borderRadius: 3, fontSize: 11, cursor: 'pointer' }}>
                 Cancel
               </button>
