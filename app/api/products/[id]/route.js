@@ -19,9 +19,6 @@ export async function PATCH(request, context) {
     await dbConnect();
     const id = context.params.id;
     const body = await request.json();
-
-    console.log('PATCH id:', id, 'body:', body);
-
     const updated = await Product.findByIdAndUpdate(
       id,
       {
@@ -35,7 +32,6 @@ export async function PATCH(request, context) {
       },
       { new: true, runValidators: true }
     );
-
     if (!updated) return NextResponse.json({ success: false, error: 'Not found' }, { status: 404 });
     return NextResponse.json({ success: true, data: updated });
   } catch (err) {
