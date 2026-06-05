@@ -70,8 +70,8 @@ export default function Sidebar() {
               const active = pathname === item.href || pathname.startsWith(item.href + '/');
               return (
                 <Link key={item.href} href={item.href} style={{
-                  display: 'block', padding: '11px 24px',
-                  fontSize: '15px', fontWeight: active ? 600 : 400,
+                  display: 'block', padding: '15px 24px',
+                  fontSize: '17px', fontWeight: active ? 600 : 400,
                   color: active ? '#34D399' : '#94A3B8',
                   textDecoration: 'none',
                   borderLeft: `3px solid ${active ? '#1D9E75' : 'transparent'}`,
