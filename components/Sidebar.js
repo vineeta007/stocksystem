@@ -7,20 +7,20 @@ import { AuthContext } from '@/context/AuthContext';
 
 const NAV = [
   { items: [
-    { label: 'Dashboard',    href: '/' },
-    { label: 'Products',     href: '/products' },
-    { label: 'Vendor List',  href: '/vendors' },
+    { label: '🏠 Dashboard',      href: '/' },
+    { label: '📦 Products',        href: '/products' },
+    { label: '🏪 Vendor List',     href: '/vendors' },
   ]},
   { items: [
     { label: '👥 Customer List',   href: '/maintenance' },
     { label: '📦 Klaim Sparepart', href: '/klaim' },
   ]},
   { items: [
-    { label: 'Data Garansi', href: '/clients' },
+    { label: '🛡️ Data Garansi',    href: '/clients' },
   ]},
   { items: [
-    { label: 'Reports',  href: '/reports' },
-    { label: 'Settings', href: '/settings' },
+    { label: '📊 Reports',         href: '/reports' },
+    { label: '⚙️ Settings',        href: '/settings' },
   ]},
 ];
 
