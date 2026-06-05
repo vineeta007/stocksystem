@@ -5,7 +5,7 @@ import Product from '@/models/Product';
 export async function GET(request, context) {
   try {
     await dbConnect();
-    const { id } = await context.params; // ✅ await params
+    const { id } = await context.params;
     const product = await Product.findById(id).lean();
     if (!product) return NextResponse.json({ success: false, error: 'Not found' }, { status: 404 });
     return NextResponse.json({ success: true, data: product });
@@ -17,7 +17,7 @@ export async function GET(request, context) {
 export async function PATCH(request, context) {
   try {
     await dbConnect();
-    const { id } = await context.params; // ✅ await params
+    const { id } = await context.params;
     const body = await request.json();
     const updated = await Product.findByIdAndUpdate(
       id,
@@ -34,7 +34,7 @@ export async function PATCH(request, context) {
 export async function DELETE(request, context) {
   try {
     await dbConnect();
-    const { id } = await context.params; // ✅ await params
+    const { id } = await context.params;
     await Product.findByIdAndUpdate(id, { $set: { isActive: false } });
     return NextResponse.json({ success: true });
   } catch (err) {
