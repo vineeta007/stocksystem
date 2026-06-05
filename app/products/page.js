@@ -156,11 +156,11 @@ export default function ProductsPage() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: 60, color: MUTED }}>Loading...</div>
         ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 9 }}>
             <thead>
               <tr style={{ borderBottom: `0.5px solid ${BORDER}` }}>
                 {['#', 'Product Name', 'Category', 'Stock', 'Min Stock', 'Status', ''].map((h, idx) => (
-                  <th key={idx} style={{ padding: '12px 10px', textAlign: 'left', fontSize: 8, letterSpacing: '0.2em', color: FAINT, textTransform: 'uppercase', fontWeight: 600 }}>{h}</th>
+                  <th key={idx} style={{ padding: '12px 10px', textAlign: 'left', fontSize: 9, letterSpacing: '0.2em', color: FAINT, textTransform: 'uppercase', fontWeight: 600 }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -169,15 +169,15 @@ export default function ProductsPage() {
                 const st = statusStyle(p.quantity ?? 0, p.minStock ?? 0);
                 return (
                   <tr key={p._id} style={{ borderBottom: '0.5px solid #16150f', background: i % 2 === 0 ? 'transparent' : '#111109' }}>
-                    <td style={{ padding: '11px 10px', color: FAINT, fontFamily: 'Space Mono, monospace', fontSize: 10 }}>{i + 1}</td>
-                    <td style={{ padding: '11px 10px', color: TEXT, fontWeight: 500 }}>{p.name}</td>
+                    <td style={{ padding: '11px 10px', color: FAINT, fontFamily: 'Space Mono, monospace', fontSize: 9 }}>{i + 1}</td>
+                    <td style={{ padding: '11px 10px', color: TEXT, fontWeight: 500, fontSize: 9 }}>{p.name}</td>
                     <td style={{ padding: '11px 10px' }}>
                       <span style={{ fontSize: 9, padding: '2px 7px', borderRadius: 2, background: '#1a1915', color: MUTED, border: `0.5px solid ${BORDER}`, letterSpacing: '0.05em' }}>{p.category}</span>
                     </td>
-                    <td style={{ padding: '11px 10px', fontFamily: 'Space Mono, monospace', fontWeight: 700, color: TEXT }}>{p.quantity ?? 0}</td>
-                    <td style={{ padding: '11px 10px', color: FAINT, fontFamily: 'Space Mono, monospace' }}>{p.minStock ?? 0}</td>
+                    <td style={{ padding: '11px 10px', fontFamily: 'Space Mono, monospace', fontWeight: 700, color: TEXT, fontSize: 9 }}>{p.quantity ?? 0}</td>
+                    <td style={{ padding: '11px 10px', color: FAINT, fontFamily: 'Space Mono, monospace', fontSize: 9 }}>{p.minStock ?? 0}</td>
                     <td style={{ padding: '11px 10px' }}>
-                      <span style={{ fontSize: 8, padding: '3px 7px', borderRadius: 2, background: st.bg, color: st.color, border: `0.5px solid ${st.border}`, fontWeight: 700, letterSpacing: '0.08em' }}>{st.label}</span>
+                      <span style={{ fontSize: 9, padding: '3px 7px', borderRadius: 2, background: st.bg, color: st.color, border: `0.5px solid ${st.border}`, fontWeight: 700, letterSpacing: '0.08em' }}>{st.label}</span>
                     </td>
                     <td style={{ padding: '11px 10px' }}>
                       <button onClick={() => openEdit(p)}
@@ -189,7 +189,7 @@ export default function ProductsPage() {
                 );
               })}
               {filtered.length === 0 && (
-                <tr><td colSpan={7} style={{ textAlign: 'center', padding: 48, color: MUTED }}>No products found</td></tr>
+                <tr><td colSpan={7} style={{ textAlign: 'center', padding: 48, color: MUTED, fontSize: 9 }}>No products found</td></tr>
               )}
             </tbody>
           </table>
