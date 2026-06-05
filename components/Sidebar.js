@@ -11,14 +11,14 @@ const NAV = [
     { label: 'Products',     href: '/products' },
     { label: 'Vendor List',  href: '/vendors' },
   ]},
-  { group: 'Maintenance', items: [
+  { items: [
     { label: '👥 Customer List',   href: '/maintenance' },
     { label: '📦 Klaim Sparepart', href: '/klaim' },
   ]},
-  { group: 'Client Details', items: [
+  { items: [
     { label: 'Data Garansi', href: '/clients' },
   ]},
-  { group: 'System', items: [
+  { items: [
     { label: 'Reports',  href: '/reports' },
     { label: 'Settings', href: '/settings' },
   ]},
@@ -66,14 +66,6 @@ export default function Sidebar() {
       <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px', paddingBottom: '12px', marginTop: '-12px' }}>
         {NAV.map((section, i) => (
           <div key={i}>
-            {section.group && (
-              <div style={{
-                fontSize: '11px', fontWeight: 700,
-                color: '#475569',
-                letterSpacing: '1.2px', textTransform: 'uppercase',
-                padding: '16px 24px 6px',
-              }}>{section.group}</div>
-            )}
             {section.items.map((item) => {
               const active = pathname === item.href || pathname.startsWith(item.href + '/');
               return (
