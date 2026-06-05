@@ -9,13 +9,7 @@ const NAV = [
   { items: [
     { label: 'Dashboard',    href: '/' },
     { label: 'Products',     href: '/products' },
-    { label: 'Vendor List', href: '/vendors' },
-  ]},
-  { group: 'Catalogue', items: [
-    { label: 'Swift Parts',    href: '/products?cat=swift-parts' },
-    { label: 'Lifting',        href: '/products?cat=lifting' },
-    { label: 'PPE / Health',   href: '/products?cat=ppe-health' },
-    { label: 'Chain Warranty', href: '/products?cat=chain-warranty' },
+    { label: 'Vendor List',  href: '/vendors' },
   ]},
   { group: 'Maintenance', items: [
     { label: '👥 Customer List',   href: '/maintenance' },
