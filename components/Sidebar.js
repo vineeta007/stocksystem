@@ -18,8 +18,8 @@ const NAV = [
     { label: 'Chain Warranty', href: '/products?cat=chain-warranty' },
   ]},
   { group: 'Maintenance', items: [
-    { label: '👥 Customer List', href: '/maintenance' },
-    { label: '📦 Klaim Sparepart',  href: '/klaim' },
+    { label: '👥 Customer List',   href: '/maintenance' },
+    { label: '📦 Klaim Sparepart', href: '/klaim' },
   ]},
   { group: 'Client Details', items: [
     { label: 'Data Garansi', href: '/clients' },
@@ -51,7 +51,7 @@ export default function Sidebar() {
 
   return (
     <aside style={{
-      width: '220px', flexShrink: 0,
+      width: '270px', flexShrink: 0,
       background: '#1E293B',
       borderRight: '1px solid rgba(148,163,184,0.1)',
       display: 'flex', flexDirection: 'column',
@@ -60,11 +60,11 @@ export default function Sidebar() {
     }}>
 
       {/* Logo */}
-      <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center' }}>
+      <div style={{ padding: '20px 24px', display: 'flex', alignItems: 'center' }}>
         <img
-          src="/kreativlogo.png"
+          src="/kreaticlogo.png"
           alt="Kreativ Lift"
-          style={{ width: '160px', height: 'auto', objectFit: 'contain' }}
+          style={{ width: '200px', height: 'auto', objectFit: 'contain' }}
         />
       </div>
 
@@ -74,18 +74,18 @@ export default function Sidebar() {
           <div key={i}>
             {section.group && (
               <div style={{
-                fontSize: '10px', fontWeight: 600,
+                fontSize: '11px', fontWeight: 700,
                 color: '#475569',
                 letterSpacing: '1.2px', textTransform: 'uppercase',
-                padding: '14px 20px 6px',
+                padding: '16px 24px 6px',
               }}>{section.group}</div>
             )}
             {section.items.map((item) => {
               const active = pathname === item.href || pathname.startsWith(item.href + '/');
               return (
                 <Link key={item.href} href={item.href} style={{
-                  display: 'block', padding: '9px 20px',
-                  fontSize: '14px', fontWeight: active ? 600 : 400,
+                  display: 'block', padding: '11px 24px',
+                  fontSize: '15px', fontWeight: active ? 600 : 400,
                   color: active ? '#34D399' : '#94A3B8',
                   textDecoration: 'none',
                   borderLeft: `3px solid ${active ? '#1D9E75' : 'transparent'}`,
@@ -102,35 +102,35 @@ export default function Sidebar() {
 
       {/* User section */}
       <div style={{
-        padding: '14px 20px',
+        padding: '16px 24px',
         borderTop: '1px solid rgba(148,163,184,0.1)',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
           <div style={{
-            width: '34px', height: '34px', borderRadius: '50%', flexShrink: 0,
+            width: '40px', height: '40px', borderRadius: '50%', flexShrink: 0,
             background: 'rgba(29,158,117,0.2)',
             border: '1px solid rgba(29,158,117,0.4)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '11px', fontWeight: 700, color: '#34D399',
+            fontSize: '13px', fontWeight: 700, color: '#34D399',
           }}>{initials}</div>
 
           <div style={{ minWidth: 0 }}>
             <div style={{
-              fontSize: '13px', fontWeight: 600, color: '#F1F5F9',
+              fontSize: '15px', fontWeight: 600, color: '#F1F5F9',
               whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
             }}>{displayName}</div>
             {role && (
-              <div style={{ fontSize: '11px', color: '#64748B', marginTop: '1px' }}>{role}</div>
+              <div style={{ fontSize: '12px', color: '#64748B', marginTop: '1px' }}>{role}</div>
             )}
           </div>
         </div>
 
         <button onClick={logout} style={{
-          width: '100%', padding: '7px 0',
+          width: '100%', padding: '9px 0',
           background: 'transparent',
           border: '1px solid rgba(239,68,68,0.3)',
           borderRadius: '7px',
-          color: '#FCA5A5', fontSize: '12px', fontWeight: 600,
+          color: '#FCA5A5', fontSize: '13px', fontWeight: 600,
           cursor: 'pointer', fontFamily: "'Sora', sans-serif",
         }}>
           Sign out
