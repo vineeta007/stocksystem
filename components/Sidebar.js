@@ -1,8 +1,9 @@
 'use client';
 
+import { useContext } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth } from '@/context/AuthContext';
+import { AuthContext } from '@/context/AuthContext';
 
 const NAV = [
   { items: [
@@ -40,7 +41,9 @@ function getInitials(name = '') {
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const auth = useContext(AuthContext);
+  const user = auth?.user ?? null;
+  const logout = auth?.logout ?? (() => {});
 
   const displayName = user?.name || user?.username || 'User';
   const role = user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : '';
@@ -99,7 +102,6 @@ export default function Sidebar() {
         padding: '14px 20px',
         borderTop: '1px solid rgba(148,163,184,0.1)',
       }}>
-        {/* Avatar + name */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
           <div style={{
             width: '34px', height: '34px', borderRadius: '50%', flexShrink: 0,
@@ -120,7 +122,6 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* Sign out */}
         <button onClick={logout} style={{
           width: '100%', padding: '7px 0',
           background: 'transparent',

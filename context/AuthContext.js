@@ -1,18 +1,15 @@
 'use client';
 // context/AuthContext.js
-// Wrap your app layout with <AuthProvider> to give all client components
-// access to the current user via useAuth().
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { hasPermission } from '@/lib/roles';
 
-const AuthContext = createContext(null);
+export const AuthContext = createContext(null);
 
 export function AuthProvider({ children, initialUser = null }) {
   const [user, setUser] = useState(initialUser);
   const [loading, setLoading] = useState(!initialUser);
 
-  // Re-fetch session on mount (useful after page refresh)
   useEffect(() => {
     if (initialUser) return;
     fetch('/api/auth/session')
@@ -59,12 +56,6 @@ export function AuthProvider({ children, initialUser = null }) {
   );
 }
 
-/**
- * Hook to access auth state anywhere in a client component.
- *
- * const { user, can, logout } = useAuth();
- * if (can(PERMISSIONS.EDIT_STOCK_IN)) { ... }
- */
 export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth must be used inside <AuthProvider>');
