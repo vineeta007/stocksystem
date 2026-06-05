@@ -1,5 +1,6 @@
 import './globals.css';
 import LayoutShell from '../components/LayoutShell';
+import { AuthProvider } from '../context/AuthContext';
 
 export const metadata = {
   title: 'StockVault',
@@ -10,7 +11,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <LayoutShell>{children}</LayoutShell>
+        <AuthProvider>
+          <LayoutShell>{children}</LayoutShell>
+        </AuthProvider>
       </body>
     </html>
   );
