@@ -110,10 +110,15 @@ export default function ProductsPage() {
           position: 'absolute', left: '50%', transform: 'translateX(-50%)',
         }}>Products</h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginLeft: 'auto' }}>
-          <div style={{ fontSize: 13, color: '#555555' }}>
-            <span style={{ fontWeight: 700, color: '#111111' }}>{total}</span> total &nbsp;·&nbsp;
-            <span style={{ fontWeight: 700, color: '#d97706' }}>{low}</span> low &nbsp;·&nbsp;
-            <span style={{ fontWeight: 700, color: '#CC2020' }}>{out}</span> out
+          <div style={{ fontSize: 13, color: '#555555', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontWeight: 700, color: '#111111' }}>{total}</span>
+            <span>total</span>
+            <span style={{ color: '#cccccc' }}>·</span>
+            <span style={{ fontWeight: 700, color: '#d97706' }}>{low}</span>
+            <span>low</span>
+            <span style={{ color: '#cccccc' }}>·</span>
+            <span style={{ fontWeight: 700, color: '#CC2020' }}>{out}</span>
+            <span>out</span>
           </div>
           <button onClick={openAdd} style={{
             padding: '9px 18px', fontSize: 12, letterSpacing: '0.08em',
