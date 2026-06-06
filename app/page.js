@@ -73,7 +73,7 @@ export default function Dashboard() {
         <h1 style={{
           fontSize: '60px', fontWeight: 700, color: C.text,
           letterSpacing: '-0.5px', margin: 0,
-          fontFamily: "'Cormorant Garamond', serif",
+          fontFamily: "var(--font-cormorant), serif",
           position: 'absolute', left: '50%', transform: 'translateX(-50%)',
         }}>
           Dashboard
