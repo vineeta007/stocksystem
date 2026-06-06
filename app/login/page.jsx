@@ -42,54 +42,59 @@ function LoginForm() {
   return (
     <div className={styles.page}>
 
+      {/* ── Left panel: replace /your-logo.png with your actual image path ── */}
       <div className={styles.leftPanel}>
         <div className={styles.leftInner}>
           <img
-            src="/kreativlogo1.png"
-            alt="Kreativ Lift"
+            src="/your-logo.png"
+            alt="Logo"
             className={styles.logo}
           />
         </div>
       </div>
 
+      {/* ── Right panel ── */}
       <div className={styles.rightPanel}>
         <div className={styles.rightInner}>
-          <h1 className={styles.heading}>Sign In</h1>
+          <p className={styles.portalLabel}>Member Access</p>
+          <h1 className={styles.heading}>Sign In.</h1>
 
           <form onSubmit={handleLogin} className={styles.form}>
-            <div className={styles.inputWrap}>
-              <input
-                type="text"
-                className={styles.input}
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
-                required
-                autoFocus
-              />
+            <div className={styles.fieldGroup}>
+              <label className={styles.label}>USERNAME</label>
+              <div className={styles.inputWrap}>
+                <input
+                  type="text"
+                  className={styles.input}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder=""
+                  required
+                  autoFocus
+                />
+              </div>
             </div>
 
-            <div className={styles.inputWrap}>
-              <input
-                type={showPassword ? "text" : "password"}
-                className={styles.input}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                required
-              />
-              <button
-                type="button"
-                className={styles.eyeBtn}
-                onClick={() => setShowPassword((p) => !p)}
-                aria-label="Toggle password visibility"
-              >
-                {showPassword ? "🙈" : "👁"}
-              </button>
-            </div>
-
-            <div className={styles.forgotRow}>
-              <a href="/forgot-password" className={styles.forgotLink}>Forgot password?</a>
+            <div className={styles.fieldGroup}>
+              <label className={styles.label}>PASSWORD</label>
+              <div className={styles.inputWrap}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className={styles.input}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder=""
+                  required
+                />
+                <button
+                  type="button"
+                  className={styles.eyeBtn}
+                  onClick={() => setShowPassword((p) => !p)}
+                  aria-label="Toggle password visibility"
+                >
+                  {showPassword ? "🙈" : "👁"}
+                </button>
+              </div>
             </div>
 
             {error && <p className={styles.error}>{error}</p>}
