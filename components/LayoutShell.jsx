@@ -12,12 +12,12 @@ export default function LayoutShell({ children }) {
   }
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#0F172A" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#f5f5f5" }}>
       <Sidebar />
       <main style={{
         flex: 1,
         minWidth: 0,
-        background: "#0F172A",
+        background: "#f5f5f5",
       }}>
         {children}
       </main>
