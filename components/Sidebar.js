@@ -50,7 +50,7 @@ export default function Sidebar() {
       background: '#3a3a3a',
       borderRight: '1px solid rgba(0,0,0,0.15)',
       display: 'flex', flexDirection: 'column',
-      minHeight: '100vh', position: 'sticky', top: 0,
+      height: '100vh',
       fontFamily: "'Sora', sans-serif",
     }}>
 
@@ -64,7 +64,7 @@ export default function Sidebar() {
       </div>
 
       {/* Nav */}
-      <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px', paddingBottom: '12px', marginTop: '4px' }}>
+      <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px', paddingBottom: '12px', marginTop: '4px', overflowY: 'auto' }}>
         {NAV.map((section, i) => (
           <div key={i}>
             {section.items.map((item) => {
@@ -92,6 +92,7 @@ export default function Sidebar() {
       <div style={{
         padding: '14px 18px',
         borderTop: '1px solid rgba(255,255,255,0.08)',
+        flexShrink: 0,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
           <div style={{
