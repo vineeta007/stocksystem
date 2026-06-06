@@ -8,7 +8,7 @@
 /* ── Left panel (red, diagonal stripe pattern) ── */
 .leftPanel {
   width: 45%;
-  background-color: #D32020;
+  background-color: #4a4a4a;
   background-image:
     repeating-linear-gradient(
       -55deg,
@@ -43,7 +43,7 @@
   max-width: 80% !important;
   object-fit: contain !important;
   display: block !important;
-  filter: brightness(0) invert(1) !important;
+  
 }
 
 /* ── Right panel ── */
