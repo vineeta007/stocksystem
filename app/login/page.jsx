@@ -45,9 +45,9 @@ function LoginForm() {
 
         <div className={styles.leftPanel}>
           <img
-            src="/kreativlogo.png"
-            alt="Kreativ Lift"
-            style={{ width: 180, objectFit: "contain" }}
+            src="/kreativlogo1.png"
+alt="Kreativ Lift"
+style={{ width: 220, height: 140, objectFit: "cover" }}
           />
           <p className={styles.tagline}>Elevate With Us</p>
         </div>
