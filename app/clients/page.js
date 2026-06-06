@@ -31,7 +31,19 @@ export default function ClientsPage() {
     <div className="page-container">
       <div className="page-header">
         <div>
-          <h1>🛡 Data Garansi</h1>
+          <h1>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="#1e40af"
+              width="28"
+              height="28"
+              style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px', marginTop: '-3px' }}
+            >
+              <path d="M12 2L3 6v6c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V6l-9-4z" />
+            </svg>
+            Data Garansi
+          </h1>
           <p className="subtitle">Garansi: 2 kunjungan pertama gratis setelah tanggal BAST</p>
         </div>
       </div>
