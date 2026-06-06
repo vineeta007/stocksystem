@@ -36,11 +36,14 @@
   z-index: 1;
 }
 
-/* ── Your image ── */
+/* ── Logo: big, white, visible ── */
 .logo {
-  width: 220px;
-  height: auto;
-  object-fit: contain;
+  width: 340px !important;
+  height: auto !important;
+  max-width: 80% !important;
+  object-fit: contain !important;
+  display: block !important;
+  filter: brightness(0) invert(1) !important;
 }
 
 /* ── Right panel ── */
@@ -73,7 +76,7 @@
 .heading {
   font-size: 46px;
   font-weight: 800;
-  color: #000000;
+  color: #000000 !important;
   margin: 0 0 2rem;
   letter-spacing: -1px;
   line-height: 1;
@@ -107,25 +110,25 @@
 }
 
 .input {
-  width: 100%;
-  padding: 13px 16px;
-  background: #3d4a5c;
-  border: none;
-  border-radius: 6px;
-  color: #ffffff;
-  font-size: 15px;
-  outline: none;
-  box-sizing: border-box;
-  font-family: inherit;
+  width: 100% !important;
+  padding: 13px 16px !important;
+  background: #3d4a5c !important;
+  border: none !important;
+  border-radius: 6px !important;
+  color: #ffffff !important;
+  font-size: 15px !important;
+  outline: none !important;
+  box-sizing: border-box !important;
+  font-family: inherit !important;
   transition: background 0.2s;
-  -webkit-text-fill-color: #ffffff;
-  caret-color: #ffffff;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff !important;
 }
 
 .input::placeholder { color: #8a9bb0; }
 
 .input:focus {
-  background: #4a5870;
+  background: #4a5870 !important;
 }
 
 .input:-webkit-autofill,
@@ -161,31 +164,31 @@
 
 /* ── Submit button ── */
 .submitBtn {
-  padding: 15px;
-  background: #000000;
-  color: #ffffff;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  border: none;
+  padding: 15px !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 4px !important;
+  text-transform: uppercase !important;
+  border: none !important;
   cursor: pointer;
   transition: background 0.2s, opacity 0.2s;
   font-family: inherit;
   margin-top: 4px;
-  width: 100%;
-  border-radius: 0;
+  width: 100% !important;
+  border-radius: 0 !important;
 }
 
 .submitBtn:hover:not(:disabled) {
-  background: #CC2020;
+  background: #CC2020 !important;
 }
 
 .submitBtn:active:not(:disabled) { opacity: 0.85; }
 
 .submitBtn:disabled {
-  background: #000000;
-  opacity: 0.3;
+  background: #000000 !important;
+  opacity: 0.3 !important;
   cursor: not-allowed;
 }
 
