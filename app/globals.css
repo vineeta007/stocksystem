@@ -96,6 +96,9 @@ span, li { color: var(--text) !important; font-family: var(--font) !important; }
 a { color: var(--red-accent) !important; text-decoration: none; transition: color 0.15s; }
 a:hover { color: var(--red-light) !important; }
 
+/* ── Prevent global a color bleeding into sidebar ── */
+aside a, aside a:hover { color: inherit !important; }
+
 /* ── Tables ── */
 table { border-collapse: collapse; width: 100%; }
 thead { background: #f9f9f9 !important; }
@@ -330,29 +333,3 @@ button { font-family: var(--font) !important; cursor: pointer !important; font-s
 
 /* ── Serif font utility ── */
 .font-serif { font-family: var(--font-serif) !important; }
-
-/* ── Sidebar link color overrides (beat global a !important) ── */
-.sidebar .sidebar-link,
-.sidebar a.sidebar-link,
-.sidebar-link,
-.sidebar-link span,
-.sidebar-link li,
-.sidebar a,
-.sidebar span,
-.sidebar li {
-  color: var(--text-sidebar) !important;
-}
-.sidebar .sidebar-link:hover,
-.sidebar a.sidebar-link:hover,
-.sidebar-link:hover,
-.sidebar-link:hover span,
-.sidebar-link:hover li {
-  color: #ffffff !important;
-}
-.sidebar .sidebar-link.active,
-.sidebar a.sidebar-link.active,
-.sidebar-link.active,
-.sidebar-link.active span,
-.sidebar-link.active li {
-  color: #ffffff !important;
-}
