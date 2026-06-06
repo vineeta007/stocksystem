@@ -85,7 +85,7 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: var(--red-accent); }
 
 /* ── Typography ── */
-h1 { font-size: 26px !important; font-weight: 700 !important; color: var(--text) !important; letter-spacing: -0.3px !important; font-family: 'Cormorant Garamond', serif !important; }
+h1 { font-size: 26px; font-weight: 700 !important; color: var(--text) !important; letter-spacing: -0.3px !important; font-family: 'Cormorant Garamond', serif !important; }
 h2 { font-size: 20px !important; font-weight: 600 !important; color: var(--text) !important; font-family: var(--font) !important; }
 h3 { font-size: 17px !important; font-weight: 600 !important; color: var(--text) !important; font-family: var(--font) !important; }
 h4, h5, h6 { color: var(--text) !important; font-family: var(--font) !important; }
