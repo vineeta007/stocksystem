@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
-import Image from "next/image";
 import styles from "./login.module.css";
 
 function LoginForm() {
@@ -46,13 +45,13 @@ function LoginForm() {
 
         <div className={styles.logoRow}>
           <Image
-            src="/kreativlogo1.png"
-            alt="Kreativ Lift"
-            width={180}
-            height={52}
-            style={{ objectFit: "contain" }}
-            priority
-          />
+  src="/kreativlogo1.png"
+  alt="Kreativ Lift"
+  width={180}
+  height={52}
+  style={{ objectFit: "contain" }}
+  priority
+/>
         </div>
 
         <h1 className={styles.heading}>Good to see you.</h1>
