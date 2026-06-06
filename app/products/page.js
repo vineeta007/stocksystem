@@ -111,20 +111,6 @@ export default function ProductsPage() {
           position: 'absolute', left: '50%', transform: 'translateX(-50%)',
         }}>Products</h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginLeft: 'auto' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{
-              padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
-              background: 'rgba(17,17,17,0.06)', border: '1px solid #e0e0e0', color: '#111111',
-            }}>{total} total</span>
-            <span style={{
-              padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
-              background: 'rgba(217,119,6,0.08)', border: '1px solid rgba(217,119,6,0.3)', color: '#d97706',
-            }}>{low} low</span>
-            <span style={{
-              padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
-              background: 'rgba(204,32,32,0.08)', border: '1px solid rgba(204,32,32,0.3)', color: '#CC2020',
-            }}>{out} out</span>
-          </div>
           <button onClick={openAdd} style={{
             padding: '9px 18px', fontSize: 12, letterSpacing: '0.08em',
             textTransform: 'uppercase', background: '#000000', color: '#ffffff',
@@ -142,6 +128,7 @@ export default function ProductsPage() {
         display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center',
         background: '#ffffff',
       }}>
+        {/* Search */}
         <input
           value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Search products..."
@@ -151,7 +138,11 @@ export default function ProductsPage() {
             outline: 'none', width: 220, fontFamily: "'Sora', sans-serif",
           }}
         />
+
+        {/* Divider */}
         <div style={{ width: '1px', height: '24px', background: '#e0e0e0', flexShrink: 0 }} />
+
+        {/* Category filters */}
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {categories.map(cat => (
             <button key={cat} onClick={() => setCategory(cat)} style={{
@@ -167,19 +158,40 @@ export default function ProductsPage() {
             </button>
           ))}
         </div>
-        <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
-          {['All', 'In Stock', 'Low', 'Out'].map(s => (
-            <button key={s} onClick={() => setStatusFilter(s)} style={{
-              padding: '6px 12px', fontSize: 11, letterSpacing: '0.08em',
-              textTransform: 'uppercase', borderRadius: 6, cursor: 'pointer',
-              background: statusFilter === s ? '#000000' : '#ffffff',
-              color: statusFilter === s ? '#ffffff' : '#555555',
-              border: `1px solid ${statusFilter === s ? '#000000' : '#dddddd'}`,
-              fontFamily: "'Sora', sans-serif",
-            }}>
-              {s}
-            </button>
-          ))}
+
+        {/* Right side: stat boxes + divider + status filters */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
+          <span style={{
+            padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
+            background: 'rgba(17,17,17,0.06)', border: '1px solid #e0e0e0', color: '#111111',
+          }}>{total} total</span>
+          <span style={{
+            padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
+            background: 'rgba(217,119,6,0.08)', border: '1px solid rgba(217,119,6,0.3)', color: '#d97706',
+          }}>{low} low</span>
+          <span style={{
+            padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
+            background: 'rgba(204,32,32,0.08)', border: '1px solid rgba(204,32,32,0.3)', color: '#CC2020',
+          }}>{out} out</span>
+
+          {/* Divider */}
+          <div style={{ width: '1px', height: '24px', background: '#e0e0e0' }} />
+
+          {/* Status filters */}
+          <div style={{ display: 'flex', gap: 6 }}>
+            {['All', 'In Stock', 'Low', 'Out'].map(s => (
+              <button key={s} onClick={() => setStatusFilter(s)} style={{
+                padding: '6px 12px', fontSize: 11, letterSpacing: '0.08em',
+                textTransform: 'uppercase', borderRadius: 6, cursor: 'pointer',
+                background: statusFilter === s ? '#000000' : '#ffffff',
+                color: statusFilter === s ? '#ffffff' : '#555555',
+                border: `1px solid ${statusFilter === s ? '#000000' : '#dddddd'}`,
+                fontFamily: "'Sora', sans-serif",
+              }}>
+                {s}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
