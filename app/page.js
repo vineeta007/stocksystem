@@ -22,11 +22,11 @@ const recentTransactions = [
 ];
 
 const categoryStock = [
-  { name: 'Swift Parts',        qty: 0,  max: 30 },
+  { name: 'Swift Parts',         qty: 0,  max: 30 },
   { name: 'Lifting (Purchased)', qty: 0,  max: 30 },
-  { name: 'Lifting (ODM)',      qty: 12, max: 30 },
-  { name: 'PPE / Health',       qty: 20, max: 30 },
-  { name: 'Station Buttons',    qty: 24, max: 30 },
+  { name: 'Lifting (ODM)',       qty: 12, max: 30 },
+  { name: 'PPE / Health',        qty: 20, max: 30 },
+  { name: 'Station Buttons',     qty: 24, max: 30 },
 ];
 
 const lowStockAlerts = [
@@ -37,24 +37,26 @@ const lowStockAlerts = [
   { id: 5, name: 'Flexa Par 130',  quantity: 1, status: 'low' },
 ];
 
-// ── colour tokens (Midnight Slate) ──────────────────────────────────────────
+// ── Light theme colour tokens ──────────────────────────────────────────────
 const C = {
-  base:       '#0F172A',
-  card:       '#1E293B',
-  hover:      '#263548',
-  border:     'rgba(148,163,184,0.1)',
-  teal:       '#1D9E75',
-  tealLight:  '#34D399',
-  tealDim:    'rgba(29,158,117,0.15)',
-  text:       '#F1F5F9',
-  muted:      '#94A3B8',
-  dim:        '#64748B',
-  green:      '#4ADE80',
-  greenDim:   'rgba(34,197,94,0.15)',
-  amber:      '#FCD34D',
-  amberDim:   'rgba(245,158,11,0.15)',
-  red:        '#FCA5A5',
-  redDim:     'rgba(239,68,68,0.15)',
+  base:      '#f5f5f5',
+  card:      '#ffffff',
+  hover:     '#f0f0f0',
+  border:    '#e0e0e0',
+  borderSoft:'rgba(0,0,0,0.06)',
+  red:       '#CC2020',
+  redLight:  '#e53535',
+  redDim:    'rgba(204,32,32,0.08)',
+  teal:      '#1D9E75',
+  tealLight: '#16a34a',
+  tealDim:   'rgba(29,158,117,0.1)',
+  text:      '#111111',
+  muted:     '#555555',
+  dim:       '#888888',
+  green:     '#16a34a',
+  greenDim:  'rgba(22,163,74,0.1)',
+  amber:     '#d97706',
+  amberDim:  'rgba(217,119,6,0.1)',
 };
 
 export default function Dashboard() {
@@ -80,14 +82,14 @@ export default function Dashboard() {
           <Link href="/transactions?type=in" style={{
             display: 'flex', alignItems: 'center', gap: '6px',
             background: C.tealDim, border: `1px solid ${C.teal}`,
-            color: C.tealLight, padding: '8px 16px', borderRadius: '8px',
+            color: C.teal, padding: '8px 16px', borderRadius: '8px',
             fontSize: '12px', fontWeight: 600, textDecoration: 'none',
           }}>
             ↓ STOCK IN
           </Link>
           <Link href="/transactions?type=out" style={{
             display: 'flex', alignItems: 'center', gap: '6px',
-            background: C.redDim, border: '1px solid rgba(239,68,68,0.4)',
+            background: C.redDim, border: `1px solid rgba(204,32,32,0.3)`,
             color: C.red, padding: '8px 16px', borderRadius: '8px',
             fontSize: '12px', fontWeight: 600, textDecoration: 'none',
           }}>
@@ -127,7 +129,7 @@ export default function Dashboard() {
               <span style={{
                 width: '7px', height: '7px', borderRadius: '50%', flexShrink: 0,
                 marginTop: '4px',
-                background: tx.type === 'in' ? C.teal : '#EF4444',
+                background: tx.type === 'in' ? C.teal : C.red,
               }} />
               <div style={{ flex: 1, fontSize: '12px', color: C.muted, lineHeight: 1.5 }}>
                 <span style={{ color: C.dim, fontWeight: 500, fontSize: '11px' }}>
@@ -138,7 +140,7 @@ export default function Dashboard() {
               </div>
               <span style={{
                 fontSize: '13px', fontWeight: 700,
-                color: tx.type === 'in' ? C.tealLight : C.red, flexShrink: 0,
+                color: tx.type === 'in' ? C.teal : C.red, flexShrink: 0,
               }}>{tx.delta}</span>
             </div>
           ))}
@@ -158,11 +160,11 @@ export default function Dashboard() {
             }}>
               <div style={{ width: '130px', fontSize: '12px', color: C.muted, flexShrink: 0 }}>{cat.name}</div>
               <div style={{ flex: 1 }}>
-                <div style={{ height: '4px', background: C.hover, borderRadius: '4px', overflow: 'hidden' }}>
+                <div style={{ height: '4px', background: C.hover, borderRadius: '4px', overflow: 'hidden', border: `1px solid ${C.border}` }}>
                   <div style={{
                     height: '100%',
                     width: `${(cat.qty / cat.max) * 100}%`,
-                    background: cat.qty === 0 ? C.redDim : C.teal,
+                    background: cat.qty === 0 ? C.red : C.teal,
                     borderRadius: '4px',
                     transition: 'width 0.4s ease',
                   }} />
@@ -185,7 +187,7 @@ export default function Dashboard() {
   );
 }
 
-// ── Card component ───────────────────────────────────────────────────────────
+// ── Card component ─────────────────────────────────────────────────────────
 function Card({ title, actionLabel, actionHref, children }) {
   return (
     <div style={{
@@ -193,6 +195,7 @@ function Card({ title, actionLabel, actionHref, children }) {
       border: `1px solid ${C.border}`,
       borderRadius: '12px',
       padding: '18px',
+      boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
     }}>
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -204,8 +207,7 @@ function Card({ title, actionLabel, actionHref, children }) {
         }}>{title}</span>
         {actionLabel && (
           <Link href={actionHref || '#'} style={{
-            fontSize: '11px', color: C.tealLight, textDecoration: 'none',
-            fontWeight: 600,
+            fontSize: '11px', color: C.red, textDecoration: 'none', fontWeight: 600,
           }}>{actionLabel}</Link>
         )}
       </div>
