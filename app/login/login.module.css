@@ -18,15 +18,11 @@
   box-shadow: 0 4px 24px rgba(15, 42, 58, 0.08);
 }
 
-.logoRow {
+.logoAbove {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: -2.4rem -2rem 1.8rem -2rem;
-  padding: 16px;
-  background: #0d0d0d;
-  border-bottom: 1px solid #1a1a1a;
-  border-radius: 14px 14px 0 0;
+  margin-bottom: 1.2rem;
 }
 
 .heading {
