@@ -46,8 +46,8 @@ function LoginForm() {
         <div className={styles.leftPanel}>
           <img
             src="/kreativlogo1.png"
-alt="Kreativ Lift"
-style={{ width: 220, height: 140, objectFit: "cover" }}
+            alt="Kreativ Lift"
+            style={{ width: 220, height: 140, objectFit: "cover" }}
           />
           <p className={styles.tagline}>Elevate With Us</p>
         </div>
@@ -62,7 +62,7 @@ style={{ width: 220, height: 140, objectFit: "cover" }}
               <div className={styles.inputWrap}>
                 <span className={styles.inputIcon}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    stroke="#888888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="8" r="4" />
                     <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
                   </svg>
@@ -84,7 +84,7 @@ style={{ width: 220, height: 140, objectFit: "cover" }}
               <div className={styles.inputWrap}>
                 <span className={styles.inputIcon}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    stroke="#888888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="11" width="18" height="11" rx="2" />
                     <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                   </svg>
