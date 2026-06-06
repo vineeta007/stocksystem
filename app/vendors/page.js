@@ -71,8 +71,7 @@ export default function VendorListPage() {
             onMouseLeave={e => e.target.style.background = '#000'}
           >+ Add Vendor</button>
         </div>
-        <p style={{ color: '#888', fontSize: '13px', margin: '60px 0 0' }}>{vendors.length} vendors registered</p>
-</div>
+        </div>
 
 {/* Divider line */}
 <div style={{
@@ -81,6 +80,8 @@ export default function VendorListPage() {
   background: '#e8e8e8',
   margin: '12px 0 20px 0',
 }} />
+
+<p style={{ color: '#888', fontSize: '13px', margin: '0 0 0 0' }}>{vendors.length} vendors registered</p>
 
 {/* Search */}
       <input
