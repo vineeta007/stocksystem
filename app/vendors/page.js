@@ -50,42 +50,53 @@ export default function VendorListPage() {
   );
 
   return (
-    <div style={{ padding: '1.5rem', background: '#0B1629', minHeight: '100vh', color: '#e2e8f0', fontFamily: "'Sora', sans-serif" }}>
+    <div style={{ padding: '32px', background: '#f5f5f5', minHeight: '100vh', fontFamily: "'Sora', sans-serif" }}>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#f1f5f9', margin: 0 }}>🏪 Vendor List</h1>
-          <p style={{ color: '#64748b', fontSize: '0.875rem', margin: '4px 0 0' }}>{vendors.length} vendors registered</p>
+      {/* Header */}
+      <div style={{ marginBottom: '8px' }}>
+        <p style={{ fontSize: '11px', fontWeight: 600, color: '#888', letterSpacing: '1.2px', textTransform: 'uppercase', margin: '0 0 6px' }}>CATALOGUE</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h1 style={{ fontSize: '26px', fontWeight: 700, color: '#111', margin: 0, fontFamily: "'Cormorant Garamond', serif" }}>Vendor List</h1>
+          <button onClick={() => { setShowForm(true); setEditId(null); setForm(EMPTY); }} style={{
+            background: '#000', color: '#fff', padding: '9px 18px',
+            borderRadius: '8px', border: 'none', cursor: 'pointer',
+            fontSize: '13px', fontWeight: 600, fontFamily: "'Sora', sans-serif",
+            transition: 'background 0.15s',
+          }}
+            onMouseEnter={e => e.target.style.background = '#CC2020'}
+            onMouseLeave={e => e.target.style.background = '#000'}
+          >+ Add Vendor</button>
         </div>
-        <button onClick={() => { setShowForm(true); setEditId(null); setForm(EMPTY); }} style={{
-          background: '#2E90FA', color: '#fff', padding: '9px 18px',
-          borderRadius: '8px', border: 'none', cursor: 'pointer',
-          fontSize: '0.875rem', fontWeight: 600,
-        }}>+ Add Vendor</button>
+        <p style={{ color: '#888', fontSize: '13px', margin: '6px 0 0' }}>{vendors.length} vendors registered</p>
       </div>
 
+      {/* Search */}
       <input
         placeholder="Search by name, city or speciality..."
         value={search}
         onChange={e => setSearch(e.target.value)}
         style={{
-          width: '100%', maxWidth: '360px', padding: '8px 12px',
-          background: '#1E2D45', border: '1px solid #1E3A5F',
-          borderRadius: '8px', color: '#e2e8f0', fontSize: '0.875rem',
-          marginBottom: '1rem', boxSizing: 'border-box', outline: 'none',
+          width: '100%', maxWidth: '360px', padding: '9px 14px',
+          background: '#fff', border: '1px solid #e0e0e0',
+          borderRadius: '8px', color: '#111', fontSize: '14px',
+          margin: '20px 0 16px', boxSizing: 'border-box', outline: 'none',
+          fontFamily: "'Sora', sans-serif",
+          WebkitTextFillColor: '#111',
         }}
       />
 
-      <div style={{ overflowX: 'auto', borderRadius: '10px', border: '1px solid #1E3A5F' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
+      {/* Table */}
+      <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1px solid #e0e0e0', background: '#fff' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
           <thead>
-            <tr>
+            <tr style={{ background: '#f9f9f9' }}>
               {['#', 'Name', 'Phone Number', 'City', 'Speciality', 'Actions'].map(h => (
                 <th key={h} style={{
-                  background: '#1E2D45', color: '#64748b', padding: '12px 16px',
-                  textAlign: 'left', fontWeight: 600, fontSize: '0.75rem',
-                  textTransform: 'uppercase', letterSpacing: '0.05em',
-                  borderBottom: '1px solid #1E3A5F', whiteSpace: 'nowrap',
+                  color: '#888', padding: '12px 16px',
+                  textAlign: 'left', fontWeight: 600, fontSize: '11px',
+                  textTransform: 'uppercase', letterSpacing: '1.2px',
+                  borderBottom: '1px solid #e0e0e0', whiteSpace: 'nowrap',
+                  fontFamily: "'Sora', sans-serif",
                 }}>{h}</th>
               ))}
             </tr>
@@ -93,34 +104,39 @@ export default function VendorListPage() {
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: '#475569' }}>
+                <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: '#aaa', fontSize: '14px' }}>
                   No vendors yet. Click "+ Add Vendor" to get started.
                 </td>
               </tr>
             ) : filtered.map((v, i) => (
-              <tr key={i} style={{ borderBottom: '1px solid #1E3A5F' }}>
-                <td style={{ padding: '12px 16px', color: '#475569' }}>{i + 1}</td>
-                <td style={{ padding: '12px 16px', fontWeight: 600, color: '#f1f5f9' }}>{v.name}</td>
-                <td style={{ padding: '12px 16px', color: '#cbd5e1' }}>{v.phone}</td>
-                <td style={{ padding: '12px 16px', color: '#cbd5e1' }}>{v.city}</td>
-                <td style={{ padding: '12px 16px' }}>
+              <tr key={i} style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}
+                onMouseEnter={e => e.currentTarget.style.background = '#f0f0f0'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+              >
+                <td style={{ padding: '13px 16px', color: '#888' }}>{i + 1}</td>
+                <td style={{ padding: '13px 16px', fontWeight: 600, color: '#111' }}>{v.name}</td>
+                <td style={{ padding: '13px 16px', color: '#555' }}>{v.phone}</td>
+                <td style={{ padding: '13px 16px', color: '#555' }}>{v.city}</td>
+                <td style={{ padding: '13px 16px' }}>
                   <span style={{
-                    background: 'rgba(46,144,250,0.15)', color: '#60a5fa',
-                    border: '1px solid rgba(46,144,250,0.3)',
-                    padding: '3px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600,
+                    background: 'rgba(29,158,117,0.12)', color: '#1D9E75',
+                    padding: '3px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: 600,
                   }}>{v.speciality}</span>
                 </td>
-                <td style={{ padding: '12px 16px' }}>
+                <td style={{ padding: '13px 16px' }}>
                   <div style={{ display: 'flex', gap: '6px' }}>
                     <button onClick={() => handleEdit(i)} style={{
-                      padding: '4px 12px', borderRadius: '6px', fontSize: '0.75rem',
-                      fontWeight: 600, cursor: 'pointer', border: '1px solid rgba(99,102,241,0.3)',
-                      background: 'rgba(99,102,241,0.15)', color: '#818cf8',
+                      padding: '4px 12px', borderRadius: '6px', fontSize: '12px',
+                      fontWeight: 600, cursor: 'pointer',
+                      border: '1px solid #e0e0e0', background: 'transparent', color: '#555',
+                      fontFamily: "'Sora', sans-serif",
                     }}>Edit</button>
                     <button onClick={() => handleDelete(i)} style={{
-                      padding: '4px 12px', borderRadius: '6px', fontSize: '0.75rem',
-                      fontWeight: 600, cursor: 'pointer', border: '1px solid rgba(239,68,68,0.3)',
-                      background: 'rgba(239,68,68,0.15)', color: '#ef4444',
+                      padding: '4px 12px', borderRadius: '6px', fontSize: '12px',
+                      fontWeight: 600, cursor: 'pointer',
+                      border: '1px solid rgba(204,32,32,0.3)',
+                      background: 'rgba(204,32,32,0.08)', color: '#CC2020',
+                      fontFamily: "'Sora', sans-serif",
                     }}>Delete</button>
                   </div>
                 </td>
@@ -130,20 +146,22 @@ export default function VendorListPage() {
         </table>
       </div>
 
+      {/* Modal */}
       {showForm && (
         <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100,
         }} onClick={() => setShowForm(false)}>
           <div style={{
-            background: '#1E2D45', border: '1px solid #1E3A5F',
+            background: '#fff', border: '1px solid #e0e0e0',
             borderRadius: '14px', width: '480px', maxWidth: '95vw',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
           }} onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid #1E3A5F' }}>
-              <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#f1f5f9' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid #e0e0e0' }}>
+              <h2 style={{ margin: 0, fontSize: '17px', fontWeight: 600, color: '#111', fontFamily: "'Sora', sans-serif" }}>
                 {editId !== null ? 'Edit Vendor' : 'Add Vendor'}
               </h2>
-              <button onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
+              <button onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', color: '#888', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
             </div>
             <form onSubmit={handleSubmit} style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
               {[
@@ -152,7 +170,7 @@ export default function VendorListPage() {
                 { label: 'City', key: 'city', placeholder: 'e.g. Jakarta' },
                 { label: 'Speciality', key: 'speciality', placeholder: 'e.g. Hydraulic Parts' },
               ].map(f => (
-                <label key={f.key} style={{ display: 'flex', flexDirection: 'column', gap: '5px', fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>
+                <label key={f.key} style={{ display: 'flex', flexDirection: 'column', gap: '5px', fontSize: '12px', color: '#888', fontWeight: 600, fontFamily: "'Sora', sans-serif" }}>
                   {f.label}
                   <input
                     required={f.required}
@@ -160,21 +178,25 @@ export default function VendorListPage() {
                     value={form[f.key]}
                     onChange={e => setForm({ ...form, [f.key]: e.target.value })}
                     style={{
-                      padding: '8px 10px', borderRadius: '7px',
-                      border: '1px solid #1E3A5F', background: '#0B1629',
-                      color: '#e2e8f0', fontSize: '0.875rem', outline: 'none',
+                      padding: '9px 12px', borderRadius: '7px',
+                      border: '1px solid #e0e0e0', background: '#f9f9f9',
+                      color: '#111', fontSize: '14px', outline: 'none',
+                      fontFamily: "'Sora', sans-serif",
+                      WebkitTextFillColor: '#111',
                     }}
                   />
                 </label>
               ))}
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '4px' }}>
                 <button type="button" onClick={() => setShowForm(false)} style={{
-                  background: 'transparent', border: '1px solid #1E3A5F',
-                  color: '#94a3b8', padding: '8px 16px', borderRadius: '7px', cursor: 'pointer',
+                  background: 'transparent', border: '1px solid #e0e0e0',
+                  color: '#555', padding: '8px 16px', borderRadius: '7px', cursor: 'pointer',
+                  fontFamily: "'Sora', sans-serif", fontSize: '13px', fontWeight: 600,
                 }}>Cancel</button>
                 <button type="submit" style={{
-                  background: '#2E90FA', color: '#fff', padding: '8px 20px',
-                  borderRadius: '7px', border: 'none', cursor: 'pointer', fontWeight: 600,
+                  background: '#000', color: '#fff', padding: '8px 20px',
+                  borderRadius: '7px', border: 'none', cursor: 'pointer',
+                  fontWeight: 600, fontFamily: "'Sora', sans-serif", fontSize: '13px',
                 }}>Save</button>
               </div>
             </form>
