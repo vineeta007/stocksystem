@@ -15,11 +15,11 @@ const NAV = [
     { label: '👥 Customer List',   href: '/maintenance' },
     { label: '📦 Klaim Sparepart', href: '/klaim' },
   ]},
- { items: [
+  { items: [
     { label: '🛡️ Data Garansi',    href: '/clients' },
     { label: '💸 Expenses',         href: '/expenses' },
   ]},
-    { items: [
+  { items: [
     { label: '📊 Reports',         href: '/reports' },
     { label: '⚙️ Settings',        href: '/settings' },
   ]},
@@ -46,9 +46,9 @@ export default function Sidebar() {
 
   return (
     <aside style={{
-      width: '270px', flexShrink: 0,
-      background: '#1E293B',
-      borderRight: '1px solid rgba(148,163,184,0.1)',
+      width: '220px', flexShrink: 0,
+      background: '#3a3a3a',
+      borderRight: '1px solid rgba(0,0,0,0.15)',
       display: 'flex', flexDirection: 'column',
       minHeight: '100vh', position: 'sticky', top: 0,
       fontFamily: "'Sora', sans-serif",
@@ -59,24 +59,24 @@ export default function Sidebar() {
         <img
           src="/kreativlogo1.png"
           alt="Kreativ Lift"
-          style={{ width: '100%', height: '160px', objectFit: 'cover' }}
+          style={{ width: '100%', height: '130px', objectFit: 'cover' }}
         />
       </div>
 
       {/* Nav */}
-      <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px', paddingBottom: '12px', marginTop: '-12px' }}>
+      <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px', paddingBottom: '12px', marginTop: '4px' }}>
         {NAV.map((section, i) => (
           <div key={i}>
             {section.items.map((item) => {
-              const active = pathname === item.href || pathname.startsWith(item.href + '/');
+              const active = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href + '/'));
               return (
                 <Link key={item.href} href={item.href} style={{
-                  display: 'block', padding: '15px 24px',
-                  fontSize: '17px', fontWeight: active ? 600 : 400,
-                  color: active ? '#34D399' : '#94A3B8',
+                  display: 'block', padding: '13px 20px',
+                  fontSize: '14px', fontWeight: active ? 600 : 400,
+                  color: active ? '#ffffff' : '#bbbbbb',
                   textDecoration: 'none',
-                  borderLeft: `3px solid ${active ? '#1D9E75' : 'transparent'}`,
-                  background: active ? 'rgba(29,158,117,0.12)' : 'transparent',
+                  borderLeft: `3px solid ${active ? '#CC2020' : 'transparent'}`,
+                  background: active ? 'rgba(204,32,32,0.15)' : 'transparent',
                   transition: 'all .15s',
                 }}>
                   {item.label}
@@ -89,36 +89,37 @@ export default function Sidebar() {
 
       {/* User section */}
       <div style={{
-        padding: '16px 24px',
-        borderTop: '1px solid rgba(148,163,184,0.1)',
+        padding: '14px 18px',
+        borderTop: '1px solid rgba(255,255,255,0.08)',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
           <div style={{
-            width: '40px', height: '40px', borderRadius: '50%', flexShrink: 0,
-            background: 'rgba(29,158,117,0.2)',
-            border: '1px solid rgba(29,158,117,0.4)',
+            width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0,
+            background: 'rgba(204,32,32,0.2)',
+            border: '1px solid rgba(204,32,32,0.4)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '13px', fontWeight: 700, color: '#34D399',
+            fontSize: '12px', fontWeight: 700, color: '#ff6b6b',
           }}>{initials}</div>
 
           <div style={{ minWidth: 0 }}>
             <div style={{
-              fontSize: '15px', fontWeight: 600, color: '#F1F5F9',
+              fontSize: '13px', fontWeight: 600, color: '#f0f0f0',
               whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
             }}>{displayName}</div>
             {role && (
-              <div style={{ fontSize: '12px', color: '#64748B', marginTop: '1px' }}>{role}</div>
+              <div style={{ fontSize: '11px', color: '#888888', marginTop: '1px' }}>{role}</div>
             )}
           </div>
         </div>
 
         <button onClick={logout} style={{
-          width: '100%', padding: '9px 0',
+          width: '100%', padding: '8px 0',
           background: 'transparent',
-          border: '1px solid rgba(239,68,68,0.3)',
-          borderRadius: '7px',
-          color: '#FCA5A5', fontSize: '13px', fontWeight: 600,
+          border: '1px solid rgba(204,32,32,0.3)',
+          borderRadius: '6px',
+          color: '#ff9999', fontSize: '12px', fontWeight: 600,
           cursor: 'pointer', fontFamily: "'Sora', sans-serif",
+          letterSpacing: '0.5px',
         }}>
           Sign out
         </button>
