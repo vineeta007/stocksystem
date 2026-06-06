@@ -330,3 +330,24 @@ button { font-family: var(--font) !important; cursor: pointer !important; font-s
 
 /* ── Serif font utility ── */
 .font-serif { font-family: var(--font-serif) !important; }
+
+/* ── Sidebar link color overrides (fix global a/span bleeding in) ── */
+.sidebar-link,
+.sidebar-link span,
+.sidebar-link li {
+  color: var(--text-sidebar) !important;
+}
+.sidebar-link:hover,
+.sidebar-link:hover span,
+.sidebar-link:hover li {
+  color: #ffffff !important;
+}
+.sidebar-link.active,
+.sidebar-link.active span,
+.sidebar-link.active li {
+  color: #ffffff !important;
+}
+.sidebar a,
+.sidebar a:hover {
+  color: inherit !important;
+}
