@@ -134,7 +134,7 @@ export default function ProductsPage() {
       {/* ── Filters ── */}
       <div style={{
         padding: '14px 28px', borderBottom: '1px solid #e0e0e0',
-        display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center',
+        display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center',
         background: '#ffffff',
       }}>
         <input
@@ -146,7 +146,8 @@ export default function ProductsPage() {
             outline: 'none', width: 220, fontFamily: "'Sora', sans-serif",
           }}
         />
-        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+        <div style={{ width: '1px', height: '24px', background: '#e0e0e0', flexShrink: 0 }} />
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {categories.map(cat => (
             <button key={cat} onClick={() => setCategory(cat)} style={{
               padding: '6px 12px', fontSize: 11, letterSpacing: '0.08em',
@@ -161,7 +162,7 @@ export default function ProductsPage() {
             </button>
           ))}
         </div>
-        <div style={{ display: 'flex', gap: 4, marginLeft: 'auto' }}>
+        <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
           {['All', 'In Stock', 'Low', 'Out'].map(s => (
             <button key={s} onClick={() => setStatusFilter(s)} style={{
               padding: '6px 12px', fontSize: 11, letterSpacing: '0.08em',
