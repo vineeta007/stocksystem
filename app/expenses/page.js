@@ -85,25 +85,25 @@ export default function ExpensesPage() {
     <div style={{ minHeight: '100vh', color: TEXT }}>
       {/* Header */}
       <div style={{ padding: '18px 28px 14px', borderBottom: `0.5px solid ${BORDER}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ flex: 1, textAlign: 'center' }}>
-          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 38, fontWeight: 700, color: '#000000', letterSpacing: '0.02em' }}>Expenses</div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, position: 'absolute', right: 28 }}>
-          <span style={{ fontSize: 11, color: MUTED }}>
-            Total: <span style={{ color: '#e05050', fontFamily: 'Space Mono, monospace', fontWeight: 700 }}>{fmt(total)}</span>
-          </span>
-          <button onClick={openAdd}
-            style={{ padding: '7px 14px', fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', background: GOLD, color: '#0a0a07', border: 'none', borderRadius: 3, cursor: 'pointer', fontWeight: 700 }}>
-            + Add Expense
-          </button>
-        </div>
-      </div>
+  <div style={{ flex: 1, textAlign: 'center' }}>
+    <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 38, fontWeight: 700, color: '#000000', letterSpacing: '0.02em' }}>Expenses</div>
+  </div>
+  <div style={{ display: 'flex', alignItems: 'center', gap: 8, position: 'absolute', right: 28 }}>
+    <span style={{ fontSize: 11, color: MUTED }}>
+      Total: <span style={{ color: '#e05050', fontFamily: 'Space Mono, monospace', fontWeight: 700 }}>{fmt(total)}</span>
+    </span>
+  </div>
+</div>
 
       {/* Filters */}
       <div style={{ padding: '14px 28px', borderBottom: `0.5px solid ${BORDER}`, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search expenses..."
-          style={{ background: '#111109', border: `0.5px solid ${BORDER}`, borderRadius: 3, padding: '7px 12px', color: TEXT, fontSize: 11, outline: 'none', width: 200 }} />
-        <div style={{ display: 'flex', gap: 4, marginLeft: 'auto', flexWrap: 'wrap' }}>
+  <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search expenses..."
+    style={{ background: '#111109', border: `0.5px solid ${BORDER}`, borderRadius: 3, padding: '7px 12px', color: TEXT, fontSize: 11, outline: 'none', width: 200 }} />
+  <div style={{ display: 'flex', gap: 4, marginLeft: 'auto', flexWrap: 'wrap', alignItems: 'center' }}>
+    <button onClick={openAdd}
+      style={{ padding: '5px 12px', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', background: GOLD, color: '#0a0a07', border: 'none', borderRadius: 3, cursor: 'pointer', fontWeight: 700 }}>
+      + Add Expense
+    </button>
           {months.map(m => (
             <button key={m} onClick={() => setMonthFilter(m)}
               style={{ padding: '5px 10px', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', borderRadius: 3, cursor: 'pointer',
