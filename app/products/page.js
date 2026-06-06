@@ -101,7 +101,7 @@ export default function ProductsPage() {
 
       {/* ── Header ── */}
       <div style={{
-        padding: '20px 28px 16px', borderBottom: '1px solid #e0e0e0',
+        padding: '32px 28px 20px', borderBottom: '1px solid #e0e0e0',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         background: '#ffffff', position: 'relative',
       }}>
