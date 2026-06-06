@@ -53,33 +53,29 @@ export default function VendorListPage() {
     <div style={{ padding: '32px', background: '#f5f5f5', minHeight: '100vh', fontFamily: "'Sora', sans-serif" }}>
 
       {/* Header */}
-      <div style={{ marginBottom: '8px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
-          <h1 style={{
-            fontSize: '50px', fontWeight: 700, color: '#111', margin: 0,
-            fontFamily: "'Cormorant Garamond', serif",
-            position: 'absolute', left: '50%', transform: 'translateX(-50%)',
-          }}>Vendor List</h1>
-          <button onClick={() => { setShowForm(true); setEditId(null); setForm(EMPTY); }} style={{
-            marginLeft: 'auto',
-            background: '#000', color: '#fff', padding: '9px 18px',
-            borderRadius: '8px', border: 'none', cursor: 'pointer',
-            fontSize: '13px', fontWeight: 600, fontFamily: "'Sora', sans-serif",
-            transition: 'background 0.15s',
-          }}
-            onMouseEnter={e => e.target.style.background = '#CC2020'}
-            onMouseLeave={e => e.target.style.background = '#000'}
-          >+ Add Vendor</button>
-        </div>
-        </div>
-
-{/* Divider line */}
 <div style={{
-  width: '100%',
-  height: '1px',
-  background: '#e8e8e8',
-  margin: '12px 0 20px 0',
-}} />
+  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+  padding: '0 0 20px',
+  borderBottom: '1px solid #e0e0e0',
+  marginBottom: '20px',
+  position: 'relative',
+}}>
+  <h1 style={{
+    fontSize: '50px', fontWeight: 700, color: '#111', margin: 0,
+    fontFamily: "'Cormorant Garamond', serif",
+    position: 'absolute', left: '50%', transform: 'translateX(-50%)',
+  }}>Vendor List</h1>
+  <button onClick={() => { setShowForm(true); setEditId(null); setForm(EMPTY); }} style={{
+    marginLeft: 'auto',
+    background: '#000', color: '#fff', padding: '9px 18px',
+    borderRadius: '8px', border: 'none', cursor: 'pointer',
+    fontSize: '13px', fontWeight: 600, fontFamily: "'Sora', sans-serif",
+    transition: 'background 0.15s',
+  }}
+    onMouseEnter={e => e.target.style.background = '#CC2020'}
+    onMouseLeave={e => e.target.style.background = '#000'}
+  >+ Add Vendor</button>
+</div>
 
 <p style={{ color: '#888', fontSize: '13px', margin: '0 0 0 0' }}>{vendors.length} vendors registered</p>
 
