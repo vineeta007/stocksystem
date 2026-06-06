@@ -67,23 +67,26 @@ export default function Sidebar() {
       <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px', paddingBottom: '12px', marginTop: '4px', overflowY: 'auto' }}>
         {NAV.map((section, i) => (
           <div key={i}>
-            {section.items.map((item) => {
-              const active = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href + '/'));
-              return (
-                <Link key={item.href} href={item.href} style={{
-                  display: 'block', padding: '13px 20px',
-                  fontSize: '22px', fontWeight: active ? 700 : 600,
-                  fontFamily: "'Cormorant Garamond', serif",
-                  color: active ? '#ffffff' : '#cccccc',
-                  textDecoration: 'none',
-                  borderLeft: `3px solid ${active ? '#CC2020' : 'transparent'}`,
-                  background: active ? 'rgba(204,32,32,0.15)' : 'transparent',
-                  transition: 'all .15s',
-                }}>
-                  {item.label}
-                </Link>
-              );
-            })}
+            {section.items.map((item, idx) => {
+  const active = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href + '/'));
+  return (
+    <div key={item.href}>
+      <Link href={item.href} style={{
+        display: 'block', padding: '13px 20px',
+        fontSize: '22px', fontWeight: active ? 700 : 600,
+        fontFamily: "'Cormorant Garamond', serif",
+        color: active ? '#ffffff' : '#cccccc',
+        textDecoration: 'none',
+        borderLeft: `3px solid ${active ? '#CC2020' : 'transparent'}`,
+        background: active ? 'rgba(204,32,32,0.15)' : 'transparent',
+        transition: 'all .15s',
+      }}>
+        {item.label}
+      </Link>
+      <div style={{ height: '1px', background: 'rgba(255,255,255,0.07)', margin: '0 12px' }} />
+    </div>
+  );
+})}
           </div>
         ))}
       </nav>
