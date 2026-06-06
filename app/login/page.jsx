@@ -47,7 +47,7 @@ function LoginForm() {
           <img
   src="/kreativlogo1.png"
   alt="Kreativ Lift"
-  style={{ width: 180, height: 52, objectFit: "contain" }}
+  style={{ width: 240, height: 70, objectFit: "contain" }}
 />
         </div>
 
