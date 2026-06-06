@@ -216,17 +216,17 @@ export default function KlaimPage() {
         .subtitle { color: #6b7280; margin: 4px 0 0; font-size: 0.875rem; }
 
         /* Summary Cards */
-        .summary-row { display: flex; gap: 24px; margin-bottom: 1.25rem; flex-wrap: wrap; justify-content: center; }
+        .summary-row { display: flex; gap: 40px; margin-bottom: 1.25rem; flex-wrap: wrap; justify-content: center; }
         .summary-card {
           background: #f9fafb;
-          border: 1px solid #e5e7eb;
+          border: 1.5px solid #111111;
           border-radius: 10px;
-          padding: 14px 24px;
-          min-width: 150px;
+          padding: 14px 32px;
+          min-width: 160px;
           text-align: center;
         }
-        .summary-card.amber { border-left: 3px solid #f59e0b; }
-        .summary-card.green { border-left: 3px solid #16a34a; }
+        .summary-card.amber { border-left: 4px solid #f59e0b; }
+        .summary-card.green { border-left: 4px solid #16a34a; }
         .sum-label { font-size: 0.75rem; color: #6b7280; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
         .sum-num { font-size: 1.75rem; font-weight: 700; color: #111111; }
 
