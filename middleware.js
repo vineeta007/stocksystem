@@ -38,5 +38,5 @@ export function middleware(request) {
 
 export const config = {
   // Apply middleware to all routes except static files and _next internals
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.svg$).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.svg$|.*\\.png$|.*\\.jpg$|.*\\.ico$).*)'],
 };
