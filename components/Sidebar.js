@@ -74,7 +74,7 @@ export default function Sidebar() {
                   display: 'block', padding: '13px 20px',
                   fontSize: '22px', fontWeight: active ? 600 : 400,
                   fontFamily: "'Cormorant Garamond', serif",
-                  color: active ? '#ffffff' : '#bbbbbb',
+                  color: active ? '#ffffff' : '#cccccc',
                   textDecoration: 'none',
                   borderLeft: `3px solid ${active ? '#CC2020' : 'transparent'}`,
                   background: active ? 'rgba(204,32,32,0.15)' : 'transparent',
