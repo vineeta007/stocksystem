@@ -138,7 +138,7 @@ export default function ProductsPage() {
 
       {/* ── Filters ── */}
       <div style={{
-        padding: '14px 28px', borderBottom: '1px solid #e0e0e0',
+        padding: '18px 28px 22px', borderBottom: '1px solid #e0e0e0',
         display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center',
         background: '#ffffff',
       }}>
