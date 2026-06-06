@@ -111,15 +111,19 @@ export default function ProductsPage() {
           position: 'absolute', left: '50%', transform: 'translateX(-50%)',
         }}>Products</h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginLeft: 'auto' }}>
-          <div style={{ fontSize: 13, color: '#555555', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontWeight: 700, color: '#111111' }}>{total}</span>
-            <span>total</span>
-            <span style={{ color: '#cccccc' }}>·</span>
-            <span style={{ fontWeight: 700, color: '#d97706' }}>{low}</span>
-            <span>low</span>
-            <span style={{ color: '#cccccc' }}>·</span>
-            <span style={{ fontWeight: 700, color: '#CC2020' }}>{out}</span>
-            <span>out</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{
+              padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
+              background: 'rgba(17,17,17,0.06)', border: '1px solid #e0e0e0', color: '#111111',
+            }}>{total} total</span>
+            <span style={{
+              padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
+              background: 'rgba(217,119,6,0.08)', border: '1px solid rgba(217,119,6,0.3)', color: '#d97706',
+            }}>{low} low</span>
+            <span style={{
+              padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
+              background: 'rgba(204,32,32,0.08)', border: '1px solid rgba(204,32,32,0.3)', color: '#CC2020',
+            }}>{out} out</span>
           </div>
           <button onClick={openAdd} style={{
             padding: '9px 18px', fontSize: 12, letterSpacing: '0.08em',
