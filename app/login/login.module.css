@@ -94,7 +94,7 @@
 .input {
   width: 100%;
   padding: 14px 16px;
-  background: #FFFFFF;
+  background: #EDE8DF;
   border: 1px solid #D0C8BC;
   border-radius: 0;
   color: #1A1A1A;
@@ -117,7 +117,7 @@
 .input:-webkit-autofill:hover,
 .input:-webkit-autofill:focus,
 .input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 9999px #ffffff inset !important;
+  -webkit-box-shadow: 0 0 0 9999px #EDE8DF inset !important;
   -webkit-text-fill-color: #1A1A1A !important;
 }
 
