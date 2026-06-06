@@ -20,6 +20,7 @@ export default function ProductsPage() {
   const [editProduct, setEditProduct] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
+  const [openStatusId, setOpenStatusId] = useState(null);
 
   async function fetchProducts() {
     setLoading(true);
@@ -217,12 +218,57 @@ export default function ProductsPage() {
                       <td style={{ padding: '13px 16px', fontWeight: 700, color: '#111111', fontSize: 14 }}>{p.quantity ?? 0}</td>
                       <td style={{ padding: '13px 16px', color: '#888888', fontSize: 13 }}>{p.minStock ?? 0}</td>
                       <td style={{ padding: '13px 16px' }}>
-                        <span style={{
-                          fontSize: 10, padding: '4px 10px', borderRadius: 6,
-                          background: st.bg, color: st.color,
-                          border: `1px solid ${st.border}`,
-                          fontWeight: 700, letterSpacing: '0.06em',
-                        }}>{st.label}</span>
+                        <div style={{ position: 'relative', display: 'inline-block' }}>
+                          <span
+                            onClick={() => setOpenStatusId(openStatusId === p._id ? null : p._id)}
+                            style={{
+                              fontSize: 10, padding: '4px 10px', borderRadius: 6,
+                              background: st.bg, color: st.color,
+                              border: `1px solid ${st.border}`,
+                              fontWeight: 700, letterSpacing: '0.06em',
+                              cursor: 'pointer', userSelect: 'none',
+                              display: 'inline-flex', alignItems: 'center', gap: 4,
+                            }}>
+                            {st.label} ▾
+                          </span>
+                          {openStatusId === p._id && (
+                            <div style={{
+                              position: 'absolute', top: '110%', left: 0, zIndex: 100,
+                              background: '#ffffff', border: '1px solid #e0e0e0',
+                              borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                              minWidth: 160, overflow: 'hidden',
+                            }}>
+                              {[
+                                { label: 'IN STOCK', value: Math.max(p.minStock + 1, 10) },
+                                { label: 'LOW STOCK', value: Math.max((p.minStock ?? 1), 1) },
+                                { label: 'OUT OF STOCK', value: 0 },
+                              ].map(opt => (
+                                <div
+                                  key={opt.label}
+                                  onClick={async () => {
+                                    setOpenStatusId(null);
+                                    await fetch(`/api/products/${p._id}`, {
+                                      method: 'PATCH',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({ quantity: opt.value }),
+                                    });
+                                    fetchProducts();
+                                  }}
+                                  style={{
+                                    padding: '10px 14px', fontSize: 12, cursor: 'pointer',
+                                    color: '#111111', fontWeight: 500,
+                                    borderBottom: '1px solid #f0f0f0',
+                                    transition: 'background 0.1s',
+                                  }}
+                                  onMouseEnter={e => e.currentTarget.style.background = '#f5f5f5'}
+                                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                                >
+                                  {opt.label}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </td>
                       <td style={{ padding: '13px 16px' }}>
                         <button onClick={() => openEdit(p)} style={{
