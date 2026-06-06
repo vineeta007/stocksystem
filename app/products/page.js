@@ -101,10 +101,10 @@ export default function ProductsPage() {
 
       {/* ── Header ── */}
       <div style={{
-        padding: '20px 28px 16px', borderBottom: '1px solid #e0e0e0',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        background: '#ffffff', position: 'relative',
-      }}>
+  padding: '32px 28px 20px', borderBottom: '1px solid #e0e0e0',
+  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+  background: '#f5f5f5', position: 'relative',
+}}>
         <h1 style={{
           fontSize: 50, fontWeight: 700, color: '#111111', margin: 0,
           letterSpacing: '-0.3px', fontFamily: "'Cormorant Garamond', serif",
