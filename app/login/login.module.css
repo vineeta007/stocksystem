@@ -48,7 +48,7 @@
 
 .heading {
   margin: 0 0 4px;
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 700;
   color: #0F2A3A;
 }
@@ -106,6 +106,8 @@
   box-sizing: border-box;
   transition: border-color 0.2s, box-shadow 0.2s;
   font-family: inherit;
+  -webkit-text-fill-color: #0F2A3A;
+  caret-color: #0F2A3A;
 }
 
 .input::placeholder { color: #A8C0CC; }
