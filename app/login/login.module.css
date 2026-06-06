@@ -50,13 +50,13 @@
   margin: 0 0 4px;
   font-size: 26px;
   font-weight: 700;
-  color: #1A1A1A;
+  color: #000000;
 }
 
 .subheading {
   margin: 0 0 1.8rem;
   font-size: 13px;
-  color: #888888;
+  color: #333333;
 }
 
 .form {
@@ -92,6 +92,7 @@
   display: flex;
   align-items: center;
   pointer-events: none;
+  z-index: 1;
 }
 
 .input {
