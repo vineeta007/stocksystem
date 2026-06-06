@@ -59,16 +59,9 @@ function LoginForm() {
           <form onSubmit={handleLogin} className={styles.form}>
             <div className={styles.field}>
               <label className={styles.label}>Username</label>
-              <div className={styles.inputWrap} style={{position:'relative'}}>
-  <span className={styles.inputIcon} style={{position:'absolute', left:'14px', zIndex:2, display:'flex', alignItems:'center', color:'#888888'}}>
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-      stroke="#888888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="8" r="4" />
-      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-    </svg>
-  </span>
-  <input
-    type="text"
+              <div className={styles.inputWrap}>
+                <input
+                  type="text"
                   className={styles.input}
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -81,16 +74,9 @@ function LoginForm() {
 
             <div className={styles.field}>
               <label className={styles.label}>Password</label>
-              <div className={styles.inputWrap} style={{position:'relative'}}>
-  <span className={styles.inputIcon} style={{position:'absolute', left:'14px', zIndex:2, display:'flex', alignItems:'center', color:'#888888'}}>
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-      stroke="#888888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="11" width="18" height="11" rx="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-    </svg>
-  </span>
-  <input
-    type={showPassword ? "text" : "password"}
+              <div className={styles.inputWrap}>
+                <input
+                  type={showPassword ? "text" : "password"}
                   className={styles.input}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
