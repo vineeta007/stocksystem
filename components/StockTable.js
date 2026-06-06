@@ -17,32 +17,32 @@ export default function StockTable({ items = [] }) {
           <div key={i} style={{
             display: 'flex', alignItems: 'center',
             padding: '11px 0',
-            borderBottom: i < items.length - 1 ? '1px solid rgba(148,163,184,0.08)' : 'none',
+            borderBottom: i < items.length - 1 ? '1px solid #eeeeee' : 'none',
             gap: '12px',
           }}>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#F1F5F9', marginBottom: '2px' }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#111111', marginBottom: '2px' }}>
                 {item.name}
               </div>
               {item.category && (
-                <div style={{ fontSize: '11px', color: '#64748B' }}>
+                <div style={{ fontSize: '11px', color: '#888888' }}>
                   {item.category}
                 </div>
               )}
             </div>
 
             <div style={{ width: '70px' }}>
-              <div style={{ height: '4px', background: '#263548', borderRadius: '4px', overflow: 'hidden' }}>
+              <div style={{ height: '4px', background: '#e8e8e8', borderRadius: '4px', overflow: 'hidden' }}>
                 <div style={{
                   height: '100%', width: `${pct}%`, borderRadius: '4px',
-                  background: isIn ? '#1D9E75' : isLow ? '#F59E0B' : '#EF4444',
+                  background: isIn ? '#1D9E75' : isLow ? '#d97706' : '#CC2020',
                   transition: 'width 0.3s ease',
                 }} />
               </div>
             </div>
 
             <div style={{
-              fontSize: '14px', fontWeight: 700, color: '#F1F5F9',
+              fontSize: '14px', fontWeight: 700, color: '#111111',
               width: '28px', textAlign: 'right', flexShrink: 0,
             }}>{qty}</div>
 
@@ -56,9 +56,9 @@ export default function StockTable({ items = [] }) {
 
 function StatusBadge({ status }) {
   const map = {
-    'IN STOCK':    { bg: 'rgba(29,158,117,0.15)',  color: '#34D399', border: 'rgba(29,158,117,0.35)',  short: 'In Stock' },
-    'LOW STOCK':   { bg: 'rgba(245,158,11,0.15)',  color: '#FCD34D', border: 'rgba(245,158,11,0.35)', short: 'Low Stock' },
-    'OUT OF STOCK':{ bg: 'rgba(239,68,68,0.15)',   color: '#FCA5A5', border: 'rgba(239,68,68,0.35)',  short: 'Out of Stock' },
+    'IN STOCK':    { bg: 'rgba(22,163,74,0.1)',   color: '#16a34a', border: 'rgba(22,163,74,0.3)',   short: 'In Stock' },
+    'LOW STOCK':   { bg: 'rgba(217,119,6,0.1)',   color: '#d97706', border: 'rgba(217,119,6,0.3)',   short: 'Low Stock' },
+    'OUT OF STOCK':{ bg: 'rgba(204,32,32,0.08)',  color: '#CC2020', border: 'rgba(204,32,32,0.25)',  short: 'Out of Stock' },
   };
   const c = map[status];
   return (
