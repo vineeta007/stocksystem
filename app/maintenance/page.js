@@ -19,12 +19,12 @@ function warrantyBadge(status) {
 }
 
 export default function MaintenancePage() {
-  const [customers, setCustomers]   = useState([])
-  const [loading, setLoading]       = useState(true)
-  const [kotaFilter, setKotaFilter] = useState('Semua Kota')
-  const [statusFilter, setStatus]   = useState('')
-  const [showForm, setShowForm]     = useState(false)
-  const [editTarget, setEditTarget] = useState(null)
+  const [customers, setCustomers]       = useState([])
+  const [loading, setLoading]           = useState(true)
+  const [kotaFilter, setKotaFilter]     = useState('Semua Kota')
+  const [statusFilter, setStatus]       = useState('')
+  const [showForm, setShowForm]         = useState(false)
+  const [editTarget, setEditTarget]     = useState(null)
   const [reminderOnly, setReminderOnly] = useState(false)
 
   const [form, setForm] = useState({
@@ -65,17 +65,17 @@ export default function MaintenancePage() {
   function openEdit(c) {
     setEditTarget(c)
     setForm({
-      customerName: c.customerName || '',
-      address:      c.address      || '',
-      kota:         c.kota         || '',
-      phone:        c.phone        || '',
-      unitType:     c.unitType     || '',
-      serialNumber: c.serialNumber || '',
-      bastDate:     c.bastDate     ? c.bastDate.slice(0,10) : '',
-      lastVisitDate:c.lastVisitDate? c.lastVisitDate.slice(0,10) : '',
-      visitCount:   c.visitCount   || 0,
-      status:       c.status       || 'New',
-      notes:        c.notes        || '',
+      customerName:  c.customerName  || '',
+      address:       c.address       || '',
+      kota:          c.kota          || '',
+      phone:         c.phone         || '',
+      unitType:      c.unitType      || '',
+      serialNumber:  c.serialNumber  || '',
+      bastDate:      c.bastDate      ? c.bastDate.slice(0,10)      : '',
+      lastVisitDate: c.lastVisitDate ? c.lastVisitDate.slice(0,10) : '',
+      visitCount:    c.visitCount    || 0,
+      status:        c.status        || 'New',
+      notes:         c.notes         || '',
     })
     setShowForm(true)
   }
@@ -99,27 +99,28 @@ export default function MaintenancePage() {
     <div className="page-container">
 
       {/* Header */}
-<div style={{
-  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-  padding: '32px 0 32px', borderBottom: '1px solid #e0e0e0',
-  marginBottom: '20px', position: 'relative',
-}}>
-  <h1 style={{
-    fontSize: '50px', fontWeight: 700, color: '#111', margin: 0,
-    fontFamily: "'Cormorant Garamond', serif",
-    position: 'absolute', left: '50%', transform: 'translateX(-50%)',
-  }}>Customer List</h1>
-  <button className="btn-primary" style={{ marginLeft: 'auto' }} onClick={() => { setEditTarget(null); setShowForm(true) }}>
-    + Tambah Customer
-  </button>
-</div>
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '32px 0 32px', borderBottom: '1px solid #e0e0e0',
+        marginBottom: '20px', position: 'relative',
+      }}>
+        <h1 style={{
+          fontSize: '50px', fontWeight: 700, color: '#111', margin: 0,
+          fontFamily: "'Cormorant Garamond', serif",
+          position: 'absolute', left: '50%', transform: 'translateX(-50%)',
+        }}>Customer List</h1>
+        <button className="btn-primary" style={{ marginLeft: 'auto' }} onClick={() => { setEditTarget(null); setShowForm(true) }}>
+          + Tambah Customer
+        </button>
+      </div>
 
-<p className="subtitle" style={{ marginBottom: '1rem' }}>
-  {customers.length} customer aktif
-  {needAttention > 0 && (
-    <span className="badge badge-warning ml-2">⚠ {needAttention} perlu perhatian</span>
-  )}
-</p>
+      {/* Subtitle */}
+      <p className="subtitle" style={{ marginBottom: '1rem' }}>
+        {customers.length} customer aktif
+        {needAttention > 0 && (
+          <span className="badge badge-warning ml-2">⚠ {needAttention} perlu perhatian</span>
+        )}
+      </p>
 
       {/* Reminder banner */}
       {!reminderOnly && needAttention > 0 && (
@@ -280,13 +281,6 @@ export default function MaintenancePage() {
           color: #111111;
           font-family: 'Sora', sans-serif;
         }
-        .page-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          margin-bottom: 1rem;
-        }
-        h1 { font-size: 1.5rem; font-weight: 700; margin: 0; color: #111111; }
         .subtitle { color: #6b7280; margin: 4px 0 0; font-size: 0.9rem; }
 
         /* Reminder */
@@ -328,11 +322,11 @@ export default function MaintenancePage() {
 
         /* Badges */
         .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
-        .badge-danger    { background: #fef2f2;   color: #dc2626; border: 1px solid #fecaca; }
-        .badge-warning   { background: #fffbeb;   color: #d97706; border: 1px solid #fde68a; }
-        .badge-success   { background: #f0fdf4;   color: #16a34a; border: 1px solid #bbf7d0; }
-        .badge-info      { background: #eff6ff;   color: #2563eb; border: 1px solid #bfdbfe; }
-        .badge-secondary { background: #f9fafb;   color: #6b7280; border: 1px solid #e5e7eb; }
+        .badge-danger    { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        .badge-warning   { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+        .badge-success   { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+        .badge-info      { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+        .badge-secondary { background: #f9fafb; color: #6b7280; border: 1px solid #e5e7eb; }
         .ml-2 { margin-left: 8px; }
 
         /* Status pills */
