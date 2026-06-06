@@ -44,13 +44,10 @@ function LoginForm() {
       <div className={styles.card}>
 
         <div className={styles.logoRow}>
-          <Image
+          <img
   src="/kreativlogo1.png"
   alt="Kreativ Lift"
-  width={180}
-  height={52}
-  style={{ objectFit: "contain" }}
-  priority
+  style={{ width: 180, height: 52, objectFit: "contain" }}
 />
         </div>
 
