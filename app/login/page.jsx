@@ -41,57 +41,55 @@ function LoginForm() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.card}>
 
-        <div className={styles.leftPanel}>
+      <div className={styles.leftPanel}>
+        <div className={styles.leftInner}>
           <img
             src="/kreativlogo1.png"
             alt="Kreativ Lift"
-            style={{ width: 220, height: 140, objectFit: "cover" }}
+            className={styles.logo}
           />
-          <p className={styles.tagline}>Elevate With Us</p>
+          <p className={styles.tagline}>KREATIV LIFT</p>
+          <span className={styles.divider} />
+          <p className={styles.taglineSub}>ELEVATE WITH US</p>
         </div>
+      </div>
 
-        <div className={styles.rightPanel}>
-          <h1 className={styles.heading}>Good to see you.</h1>
-          <p className={styles.subheading}>Sign in to continue to your account.</p>
+      <div className={styles.rightPanel}>
+        <div className={styles.rightInner}>
+          <p className={styles.portalLabel}>ADMIN PORTAL</p>
+          <h1 className={styles.heading}>Sign In</h1>
 
           <form onSubmit={handleLogin} className={styles.form}>
-            <div className={styles.field}>
-              <label className={styles.label}>Username</label>
-              <div className={styles.inputWrap}>
-                <input
-                  type="text"
-                  className={styles.input}
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Enter your username"
-                  required
-                  autoFocus
-                />
-              </div>
+            <div className={styles.inputWrap}>
+              <input
+                type="text"
+                className={styles.input}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Username"
+                required
+                autoFocus
+              />
             </div>
 
-            <div className={styles.field}>
-              <label className={styles.label}>Password</label>
-              <div className={styles.inputWrap}>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  className={styles.input}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                />
-                <button
-                  type="button"
-                  className={styles.eyeBtn}
-                  onClick={() => setShowPassword((p) => !p)}
-                  aria-label="Toggle password visibility"
-                >
-                  {showPassword ? "🙈" : "👁"}
-                </button>
-              </div>
+            <div className={styles.inputWrap}>
+              <input
+                type={showPassword ? "text" : "password"}
+                className={styles.input}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                required
+              />
+              <button
+                type="button"
+                className={styles.eyeBtn}
+                onClick={() => setShowPassword((p) => !p)}
+                aria-label="Toggle password visibility"
+              >
+                {showPassword ? "🙈" : "👁"}
+              </button>
             </div>
 
             <div className={styles.forgotRow}>
@@ -105,14 +103,14 @@ function LoginForm() {
               className={styles.submitBtn}
               disabled={loading || !username || !password}
             >
-              {loading ? "Signing in…" : "Sign In"}
+              {loading ? "SIGNING IN…" : "ENTER"}
             </button>
           </form>
 
           <p className={styles.footer}>© 2026 Kreativ Lift. All rights reserved.</p>
         </div>
-
       </div>
+
     </div>
   );
 }
