@@ -38,7 +38,7 @@
 
 /* ── Logo: big, white, visible ── */
 .logo {
-  width: 340px !important;
+  width: 480px !important;
   height: auto !important;
   max-width: 80% !important;
   object-fit: contain !important;
