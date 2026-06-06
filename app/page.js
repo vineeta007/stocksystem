@@ -68,15 +68,17 @@ export default function Dashboard() {
         padding: '32px 0 20px',
         borderBottom: `1px solid ${C.border}`,
         marginBottom: '20px',
+        position: 'relative',
       }}>
         <h1 style={{
-          fontSize: '36px', fontWeight: 700, color: C.text,
+          fontSize: '48px', fontWeight: 700, color: C.text,
           letterSpacing: '-0.5px', margin: 0,
           fontFamily: "'Cormorant Garamond', serif",
+          position: 'absolute', left: '50%', transform: 'translateX(-50%)',
         }}>
           Dashboard
         </h1>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>
           <Link href="/transactions?type=in" style={{
             display: 'flex', alignItems: 'center', gap: '6px',
             background: C.tealDim, border: `1px solid ${C.teal}`,
