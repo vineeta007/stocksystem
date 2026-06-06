@@ -72,9 +72,17 @@ export default function VendorListPage() {
           >+ Add Vendor</button>
         </div>
         <p style={{ color: '#888', fontSize: '13px', margin: '60px 0 0' }}>{vendors.length} vendors registered</p>
-      </div>
+</div>
 
-      {/* Search */}
+{/* Divider line */}
+<div style={{
+  width: '100%',
+  height: '1px',
+  background: '#e8e8e8',
+  margin: '12px 0 20px 0',
+}} />
+
+{/* Search */}
       <input
         placeholder="Search by name, city or speciality..."
         value={search}
