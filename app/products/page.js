@@ -101,14 +101,15 @@ export default function ProductsPage() {
       {/* ── Header ── */}
       <div style={{
         padding: '20px 28px 16px', borderBottom: '1px solid #e0e0e0',
-        display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
-        background: '#ffffff',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        background: '#ffffff', position: 'relative',
       }}>
-        <div>
-          <div style={{ fontSize: 10, letterSpacing: '0.2em', color: '#888888', textTransform: 'uppercase', marginBottom: 4 }}>Catalogue</div>
-          <h1 style={{ fontSize: 26, fontWeight: 700, color: '#111111', margin: 0, letterSpacing: '-0.3px' }}>Products</h1>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+        <h1 style={{
+          fontSize: 50, fontWeight: 700, color: '#111111', margin: 0,
+          letterSpacing: '-0.3px', fontFamily: "'Cormorant Garamond', serif",
+          position: 'absolute', left: '50%', transform: 'translateX(-50%)',
+        }}>Products</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginLeft: 'auto' }}>
           <div style={{ fontSize: 13, color: '#555555' }}>
             <span style={{ fontWeight: 700, color: '#111111' }}>{total}</span> total &nbsp;·&nbsp;
             <span style={{ fontWeight: 700, color: '#d97706' }}>{low}</span> low &nbsp;·&nbsp;
