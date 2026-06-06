@@ -72,7 +72,7 @@ export default function Sidebar() {
               return (
                 <Link key={item.href} href={item.href} style={{
                   display: 'block', padding: '13px 20px',
-                  fontSize: '14px', fontWeight: active ? 600 : 400,
+                  fontSize: '16px', fontWeight: active ? 600 : 400,
                   color: active ? '#ffffff' : '#bbbbbb',
                   textDecoration: 'none',
                   borderLeft: `3px solid ${active ? '#CC2020' : 'transparent'}`,
