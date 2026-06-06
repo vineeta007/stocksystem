@@ -41,87 +41,91 @@ function LoginForm() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.logoAbove}>
-  <img
-    src="/kreativlogo.png"
-    alt="Kreativ Lift"
-    style={{ width: 220, height: 64, objectFit: "contain" }}
-  />
-</div>
+      <div className={styles.card}>
 
-<div className={styles.card}>
+        <div className={styles.leftPanel}>
+          <img
+            src="/kreativlogo.png"
+            alt="Kreativ Lift"
+            style={{ width: 180, objectFit: "contain" }}
+          />
+          <p className={styles.tagline}>Elevate With Us</p>
+        </div>
 
-        <h1 className={styles.heading}>Good to see you.</h1>
-        <p className={styles.subheading}>Sign in to continue to your account.</p>
+        <div className={styles.rightPanel}>
+          <h1 className={styles.heading}>Good to see you.</h1>
+          <p className={styles.subheading}>Sign in to continue to your account.</p>
 
-        <form onSubmit={handleLogin} className={styles.form}>
-          <div className={styles.field}>
-            <label className={styles.label}>Username</label>
-            <div className={styles.inputWrap}>
-              <span className={styles.inputIcon}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="8" r="4" />
-                  <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-                </svg>
-              </span>
-              <input
-                type="text"
-                className={styles.input}
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter your username"
-                required
-                autoFocus
-              />
+          <form onSubmit={handleLogin} className={styles.form}>
+            <div className={styles.field}>
+              <label className={styles.label}>Username</label>
+              <div className={styles.inputWrap}>
+                <span className={styles.inputIcon}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+                  </svg>
+                </span>
+                <input
+                  type="text"
+                  className={styles.input}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Enter your username"
+                  required
+                  autoFocus
+                />
+              </div>
             </div>
-          </div>
 
-          <div className={styles.field}>
-            <label className={styles.label}>Password</label>
-            <div className={styles.inputWrap}>
-              <span className={styles.inputIcon}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="11" width="18" height="11" rx="2" />
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                </svg>
-              </span>
-              <input
-                type={showPassword ? "text" : "password"}
-                className={styles.input}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-              />
-              <button
-                type="button"
-                className={styles.eyeBtn}
-                onClick={() => setShowPassword((p) => !p)}
-                aria-label="Toggle password visibility"
-              >
-                {showPassword ? "🙈" : "👁"}
-              </button>
+            <div className={styles.field}>
+              <label className={styles.label}>Password</label>
+              <div className={styles.inputWrap}>
+                <span className={styles.inputIcon}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                </span>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className={styles.input}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  className={styles.eyeBtn}
+                  onClick={() => setShowPassword((p) => !p)}
+                  aria-label="Toggle password visibility"
+                >
+                  {showPassword ? "🙈" : "👁"}
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className={styles.forgotRow}>
-            <a href="/forgot-password" className={styles.forgotLink}>Forgot password?</a>
-          </div>
+            <div className={styles.forgotRow}>
+              <a href="/forgot-password" className={styles.forgotLink}>Forgot password?</a>
+            </div>
 
-          {error && <p className={styles.error}>{error}</p>}
+            {error && <p className={styles.error}>{error}</p>}
 
-          <button
-            type="submit"
-            className={styles.submitBtn}
-            disabled={loading || !username || !password}
-          >
-            {loading ? "Signing in…" : "Sign In"}
-          </button>
-        </form>
+            <button
+              type="submit"
+              className={styles.submitBtn}
+              disabled={loading || !username || !password}
+            >
+              {loading ? "Signing in…" : "Sign In"}
+            </button>
+          </form>
 
-        <p className={styles.footer}>© 2026 Kreativ Lift. All rights reserved.</p>
+          <p className={styles.footer}>© 2026 Kreativ Lift. All rights reserved.</p>
+        </div>
+
       </div>
     </div>
   );
