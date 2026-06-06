@@ -1,58 +1,55 @@
+/* ── Layout ── */
 .page {
   min-height: 100vh;
   display: flex;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
+/* ── Left panel (red, diagonal stripe pattern) ── */
 .leftPanel {
-  width: 50%;
-  background: #1A1A1A;
+  width: 45%;
+  background-color: #D32020;
+  background-image:
+    repeating-linear-gradient(
+      -55deg,
+      transparent,
+      transparent 18px,
+      rgba(0, 0, 0, 0.07) 18px,
+      rgba(0, 0, 0, 0.07) 20px
+    );
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  position: relative;
+  overflow: hidden;
 }
 
 .leftInner {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 16px;
   padding: 2rem;
+  position: relative;
+  z-index: 1;
 }
 
+/* ── Your image ── */
+/* Adjust width/height to fit your image's natural proportions */
 .logo {
-  width: 260px;
-  height: 180px;
-  object-fit: cover;
+  width: 220px;
+  height: auto;
+  object-fit: contain;
+  /* Remove or tweak the filter if your image already has the right colors */
+  /* filter: brightness(0) invert(1); */
 }
 
-.tagline {
-  color: #aaaaaa;
-  font-size: 13px;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  margin: 0;
-}
-
-.taglineSub {
-  color: #666666;
-  font-size: 11px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  margin: 0;
-}
-
-.divider {
-  display: block;
-  width: 40px;
-  height: 1px;
-  background: #444;
-}
-
+/* ── Right panel ── */
 .rightPanel {
-  width: 50%;
-  background: #F5F0E8;
+  width: 55%;
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -62,29 +59,46 @@
 .rightInner {
   width: 100%;
   max-width: 400px;
-  padding: 2rem;
+  padding: 2.5rem 2rem;
 }
 
 .portalLabel {
   font-size: 11px;
   letter-spacing: 3px;
-  color: #999;
+  color: #CC2020;
   text-transform: uppercase;
-  margin: 0 0 8px;
+  margin: 0 0 6px;
+  font-weight: 500;
 }
 
 .heading {
-  font-size: 42px;
-  font-weight: 300;
-  color: #000000 !important;
+  font-size: 46px;
+  font-weight: 800;
+  color: #111111;
   margin: 0 0 2rem;
-  letter-spacing: -0.5px;
+  letter-spacing: -1px;
+  line-height: 1;
 }
 
+/* ── Form ── */
 .form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  color: #888888;
+  text-transform: uppercase;
+  font-weight: 600;
 }
 
 .inputWrap {
@@ -93,32 +107,32 @@
 
 .input {
   width: 100%;
-  padding: 14px 16px;
-  background: #EDE8DF !important;
-  border: 1px solid #D0C8BC;
+  padding: 13px 16px;
+  background: #2a2a2a;
+  border: none;
   border-radius: 0;
-  color: #1A1A1A;
-  font-size: 14px;
+  color: #ffffff;
+  font-size: 15px;
   outline: none;
   box-sizing: border-box;
   font-family: inherit;
-  transition: border-color 0.2s;
-  -webkit-text-fill-color: #1A1A1A;
-  caret-color: #1A1A1A;
+  transition: background 0.2s;
+  -webkit-text-fill-color: #ffffff;
+  caret-color: #ffffff;
 }
 
-.input::placeholder { color: #BBBBBB; }
+.input::placeholder { color: #666666; }
 
 .input:focus {
-  border-color: #1A1A1A;
+  background: #333333;
 }
 
 .input:-webkit-autofill,
 .input:-webkit-autofill:hover,
 .input:-webkit-autofill:focus,
 .input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 9999px #EDE8DF inset !important;
-  -webkit-text-fill-color: #1A1A1A !important;
+  -webkit-box-shadow: 0 0 0 9999px #2a2a2a inset !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 .eyeBtn {
@@ -135,57 +149,56 @@
   line-height: 1;
 }
 
-.forgotRow {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.forgotLink {
-  font-size: 12px;
-  color: #888;
-  text-decoration: none;
-  letter-spacing: 0.5px;
-}
-
-.forgotLink:hover { text-decoration: underline; }
-
+/* ── Error ── */
 .error {
   padding: 10px 12px;
   background: #FEF2F2;
-  border: 1px solid #FECACA;
+  border-left: 3px solid #CC2020;
   font-size: 13px;
-  color: #DC2626;
+  color: #CC2020;
 }
 
+/* ── Submit button ── */
 .submitBtn {
-  padding: 16px;
-  background: #1A1A1A;
-  color: #ffffff;
-  font-size: 12px;
+  padding: 15px;
+  background: transparent;
+  color: #999999;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 3px;
+  letter-spacing: 4px;
   text-transform: uppercase;
-  border: none;
+  border: 1px solid #dddddd;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
   font-family: inherit;
-  margin-top: 8px;
+  margin-top: 4px;
   width: 100%;
 }
 
-.submitBtn:hover:not(:disabled) { background: #E03030; }
-.submitBtn:active:not(:disabled) { opacity: 0.9; }
-.submitBtn:disabled { background: #ccc; cursor: not-allowed; }
+.submitBtn:hover:not(:disabled) {
+  background: #CC2020;
+  color: #ffffff;
+  border-color: #CC2020;
+}
 
+.submitBtn:active:not(:disabled) { opacity: 0.85; }
+
+.submitBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Footer ── */
 .footer {
   font-size: 11px;
   color: #AAAAAA;
-  text-align: center;
-  margin: 2rem 0 0;
+  text-align: left;
+  margin: 2.5rem 0 0;
 }
 
+/* ── Responsive ── */
 @media (max-width: 700px) {
   .page { flex-direction: column; }
-  .leftPanel { width: 100%; min-height: 40vh; }
-  .rightPanel { width: 100%; min-height: 60vh; }
+  .leftPanel { width: 100%; min-height: 220px; }
+  .rightPanel { width: 100%; min-height: 0; }
 }
