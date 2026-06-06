@@ -8,7 +8,7 @@ import styles from "./login.module.css";
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const from = searchParams.get("from") || "/dashboard";
+  const from = searchParams.get("from") || "/";
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
