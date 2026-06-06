@@ -41,15 +41,15 @@ function LoginForm() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.card}>
+      <div className={styles.logoAbove}>
+  <img
+    src="/kreativlogo.png"
+    alt="Kreativ Lift"
+    style={{ width: 220, height: 64, objectFit: "contain" }}
+  />
+</div>
 
-        <div className={styles.logoRow}>
-          <img
-  src="/kreativlogo1.png"
-  alt="Kreativ Lift"
-  style={{ width: 240, height: 70, objectFit: "contain" }}
-/>
-        </div>
+<div className={styles.card}>
 
         <h1 className={styles.heading}>Good to see you.</h1>
         <p className={styles.subheading}>Sign in to continue to your account.</p>
