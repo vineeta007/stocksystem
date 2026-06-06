@@ -37,7 +37,6 @@ const lowStockAlerts = [
   { id: 5, name: 'Flexa Par 130',  quantity: 1, status: 'low' },
 ];
 
-// ── Light theme colour tokens ──────────────────────────────────────────────
 const C = {
   base:      '#f5f5f5',
   card:      '#ffffff',
@@ -66,18 +65,17 @@ export default function Dashboard() {
       {/* ── Header ── */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '24px 0 20px',
+        padding: '32px 0 20px',
         borderBottom: `1px solid ${C.border}`,
         marginBottom: '20px',
       }}>
-        <div>
-          <div style={{ fontSize: '10px', color: C.dim, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '4px' }}>
-            Overview
-          </div>
-          <h1 style={{ fontSize: '24px', fontWeight: 700, color: C.text, letterSpacing: '-0.3px', margin: 0 }}>
-            Dashboard
-          </h1>
-        </div>
+        <h1 style={{
+          fontSize: '36px', fontWeight: 700, color: C.text,
+          letterSpacing: '-0.5px', margin: 0,
+          fontFamily: "'Cormorant Garamond', serif",
+        }}>
+          Dashboard
+        </h1>
         <div style={{ display: 'flex', gap: '8px' }}>
           <Link href="/transactions?type=in" style={{
             display: 'flex', alignItems: 'center', gap: '6px',
@@ -113,11 +111,9 @@ export default function Dashboard() {
 
       {/* ── Middle Row ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-
         <Card title="Current Stock Levels" actionLabel="View All →" actionHref="/products">
           <StockTable items={stockItems} />
         </Card>
-
         <Card title="Recent Transactions" actionLabel="View All" actionHref="/transactions">
           {recentTransactions.map((tx, i) => (
             <div key={i} style={{
@@ -149,7 +145,6 @@ export default function Dashboard() {
 
       {/* ── Bottom Row ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-
         <Card title="Stock By Category">
           {categoryStock.map((cat, i) => (
             <div key={i} style={{
@@ -178,7 +173,6 @@ export default function Dashboard() {
             </div>
           ))}
         </Card>
-
         <Card title="Low Stock Alerts" actionLabel="Manage" actionHref="/products">
           <LowStockAlert alerts={lowStockAlerts} />
         </Card>
@@ -187,7 +181,6 @@ export default function Dashboard() {
   );
 }
 
-// ── Card component ─────────────────────────────────────────────────────────
 function Card({ title, actionLabel, actionHref, children }) {
   return (
     <div style={{
