@@ -1,393 +1,210 @@
-'use client'
-import { useState, useEffect, useCallback } from 'react'
+'use client';
+import StatCard from '@/components/StatCard';
+import StockTable from '@/components/StockTable';
+import LowStockAlert from '@/components/LowStockAlert';
+import ReminderWidget from '@/components/ReminderWidget';
+import Link from 'next/link';
 
-const KOTA_LIST = [
-  'Semua Kota','Jakarta','Surabaya','Bandung','Medan','Semarang',
-  'Bekasi','Depok','Tangerang','Makassar','Palembang',
-]
+const stockItems = [
+  { name: 'D-Shackle', category: null, qty: 42, maxQty: 50, status: 'IN STOCK' },
+  { name: 'Modular E. 300', category: null, qty: 3, maxQty: 50, status: 'LOW STOCK' },
+  { name: 'Flexa Par 100', category: 'PPE / Health', qty: 18, maxQty: 50, status: 'IN STOCK' },
+  { name: 'Emergency Key', category: 'Swift Parts', qty: 2, maxQty: 50, status: 'LOW STOCK' },
+  { name: 'Solarcraft Coil', category: 'Chain Warranty', qty: 0, maxQty: 50, status: 'OUT OF STOCK' },
+];
 
-function daysBadge(days) {
-  if (days === null || days === undefined) return null
-  if (days < 0)    return <span className="badge badge-danger">Terlambat {Math.abs(days)}h</span>
-  if (days <= 14)  return <span className="badge badge-warning">⚠ {days} hari lagi</span>
-  return <span className="badge badge-success">{days} hari</span>
-}
+const recentTransactions = [
+  { type: 'in',  label: 'Swift S-Hook — Paleo Enclosures',   delta: '+15', time: '6 hours ago' },
+  { type: 'out', label: 'Modular E. stock in',               delta: '-3',  time: '5 hours ago' },
+  { type: 'in',  label: 'D-Shackle — Forty Cities Pvt Ltd',  delta: '+20', time: 'Yesterday' },
+  { type: 'out', label: 'Solarcraft Coil stock in',          delta: '-8',  time: 'Yesterday' },
+  { type: 'in',  label: 'Flexa Par 180 — Online Minimum',    delta: '+10', time: '2 days ago' },
+];
 
-function warrantyBadge(status) {
-  if (status === 'free') return <span className="badge badge-info">Garansi (Free)</span>
-  return <span className="badge badge-secondary">Berbayar</span>
-}
+const categoryStock = [
+  { name: 'Swift Parts',         qty: 0,  max: 30 },
+  { name: 'Lifting (Purchased)', qty: 0,  max: 30 },
+  { name: 'Lifting (ODM)',       qty: 12, max: 30 },
+  { name: 'PPE / Health',        qty: 20, max: 30 },
+  { name: 'Station Buttons',     qty: 24, max: 30 },
+];
 
-export default function MaintenancePage() {
-  const [customers, setCustomers]   = useState([])
-  const [loading, setLoading]       = useState(true)
-  const [kotaFilter, setKotaFilter] = useState('Semua Kota')
-  const [statusFilter, setStatus]   = useState('')
-  const [showForm, setShowForm]     = useState(false)
-  const [editTarget, setEditTarget] = useState(null)
-  const [reminderOnly, setReminderOnly] = useState(false)
+const lowStockAlerts = [
+  { id: 1, name: 'Swift S-Hook',   quantity: 3, status: 'low' },
+  { id: 2, name: 'Modular Elbow',  quantity: 3, status: 'low' },
+  { id: 3, name: 'D-Shackle 8mm', quantity: 2, status: 'low' },
+  { id: 4, name: 'Chain Warranty', quantity: 0, status: 'out' },
+  { id: 5, name: 'Flexa Par 130',  quantity: 1, status: 'low' },
+];
 
-  const [form, setForm] = useState({
-    customerName:'', address:'', kota:'', phone:'', unitType:'',
-    serialNumber:'', bastDate:'', lastVisitDate:'', visitCount:0, status:'New', notes:''
-  })
+const C = {
+  base:      '#f5f5f5',
+  card:      '#ffffff',
+  hover:     '#f0f0f0',
+  border:    '#e0e0e0',
+  borderSoft:'rgba(0,0,0,0.06)',
+  red:       '#CC2020',
+  redLight:  '#e53535',
+  redDim:    'rgba(204,32,32,0.08)',
+  teal:      '#1D9E75',
+  tealLight: '#16a34a',
+  tealDim:   'rgba(29,158,117,0.1)',
+  text:      '#111111',
+  muted:     '#555555',
+  dim:       '#888888',
+  green:     '#16a34a',
+  greenDim:  'rgba(22,163,74,0.1)',
+  amber:     '#d97706',
+  amberDim:  'rgba(217,119,6,0.1)',
+};
 
-  const fetchData = useCallback(async () => {
-    setLoading(true)
-    const params = new URLSearchParams()
-    if (kotaFilter !== 'Semua Kota') params.set('kota', kotaFilter)
-    if (statusFilter)                params.set('status', statusFilter)
-    if (reminderOnly)                params.set('reminder', 'true')
-    const res  = await fetch(`/api/maintenance?${params}`)
-    const json = await res.json()
-    setCustomers(json.data || [])
-    setLoading(false)
-  }, [kotaFilter, statusFilter, reminderOnly])
-
-  useEffect(() => { fetchData() }, [fetchData])
-
-  const needAttention = customers.filter(
-    (c) => c.daysUntilNextVisit !== null && c.daysUntilNextVisit <= 14
-  ).length
-
-  async function handleSubmit(e) {
-    e.preventDefault()
-    const method = editTarget ? 'PATCH' : 'POST'
-    const url    = editTarget ? `/api/maintenance/${editTarget._id}` : '/api/maintenance'
-    await fetch(url, { method, headers:{'Content-Type':'application/json'}, body: JSON.stringify(form) })
-    setShowForm(false)
-    setEditTarget(null)
-    setForm({ customerName:'', address:'', kota:'', phone:'', unitType:'',
-              serialNumber:'', bastDate:'', lastVisitDate:'', visitCount:0, status:'New', notes:'' })
-    fetchData()
-  }
-
-  function openEdit(c) {
-    setEditTarget(c)
-    setForm({
-      customerName: c.customerName || '',
-      address:      c.address      || '',
-      kota:         c.kota         || '',
-      phone:        c.phone        || '',
-      unitType:     c.unitType     || '',
-      serialNumber: c.serialNumber || '',
-      bastDate:     c.bastDate     ? c.bastDate.slice(0,10) : '',
-      lastVisitDate:c.lastVisitDate? c.lastVisitDate.slice(0,10) : '',
-      visitCount:   c.visitCount   || 0,
-      status:       c.status       || 'New',
-      notes:        c.notes        || '',
-    })
-    setShowForm(true)
-  }
-
-  async function recordVisit(id) {
-    await fetch(`/api/maintenance/${id}`, {
-      method: 'PATCH',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ action: 'recordVisit' }),
-    })
-    fetchData()
-  }
-
-  async function deleteCustomer(id) {
-    if (!confirm('Hapus customer ini?')) return
-    await fetch(`/api/maintenance/${id}`, { method: 'DELETE' })
-    fetchData()
-  }
-
+export default function Dashboard() {
   return (
-    <div className="page-container">
+    <div style={{ padding: '0 24px 32px', background: C.base, minHeight: '100vh' }}>
 
-      {/* Header */}
-      <div className="page-header">
-        <div>
-          <h1>🔧 Data Maintenance</h1>
-          <p className="subtitle">
-            {customers.length} customer aktif
-            {needAttention > 0 && (
-              <span className="badge badge-warning ml-2">⚠ {needAttention} perlu perhatian</span>
-            )}
-          </p>
+      {/* ── Header ── */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '32px 0 20px',
+        borderBottom: `1px solid ${C.border}`,
+        marginBottom: '20px',
+      }}>
+        <h1 style={{
+          fontSize: '36px', fontWeight: 700, color: C.text,
+          letterSpacing: '-0.5px', margin: 0,
+          fontFamily: "'Cormorant Garamond', serif",
+        }}>
+          Dashboard
+        </h1>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <Link href="/transactions?type=in" style={{
+            display: 'flex', alignItems: 'center', gap: '6px',
+            background: C.tealDim, border: `1px solid ${C.teal}`,
+            color: C.teal, padding: '8px 16px', borderRadius: '8px',
+            fontSize: '12px', fontWeight: 600, textDecoration: 'none',
+          }}>
+            ↓ STOCK IN
+          </Link>
+          <Link href="/transactions?type=out" style={{
+            display: 'flex', alignItems: 'center', gap: '6px',
+            background: C.redDim, border: `1px solid rgba(204,32,32,0.3)`,
+            color: C.red, padding: '8px 16px', borderRadius: '8px',
+            fontSize: '12px', fontWeight: 600, textDecoration: 'none',
+          }}>
+            ↑ STOCK OUT
+          </Link>
         </div>
-        <button className="btn-primary" onClick={() => { setEditTarget(null); setShowForm(true) }}>
-          + Tambah Customer
-        </button>
       </div>
 
-      {/* Reminder banner */}
-      {!reminderOnly && needAttention > 0 && (
-        <div className="reminder-banner" onClick={() => setReminderOnly(true)}>
-          🔔 <strong>{needAttention} customer</strong> memiliki jadwal kunjungan dalam 14 hari ke depan.
-          <span className="reminder-link">Lihat semua →</span>
-        </div>
-      )}
-      {reminderOnly && (
-        <div className="reminder-banner active">
-          🔔 Menampilkan customer dengan jadwal ≤ 14 hari.
-          <span className="reminder-link" onClick={() => setReminderOnly(false)}>Reset →</span>
-        </div>
-      )}
+      {/* ── Stat Cards ── */}
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+        <StatCard label="Total Products" value="18" sublabel="Active lines"   dotColor="green"  />
+        <StatCard label="Low Stock"      value="5"  sublabel="Need attention" dotColor="orange" />
+        <StatCard label="Out of Stock"   value="2"  sublabel="Depleted items" dotColor="red"    />
+        <StatCard label="Transactions"   value="47" sublabel="This month"     dotColor="blue"   />
+      </div>
 
-      {/* Filters */}
-      <div className="filter-row">
-        <select value={kotaFilter} onChange={(e) => setKotaFilter(e.target.value)}>
-          {KOTA_LIST.map((k) => <option key={k}>{k}</option>)}
-        </select>
-        <select value={statusFilter} onChange={(e) => setStatus(e.target.value)}>
-          <option value="">Semua Status</option>
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
-          <option value="New">New</option>
-        </select>
-        {(kotaFilter !== 'Semua Kota' || statusFilter || reminderOnly) && (
-          <button className="btn-ghost" onClick={() => { setKotaFilter('Semua Kota'); setStatus(''); setReminderOnly(false) }}>
-            Reset Filter
-          </button>
+      {/* ── Reminder Widget ── */}
+      <div style={{ marginBottom: '12px' }}>
+        <ReminderWidget />
+      </div>
+
+      {/* ── Middle Row ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+        <Card title="Current Stock Levels" actionLabel="View All →" actionHref="/products">
+          <StockTable items={stockItems} />
+        </Card>
+        <Card title="Recent Transactions" actionLabel="View All" actionHref="/transactions">
+          {recentTransactions.map((tx, i) => (
+            <div key={i} style={{
+              display: 'flex', alignItems: 'flex-start',
+              padding: '10px 0',
+              borderBottom: i < recentTransactions.length - 1 ? `1px solid ${C.border}` : 'none',
+              gap: '10px',
+            }}>
+              <span style={{
+                width: '7px', height: '7px', borderRadius: '50%', flexShrink: 0,
+                marginTop: '4px',
+                background: tx.type === 'in' ? C.teal : C.red,
+              }} />
+              <div style={{ flex: 1, fontSize: '12px', color: C.muted, lineHeight: 1.5 }}>
+                <span style={{ color: C.dim, fontWeight: 500, fontSize: '11px' }}>
+                  {tx.type === 'in' ? 'In: ' : 'Out: '}
+                </span>
+                {tx.label}
+                <div style={{ fontSize: '10px', color: C.dim, marginTop: '2px' }}>{tx.time}</div>
+              </div>
+              <span style={{
+                fontSize: '13px', fontWeight: 700,
+                color: tx.type === 'in' ? C.teal : C.red, flexShrink: 0,
+              }}>{tx.delta}</span>
+            </div>
+          ))}
+        </Card>
+      </div>
+
+      {/* ── Bottom Row ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+        <Card title="Stock By Category">
+          {categoryStock.map((cat, i) => (
+            <div key={i} style={{
+              display: 'flex', alignItems: 'center',
+              padding: '10px 0',
+              borderBottom: i < categoryStock.length - 1 ? `1px solid ${C.border}` : 'none',
+              gap: '12px',
+            }}>
+              <div style={{ width: '130px', fontSize: '12px', color: C.muted, flexShrink: 0 }}>{cat.name}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ height: '4px', background: C.hover, borderRadius: '4px', overflow: 'hidden', border: `1px solid ${C.border}` }}>
+                  <div style={{
+                    height: '100%',
+                    width: `${(cat.qty / cat.max) * 100}%`,
+                    background: cat.qty === 0 ? C.red : C.teal,
+                    borderRadius: '4px',
+                    transition: 'width 0.4s ease',
+                  }} />
+                </div>
+              </div>
+              <div style={{
+                fontSize: '13px', fontWeight: 600,
+                color: cat.qty === 0 ? C.red : C.text,
+                width: '24px', textAlign: 'right',
+              }}>{cat.qty}</div>
+            </div>
+          ))}
+        </Card>
+        <Card title="Low Stock Alerts" actionLabel="Manage" actionHref="/products">
+          <LowStockAlert alerts={lowStockAlerts} />
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function Card({ title, actionLabel, actionHref, children }) {
+  return (
+    <div style={{
+      background: C.card,
+      border: `1px solid ${C.border}`,
+      borderRadius: '12px',
+      padding: '18px',
+      boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+    }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        marginBottom: '14px',
+      }}>
+        <span style={{
+          fontSize: '10px', textTransform: 'uppercase',
+          letterSpacing: '0.12em', color: C.dim, fontWeight: 600,
+        }}>{title}</span>
+        {actionLabel && (
+          <Link href={actionHref || '#'} style={{
+            fontSize: '11px', color: C.red, textDecoration: 'none', fontWeight: 600,
+          }}>{actionLabel}</Link>
         )}
       </div>
-
-      {/* Table */}
-      {loading ? (
-        <p className="loading-text">Memuat data...</p>
-      ) : customers.length === 0 ? (
-        <div className="empty-state">
-          <p>Tidak ada data{kotaFilter !== 'Semua Kota' ? ` untuk kota ${kotaFilter}` : ''}.</p>
-          <button className="btn-primary" onClick={() => setShowForm(true)}>+ Tambah Customer</button>
-        </div>
-      ) : (
-        <div className="table-wrapper">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Customer</th>
-                <th>Kota</th>
-                <th>Unit</th>
-                <th>Kunjungan Terakhir</th>
-                <th>Kunjungan Berikutnya</th>
-                <th>Sisa Hari</th>
-                <th>Jml Kunjungan</th>
-                <th>Garansi</th>
-                <th>Status</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {customers.map((c, i) => (
-                <tr key={c._id} className={c.daysUntilNextVisit !== null && c.daysUntilNextVisit <= 14 ? 'row-warning' : ''}>
-                  <td>{i + 1}</td>
-                  <td>
-                    <div className="customer-name">{c.customerName}</div>
-                    <div className="customer-addr">{c.address}</div>
-                  </td>
-                  <td>{c.kota}</td>
-                  <td>
-                    <div>{c.unitType}</div>
-                    <div className="text-muted">{c.serialNumber}</div>
-                  </td>
-                  <td>{c.lastVisitDate ? new Date(c.lastVisitDate).toLocaleDateString('id-ID') : <span className="text-muted">—</span>}</td>
-                  <td>{c.nextVisitDate  ? new Date(c.nextVisitDate).toLocaleDateString('id-ID')  : <span className="text-muted">—</span>}</td>
-                  <td>{daysBadge(c.daysUntilNextVisit)}</td>
-                  <td className="text-center">{c.visitCount}</td>
-                  <td>{warrantyBadge(c.warrantyStatus)}</td>
-                  <td><span className={`status-pill status-${c.status?.toLowerCase()}`}>{c.status}</span></td>
-                  <td>
-                    <div className="action-btns">
-                      <button className="btn-sm btn-visit" onClick={() => recordVisit(c._id)}>✓ Kunjungan</button>
-                      <button className="btn-sm btn-edit"  onClick={() => openEdit(c)}>Edit</button>
-                      <button className="btn-sm btn-del"   onClick={() => deleteCustomer(c._id)}>Hapus</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Modal Form */}
-      {showForm && (
-        <div className="modal-overlay" onClick={() => setShowForm(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>{editTarget ? 'Edit Customer' : 'Tambah Customer'}</h2>
-              <button onClick={() => setShowForm(false)}>✕</button>
-            </div>
-            <form onSubmit={handleSubmit} className="form-grid">
-              <label>Nama Customer *
-                <input required value={form.customerName} onChange={(e) => setForm({...form, customerName: e.target.value})} />
-              </label>
-              <label>Kota *
-                <select required value={form.kota} onChange={(e) => setForm({...form, kota: e.target.value})}>
-                  <option value="">Pilih Kota</option>
-                  {KOTA_LIST.slice(1).map((k) => <option key={k}>{k}</option>)}
-                </select>
-              </label>
-              <label>Alamat
-                <input value={form.address} onChange={(e) => setForm({...form, address: e.target.value})} />
-              </label>
-              <label>Telepon
-                <input value={form.phone} onChange={(e) => setForm({...form, phone: e.target.value})} />
-              </label>
-              <label>Tipe Unit
-                <input value={form.unitType} onChange={(e) => setForm({...form, unitType: e.target.value})} />
-              </label>
-              <label>Serial Number
-                <input value={form.serialNumber} onChange={(e) => setForm({...form, serialNumber: e.target.value})} />
-              </label>
-              <label>Tanggal BAST
-                <input type="date" value={form.bastDate} onChange={(e) => setForm({...form, bastDate: e.target.value})} />
-              </label>
-              <label>Tanggal Kunjungan Terakhir
-                <input type="date" value={form.lastVisitDate} onChange={(e) => setForm({...form, lastVisitDate: e.target.value})} />
-              </label>
-              <label>Jumlah Kunjungan
-                <input type="number" min="0" value={form.visitCount} onChange={(e) => setForm({...form, visitCount: parseInt(e.target.value)||0})} />
-              </label>
-              <label>Status
-                <select value={form.status} onChange={(e) => setForm({...form, status: e.target.value})}>
-                  <option>New</option>
-                  <option>Active</option>
-                  <option>Inactive</option>
-                </select>
-              </label>
-              <label className="full-width">Catatan
-                <textarea value={form.notes} onChange={(e) => setForm({...form, notes: e.target.value})} rows={3} />
-              </label>
-              <div className="form-actions full-width">
-                <button type="button" className="btn-ghost" onClick={() => setShowForm(false)}>Batal</button>
-                <button type="submit" className="btn-primary">Simpan</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      <style jsx>{`
-        .page-container {
-          padding: 1.5rem;
-          width: 100%;
-          box-sizing: border-box;
-          min-height: 100vh;
-          background: #0B1629;
-          color: #e2e8f0;
-          font-family: 'Sora', sans-serif;
-        }
-        .page-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          margin-bottom: 1rem;
-        }
-        h1 { font-size: 1.5rem; font-weight: 700; margin: 0; color: #f1f5f9; }
-        .subtitle { color: #64748b; margin: 4px 0 0; font-size: 0.9rem; }
-
-        /* Reminder */
-        .reminder-banner {
-          background: #1E2D45; border: 1px solid #f59e0b; border-radius: 8px;
-          padding: 10px 16px; margin-bottom: 1rem; font-size: 0.9rem;
-          cursor: pointer; color: #e2e8f0;
-        }
-        .reminder-banner.active { background: #1E2D45; border-color: #f59e0b; }
-        .reminder-link { margin-left: 8px; color: #f59e0b; font-weight: 600; }
-
-        /* Filters */
-        .filter-row { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
-        .filter-row select {
-  padding: 6px 10px; border: 1px solid #1E3A5F; border-radius: 6px;
-  font-size: 0.85rem; background: #1E2D45; color: #e2e8f0;
-  width: auto;
-  min-width: 160px;
-}
-
-        /* Table */
-        .table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid #1E3A5F; }
-        .data-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
-        .data-table th {
-          background: #1E2D45; color: #64748b; padding: 10px 12px; text-align: left;
-          font-weight: 600; border-bottom: 1px solid #1E3A5F; white-space: nowrap;
-          font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;
-        }
-        .data-table td {
-          padding: 10px 12px; border-bottom: 1px solid #1E3A5F;
-          vertical-align: middle; color: #cbd5e1;
-        }
-        .data-table tbody tr:last-child td { border-bottom: none; }
-        .data-table tbody tr:hover td { background: #1E2D45; }
-        .row-warning td { background: rgba(245,158,11,0.08) !important; }
-        .customer-name { font-weight: 600; color: #f1f5f9; }
-        .customer-addr { font-size: 0.78rem; color: #475569; }
-        .text-muted { font-size: 0.78rem; color: #475569; }
-        .text-center { text-align: center; }
-
-        /* Badges */
-        .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
-        .badge-danger    { background: rgba(239,68,68,0.15);   color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
-        .badge-warning   { background: rgba(245,158,11,0.15);  color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
-        .badge-success   { background: rgba(16,185,129,0.15);  color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
-        .badge-info      { background: rgba(59,130,246,0.15);  color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
-        .badge-secondary { background: rgba(100,116,139,0.15); color: #94a3b8; border: 1px solid rgba(100,116,139,0.3); }
-        .ml-2 { margin-left: 8px; }
-
-        /* Status pills */
-        .status-pill { padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
-        .status-active   { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
-        .status-inactive { background: rgba(239,68,68,0.15);  color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
-        .status-new      { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
-
-        /* Action buttons */
-        .action-btns { display: flex; gap: 4px; }
-        .btn-sm { padding: 4px 10px; border-radius: 6px; font-size: 0.72rem; cursor: pointer; border: none; font-weight: 600; }
-        .btn-visit { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
-        .btn-edit  { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
-        .btn-del   { background: rgba(239,68,68,0.15);  color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
-
-        /* Primary / ghost buttons */
-        .btn-primary {
-          background: #2E90FA; color: #fff; padding: 9px 18px; border-radius: 8px;
-          border: none; cursor: pointer; font-size: 0.875rem; font-weight: 600; white-space: nowrap;
-        }
-        .btn-primary:hover { background: #1d6fca; }
-        .btn-ghost {
-          background: transparent; border: 1px solid #1E3A5F; color: #94a3b8;
-          padding: 8px 14px; border-radius: 7px; cursor: pointer; font-size: 0.875rem;
-        }
-
-        /* States */
-        .loading-text { color: #475569; padding: 2rem; text-align: center; }
-        .empty-state {
-          text-align: center; padding: 3rem; color: #475569;
-          background: #1E2D45; border-radius: 10px; border: 1px solid #1E3A5F;
-        }
-        .empty-state p { margin-bottom: 1rem; }
-
-        /* Modal */
-        .modal-overlay {
-          position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-          display: flex; align-items: center; justify-content: center; z-index: 100;
-        }
-        .modal {
-          background: #1E2D45; border: 1px solid #1E3A5F; border-radius: 12px;
-          width: 680px; max-width: 95vw; max-height: 90vh; overflow-y: auto;
-        }
-        .modal-header {
-          display: flex; justify-content: space-between; align-items: center;
-          padding: 16px 20px; border-bottom: 1px solid #1E3A5F;
-        }
-        .modal-header h2 { margin: 0; font-size: 1.1rem; font-weight: 700; color: #f1f5f9; }
-        .modal-header button { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #64748b; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 20px; }
-        .form-grid label { display: flex; flex-direction: column; font-size: 0.8rem; color: #64748b; gap: 4px; font-weight: 600; }
-        .form-grid input, .form-grid select, .form-grid textarea {
-          border: 1px solid #1E3A5F; border-radius: 6px; padding: 8px 10px;
-          font-size: 0.875rem; background: #0B1629; color: #e2e8f0; outline: none;
-        }
-        .form-grid input:focus, .form-grid select:focus, .form-grid textarea:focus {
-          border-color: #2E90FA;
-        }
-        .full-width { grid-column: 1 / -1; }
-        .form-actions { display: flex; justify-content: flex-end; gap: 8px; padding-top: 4px; }
-      `}</style>
+      {children}
     </div>
-  )
+  );
 }
