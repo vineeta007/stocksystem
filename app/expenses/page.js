@@ -84,12 +84,11 @@ export default function ExpensesPage() {
   return (
     <div style={{ minHeight: '100vh', color: TEXT }}>
       {/* Header */}
-      <div style={{ padding: '18px 28px 14px', borderBottom: `0.5px solid ${BORDER}`, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-        <div>
-          <div style={{ fontSize: 8, letterSpacing: '0.3em', color: FAINT, textTransform: 'uppercase', marginBottom: 3 }}>Finance</div>
-          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 400, color: TEXT }}>Expenses</div>
+      <div style={{ padding: '18px 28px 14px', borderBottom: `0.5px solid ${BORDER}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ flex: 1, textAlign: 'center' }}>
+          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 38, fontWeight: 700, color: '#000000', letterSpacing: '0.02em' }}>Expenses</div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, position: 'absolute', right: 28 }}>
           <span style={{ fontSize: 11, color: MUTED }}>
             Total: <span style={{ color: '#e05050', fontFamily: 'Space Mono, monospace', fontWeight: 700 }}>{fmt(total)}</span>
           </span>
