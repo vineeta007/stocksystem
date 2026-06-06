@@ -3,7 +3,7 @@
 export default function LowStockAlert({ alerts = [], onOrder }) {
   if (alerts.length === 0) {
     return (
-      <div style={{ padding: '20px 0', fontSize: '14px', color: '#64748B', textAlign: 'center' }}>
+      <div style={{ padding: '20px 0', fontSize: '14px', color: '#888888', textAlign: 'center' }}>
         All stock levels are healthy.
       </div>
     );
@@ -17,15 +17,15 @@ export default function LowStockAlert({ alerts = [], onOrder }) {
           <div key={alert.id || i} style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             gap: '10px', padding: '13px 0',
-            borderBottom: i !== alerts.length - 1 ? '1px solid rgba(148,163,184,0.08)' : 'none',
+            borderBottom: i !== alerts.length - 1 ? '1px solid #eeeeee' : 'none',
             fontFamily: "'Sora', sans-serif",
           }}>
             {/* Left */}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#F1F5F9', marginBottom: '4px' }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#111111', marginBottom: '4px' }}>
                 {alert.name}
               </div>
-              <div style={{ fontSize: '11px', color: isOut ? '#FCA5A5' : '#94A3B8' }}>
+              <div style={{ fontSize: '11px', color: isOut ? '#CC2020' : '#888888' }}>
                 {isOut ? 'Depleted — restock needed' : `Qty: ${alert.quantity} remaining`}
               </div>
             </div>
@@ -35,9 +35,9 @@ export default function LowStockAlert({ alerts = [], onOrder }) {
               <span style={{
                 padding: '3px 10px', borderRadius: '999px',
                 fontSize: '10px', fontWeight: 700, letterSpacing: '0.04em',
-                background: isOut ? 'rgba(239,68,68,0.15)' : 'rgba(245,158,11,0.15)',
-                color: isOut ? '#FCA5A5' : '#FCD34D',
-                border: isOut ? '1px solid rgba(239,68,68,0.35)' : '1px solid rgba(245,158,11,0.35)',
+                background: isOut ? 'rgba(204,32,32,0.08)' : 'rgba(217,119,6,0.1)',
+                color: isOut ? '#CC2020' : '#d97706',
+                border: isOut ? '1px solid rgba(204,32,32,0.25)' : '1px solid rgba(217,119,6,0.3)',
               }}>
                 {isOut ? 'OUT' : 'LOW'}
               </span>
@@ -45,11 +45,11 @@ export default function LowStockAlert({ alerts = [], onOrder }) {
               <button onClick={() => onOrder?.(alert)} style={{
                 padding: '6px 14px', borderRadius: '7px',
                 fontSize: '12px', fontWeight: 600,
-                border: '1px solid rgba(29,158,117,0.4)',
-                background: 'rgba(29,158,117,0.12)',
-                color: '#34D399', cursor: 'pointer',
+                border: '1px solid #000000',
+                background: '#000000',
+                color: '#ffffff', cursor: 'pointer',
                 fontFamily: "'Sora', sans-serif",
-                transition: 'all 0.15s',
+                transition: 'background 0.15s',
               }}>
                 Order
               </button>
