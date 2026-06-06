@@ -37,13 +37,10 @@
 }
 
 /* ── Your image ── */
-/* Adjust width/height to fit your image's natural proportions */
 .logo {
   width: 220px;
   height: auto;
   object-fit: contain;
-  /* Remove or tweak the filter if your image already has the right colors */
-  /* filter: brightness(0) invert(1); */
 }
 
 /* ── Right panel ── */
@@ -60,6 +57,7 @@
   width: 100%;
   max-width: 400px;
   padding: 2.5rem 2rem;
+  text-align: center;
 }
 
 .portalLabel {
@@ -69,15 +67,17 @@
   text-transform: uppercase;
   margin: 0 0 6px;
   font-weight: 500;
+  text-align: center;
 }
 
 .heading {
   font-size: 46px;
   font-weight: 800;
-  color: #111111;
+  color: #000000;
   margin: 0 0 2rem;
   letter-spacing: -1px;
   line-height: 1;
+  text-align: center;
 }
 
 /* ── Form ── */
@@ -85,6 +85,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  text-align: left;
 }
 
 .fieldGroup {
@@ -108,9 +109,9 @@
 .input {
   width: 100%;
   padding: 13px 16px;
-  background: #2a2a2a;
+  background: #3d4a5c;
   border: none;
-  border-radius: 0;
+  border-radius: 6px;
   color: #ffffff;
   font-size: 15px;
   outline: none;
@@ -121,17 +122,17 @@
   caret-color: #ffffff;
 }
 
-.input::placeholder { color: #666666; }
+.input::placeholder { color: #8a9bb0; }
 
 .input:focus {
-  background: #333333;
+  background: #4a5870;
 }
 
 .input:-webkit-autofill,
 .input:-webkit-autofill:hover,
 .input:-webkit-autofill:focus,
 .input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 9999px #2a2a2a inset !important;
+  -webkit-box-shadow: 0 0 0 9999px #3d4a5c inset !important;
   -webkit-text-fill-color: #ffffff !important;
 }
 
@@ -144,7 +145,7 @@
   border: none;
   cursor: pointer;
   font-size: 14px;
-  color: #888888;
+  color: #8a9bb0;
   padding: 0;
   line-height: 1;
 }
@@ -161,30 +162,30 @@
 /* ── Submit button ── */
 .submitBtn {
   padding: 15px;
-  background: transparent;
-  color: #999999;
+  background: #000000;
+  color: #ffffff;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 4px;
   text-transform: uppercase;
-  border: 1px solid #dddddd;
+  border: none;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  transition: background 0.2s, opacity 0.2s;
   font-family: inherit;
   margin-top: 4px;
   width: 100%;
+  border-radius: 0;
 }
 
 .submitBtn:hover:not(:disabled) {
   background: #CC2020;
-  color: #ffffff;
-  border-color: #CC2020;
 }
 
 .submitBtn:active:not(:disabled) { opacity: 0.85; }
 
 .submitBtn:disabled {
-  opacity: 0.4;
+  background: #000000;
+  opacity: 0.3;
   cursor: not-allowed;
 }
 
@@ -192,7 +193,7 @@
 .footer {
   font-size: 11px;
   color: #AAAAAA;
-  text-align: left;
+  text-align: center;
   margin: 2.5rem 0 0;
 }
 
