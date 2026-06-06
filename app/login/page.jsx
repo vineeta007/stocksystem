@@ -46,7 +46,7 @@ function LoginForm() {
       <div className={styles.leftPanel}>
         <div className={styles.leftInner}>
           <img
-            src="/your-logo.png"
+            src="/kreativlogo1.png"
             alt="Logo"
             className={styles.logo}
           />
