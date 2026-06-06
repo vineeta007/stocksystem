@@ -1,11 +1,11 @@
 'use client';
 
 const COLORS = {
-  green:  { accent: '#1D9E75', dot: '#34D399', label: '#34D399' },
-  orange: { accent: '#F59E0B', dot: '#FCD34D', label: '#FCD34D' },
-  red:    { accent: '#EF4444', dot: '#FCA5A5', label: '#FCA5A5' },
-  blue:   { accent: '#3B82F6', dot: '#93C5FD', label: '#93C5FD' },
-  teal:   { accent: '#1D9E75', dot: '#34D399', label: '#34D399' },
+  green:  { accent: '#16a34a', dot: '#16a34a', label: '#16a34a' },
+  orange: { accent: '#d97706', dot: '#d97706', label: '#d97706' },
+  red:    { accent: '#CC2020', dot: '#CC2020', label: '#CC2020' },
+  blue:   { accent: '#3B82F6', dot: '#3B82F6', label: '#3B82F6' },
+  teal:   { accent: '#1D9E75', dot: '#1D9E75', label: '#1D9E75' },
 };
 
 export default function StatCard({ label, value, sublabel, dotColor = 'teal' }) {
@@ -13,8 +13,8 @@ export default function StatCard({ label, value, sublabel, dotColor = 'teal' }) 
 
   return (
     <div style={{
-      background: '#1E293B',
-      border: '1px solid rgba(148,163,184,0.1)',
+      background: '#ffffff',
+      border: '1px solid #e0e0e0',
       borderRadius: '12px',
       padding: '20px 22px',
       position: 'relative',
@@ -27,7 +27,7 @@ export default function StatCard({ label, value, sublabel, dotColor = 'teal' }) 
       alignItems: 'center',
       justifyContent: 'center',
       textAlign: 'center',
-      transition: 'border-color 0.2s',
+      transition: 'border-color 0.2s, box-shadow 0.2s',
     }}>
       {/* Top accent bar */}
       <div style={{
@@ -52,14 +52,14 @@ export default function StatCard({ label, value, sublabel, dotColor = 'teal' }) 
       {/* Value */}
       <div style={{
         fontSize: '48px', fontWeight: 700,
-        color: '#F1F5F9', letterSpacing: '-1.5px', lineHeight: 1,
+        color: '#111111', letterSpacing: '-1.5px', lineHeight: 1,
       }}>
         {value}
       </div>
 
       {/* Sublabel */}
       {sublabel && (
-        <div style={{ marginTop: '8px', fontSize: '12px', color: '#64748B' }}>
+        <div style={{ marginTop: '8px', fontSize: '12px', color: '#888888' }}>
           {sublabel}
         </div>
       )}
