@@ -176,7 +176,7 @@ export default function ExpensesPage() {
             </div>
             {[
               { label: 'Date *', key: 'date', type: 'date' },
-              { label: 'Name *', key: 'name', placeholder: 'e.g. Office Supplies' },
+              { label: 'Name *', key: 'name', placeholder: 'e.g. Customer Name' },
               { label: 'Amount (IDR) *', key: 'amount', placeholder: '0', type: 'number' },
               { label: 'Details', key: 'details', placeholder: 'Optional notes...' },
             ].map(f => (
