@@ -76,7 +76,7 @@
 .heading {
   font-size: 42px;
   font-weight: 300;
-  color: #1A1A1A;
+  color: #000000 !important;
   margin: 0 0 2rem;
   letter-spacing: -0.5px;
 }
@@ -94,8 +94,8 @@
 .input {
   width: 100%;
   padding: 14px 16px;
-  background: #ffffff;
-  border: 1px solid #E0D8CC;
+  background: #FFFFFF;
+  border: 1px solid #D0C8BC;
   border-radius: 0;
   color: #1A1A1A;
   font-size: 14px;
