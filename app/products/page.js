@@ -181,7 +181,7 @@ export default function ProductsPage() {
 
       {/* ── Table ── */}
       <div style={{ padding: '16px 28px 40px' }}>
-        <div style={{ background: '#ffffff', border: '1px solid #e0e0e0', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+        <div style={{ background: '#ffffff', border: '1px solid #e0e0e0', borderRadius: 12, overflow: 'visible', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
           {loading ? (
             <div style={{ textAlign: 'center', padding: 60, color: '#888888', fontSize: 14 }}>Loading...</div>
           ) : (
@@ -239,7 +239,7 @@ export default function ProductsPage() {
                               minWidth: 160, overflow: 'hidden',
                             }}>
                               {[
-                                { label: 'IN STOCK', value: Math.max(p.minStock + 1, 10) },
+                                { label: 'IN STOCK', value: (p.minStock ?? 0) + 1 },
                                 { label: 'LOW STOCK', value: Math.max((p.minStock ?? 1), 1) },
                                 { label: 'OUT OF STOCK', value: 0 },
                               ].map(opt => (
