@@ -2,16 +2,10 @@
 
 import { useState, useEffect } from 'react';
 
-const BORDER = '#1e1e16';
-const TEXT = '#d8d4c8';
-const FAINT = '#3a3830';
-const MUTED = '#6a6658';
-const GOLD = '#c9a84c';
-
 function statusStyle(quantity, minStock) {
-  if (quantity === 0) return { bg: '#2e1a1a', color: '#e05050', border: '#4a2020', label: 'OUT OF STOCK' };
-  if (quantity <= minStock) return { bg: '#2e1e10', color: '#d97b3a', border: '#4a3010', label: 'LOW STOCK' };
-  return { bg: '#1a2e22', color: '#4caf7a', border: '#2a4a32', label: 'IN STOCK' };
+  if (quantity === 0) return { bg: 'rgba(204,32,32,0.08)', color: '#CC2020', border: 'rgba(204,32,32,0.25)', label: 'OUT OF STOCK' };
+  if (quantity <= minStock) return { bg: 'rgba(217,119,6,0.08)', color: '#d97706', border: 'rgba(217,119,6,0.25)', label: 'LOW STOCK' };
+  return { bg: 'rgba(22,163,74,0.08)', color: '#16a34a', border: 'rgba(22,163,74,0.25)', label: 'IN STOCK' };
 }
 
 const EMPTY_FORM = { name: '', category: '', stock: '', minStock: '', sku: '' };
@@ -58,8 +52,7 @@ export default function ProductsPage() {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: form.name,
-          category: form.category,
+          name: form.name, category: form.category,
           quantity: Number(form.stock) || 0,
           minStock: Number(form.minStock) || 0,
           sku: form.sku,
@@ -74,8 +67,7 @@ export default function ProductsPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: form.name,
-          category: form.category,
+          name: form.name, category: form.category,
           quantity: Number(form.stock) || 0,
           minStock: Number(form.minStock) || 0,
           sku: form.sku,
@@ -104,105 +96,164 @@ export default function ProductsPage() {
   const out = products.filter(p => (p.quantity ?? 0) === 0).length;
 
   return (
-    <div style={{ minHeight: '100vh', color: TEXT }}>
+    <div style={{ minHeight: '100vh', background: '#f5f5f5', fontFamily: "'Sora', sans-serif" }}>
 
-      {/* Header */}
-      <div style={{ padding: '18px 28px 14px', borderBottom: `0.5px solid ${BORDER}`, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+      {/* ── Header ── */}
+      <div style={{
+        padding: '20px 28px 16px', borderBottom: '1px solid #e0e0e0',
+        display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
+        background: '#ffffff',
+      }}>
         <div>
-          <div style={{ fontSize: 8, letterSpacing: '0.3em', color: FAINT, textTransform: 'uppercase', marginBottom: 3 }}>Catalogue</div>
-          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 400, color: TEXT }}>Products</div>
+          <div style={{ fontSize: 10, letterSpacing: '0.2em', color: '#888888', textTransform: 'uppercase', marginBottom: 4 }}>Catalogue</div>
+          <h1 style={{ fontSize: 26, fontWeight: 700, color: '#111111', margin: 0, letterSpacing: '-0.3px' }}>Products</h1>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div style={{ display: 'flex', gap: 8, fontSize: 11, color: MUTED }}>
-            <span style={{ color: TEXT, fontFamily: 'Space Mono, monospace', fontWeight: 700 }}>{total}</span> total &nbsp;·&nbsp;
-            <span style={{ color: '#d97b3a', fontFamily: 'Space Mono, monospace', fontWeight: 700 }}>{low}</span> low &nbsp;·&nbsp;
-            <span style={{ color: '#e05050', fontFamily: 'Space Mono, monospace', fontWeight: 700 }}>{out}</span> out
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+          <div style={{ fontSize: 13, color: '#555555' }}>
+            <span style={{ fontWeight: 700, color: '#111111' }}>{total}</span> total &nbsp;·&nbsp;
+            <span style={{ fontWeight: 700, color: '#d97706' }}>{low}</span> low &nbsp;·&nbsp;
+            <span style={{ fontWeight: 700, color: '#CC2020' }}>{out}</span> out
           </div>
-          <button onClick={openAdd}
-            style={{ padding: '7px 14px', fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', background: GOLD, color: '#0a0a07', border: 'none', borderRadius: 3, cursor: 'pointer', fontWeight: 700 }}>
+          <button onClick={openAdd} style={{
+            padding: '9px 18px', fontSize: 12, letterSpacing: '0.08em',
+            textTransform: 'uppercase', background: '#000000', color: '#ffffff',
+            border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700,
+            fontFamily: "'Sora', sans-serif", transition: 'background 0.15s',
+          }}>
             + Add Product
           </button>
         </div>
       </div>
 
-      {/* Filters */}
-      <div style={{ padding: '14px 28px', borderBottom: `0.5px solid ${BORDER}`, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search products..."
-          style={{ background: '#111109', border: `0.5px solid ${BORDER}`, borderRadius: 3, padding: '7px 12px', color: TEXT, fontSize: 11, outline: 'none', width: 200 }} />
-        <div style={{ display: 'flex', gap: 4 }}>
+      {/* ── Filters ── */}
+      <div style={{
+        padding: '14px 28px', borderBottom: '1px solid #e0e0e0',
+        display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center',
+        background: '#ffffff',
+      }}>
+        <input
+          value={search} onChange={e => setSearch(e.target.value)}
+          placeholder="Search products..."
+          style={{
+            background: '#3d4a5c', border: 'none', borderRadius: 6,
+            padding: '8px 14px', color: '#ffffff', fontSize: 13,
+            outline: 'none', width: 220, fontFamily: "'Sora', sans-serif",
+          }}
+        />
+        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
           {categories.map(cat => (
-            <button key={cat} onClick={() => setCategory(cat)}
-              style={{ padding: '5px 10px', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', borderRadius: 3, cursor: 'pointer',
-                background: category === cat ? GOLD : 'transparent', color: category === cat ? '#0a0a07' : MUTED,
-                border: `0.5px solid ${category === cat ? GOLD : BORDER}`, fontWeight: category === cat ? 600 : 400 }}>
+            <button key={cat} onClick={() => setCategory(cat)} style={{
+              padding: '6px 12px', fontSize: 11, letterSpacing: '0.08em',
+              textTransform: 'uppercase', borderRadius: 6, cursor: 'pointer',
+              background: category === cat ? '#000000' : '#ffffff',
+              color: category === cat ? '#ffffff' : '#555555',
+              border: `1px solid ${category === cat ? '#000000' : '#dddddd'}`,
+              fontWeight: category === cat ? 600 : 400,
+              fontFamily: "'Sora', sans-serif",
+            }}>
               {cat}
             </button>
           ))}
         </div>
         <div style={{ display: 'flex', gap: 4, marginLeft: 'auto' }}>
           {['All', 'In Stock', 'Low', 'Out'].map(s => (
-            <button key={s} onClick={() => setStatusFilter(s)}
-              style={{ padding: '5px 10px', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', borderRadius: 3, cursor: 'pointer',
-                background: statusFilter === s ? '#1e1d19' : 'transparent', color: statusFilter === s ? TEXT : FAINT,
-                border: `0.5px solid ${statusFilter === s ? '#333230' : BORDER}` }}>
+            <button key={s} onClick={() => setStatusFilter(s)} style={{
+              padding: '6px 12px', fontSize: 11, letterSpacing: '0.08em',
+              textTransform: 'uppercase', borderRadius: 6, cursor: 'pointer',
+              background: statusFilter === s ? '#000000' : '#ffffff',
+              color: statusFilter === s ? '#ffffff' : '#555555',
+              border: `1px solid ${statusFilter === s ? '#000000' : '#dddddd'}`,
+              fontFamily: "'Sora', sans-serif",
+            }}>
               {s}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Table */}
-      <div style={{ padding: '0 28px 32px' }}>
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: 60, color: MUTED }}>Loading...</div>
-        ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 9 }}>
-            <thead>
-              <tr style={{ borderBottom: `0.5px solid ${BORDER}` }}>
-                {['#', 'Product Name', 'Category', 'Stock', 'Min Stock', 'Status', ''].map((h, idx) => (
-                  <th key={idx} style={{ padding: '12px 10px', textAlign: 'left', fontSize: 9, letterSpacing: '0.2em', color: FAINT, textTransform: 'uppercase', fontWeight: 600 }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((p, i) => {
-                const st = statusStyle(p.quantity ?? 0, p.minStock ?? 0);
-                return (
-                  <tr key={p._id} style={{ borderBottom: '0.5px solid #16150f', background: i % 2 === 0 ? 'transparent' : '#111109' }}>
-                    <td style={{ padding: '11px 10px', color: FAINT, fontFamily: 'Space Mono, monospace', fontSize: 9 }}>{i + 1}</td>
-                    <td style={{ padding: '11px 10px', color: TEXT, fontWeight: 500, fontSize: 9 }}>{p.name}</td>
-                    <td style={{ padding: '11px 10px' }}>
-                      <span style={{ fontSize: 9, padding: '2px 7px', borderRadius: 2, background: '#1a1915', color: MUTED, border: `0.5px solid ${BORDER}`, letterSpacing: '0.05em' }}>{p.category}</span>
-                    </td>
-                    <td style={{ padding: '11px 10px', fontFamily: 'Space Mono, monospace', fontWeight: 700, color: TEXT, fontSize: 9 }}>{p.quantity ?? 0}</td>
-                    <td style={{ padding: '11px 10px', color: FAINT, fontFamily: 'Space Mono, monospace', fontSize: 9 }}>{p.minStock ?? 0}</td>
-                    <td style={{ padding: '11px 10px' }}>
-                      <span style={{ fontSize: 9, padding: '3px 7px', borderRadius: 2, background: st.bg, color: st.color, border: `0.5px solid ${st.border}`, fontWeight: 700, letterSpacing: '0.08em' }}>{st.label}</span>
-                    </td>
-                    <td style={{ padding: '11px 10px' }}>
-                      <button onClick={() => openEdit(p)}
-                        style={{ padding: '4px 10px', fontSize: 9, letterSpacing: '0.08em', textTransform: 'uppercase', background: 'transparent', color: GOLD, border: `0.5px solid ${GOLD}`, borderRadius: 3, cursor: 'pointer', fontWeight: 600 }}>
-                        Edit
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-              {filtered.length === 0 && (
-                <tr><td colSpan={7} style={{ textAlign: 'center', padding: 48, color: MUTED, fontSize: 9 }}>No products found</td></tr>
-              )}
-            </tbody>
-          </table>
-        )}
+      {/* ── Table ── */}
+      <div style={{ padding: '16px 28px 40px' }}>
+        <div style={{ background: '#ffffff', border: '1px solid #e0e0e0', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: 60, color: '#888888', fontSize: 14 }}>Loading...</div>
+          ) : (
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #eeeeee', background: '#fafafa' }}>
+                  {['#', 'Product Name', 'Category', 'Stock', 'Min Stock', 'Status', ''].map((h, idx) => (
+                    <th key={idx} style={{
+                      padding: '12px 16px', textAlign: 'left',
+                      fontSize: 10, letterSpacing: '0.15em',
+                      color: '#888888', textTransform: 'uppercase', fontWeight: 600,
+                    }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((p, i) => {
+                  const st = statusStyle(p.quantity ?? 0, p.minStock ?? 0);
+                  return (
+                    <tr key={p._id} style={{
+                      borderBottom: '1px solid #f0f0f0',
+                      background: i % 2 === 0 ? '#ffffff' : '#fafafa',
+                      transition: 'background 0.1s',
+                    }}>
+                      <td style={{ padding: '13px 16px', color: '#aaaaaa', fontSize: 13 }}>{i + 1}</td>
+                      <td style={{ padding: '13px 16px', color: '#111111', fontWeight: 600, fontSize: 14 }}>{p.name}</td>
+                      <td style={{ padding: '13px 16px' }}>
+                        <span style={{
+                          fontSize: 11, padding: '3px 10px', borderRadius: 20,
+                          background: '#f0f0f0', color: '#555555', border: '1px solid #e0e0e0',
+                          fontWeight: 500,
+                        }}>{p.category}</span>
+                      </td>
+                      <td style={{ padding: '13px 16px', fontWeight: 700, color: '#111111', fontSize: 14 }}>{p.quantity ?? 0}</td>
+                      <td style={{ padding: '13px 16px', color: '#888888', fontSize: 13 }}>{p.minStock ?? 0}</td>
+                      <td style={{ padding: '13px 16px' }}>
+                        <span style={{
+                          fontSize: 10, padding: '4px 10px', borderRadius: 6,
+                          background: st.bg, color: st.color,
+                          border: `1px solid ${st.border}`,
+                          fontWeight: 700, letterSpacing: '0.06em',
+                        }}>{st.label}</span>
+                      </td>
+                      <td style={{ padding: '13px 16px' }}>
+                        <button onClick={() => openEdit(p)} style={{
+                          padding: '5px 14px', fontSize: 11, letterSpacing: '0.08em',
+                          textTransform: 'uppercase', background: 'transparent',
+                          color: '#CC2020', border: '1px solid rgba(204,32,32,0.3)',
+                          borderRadius: 6, cursor: 'pointer', fontWeight: 600,
+                          fontFamily: "'Sora', sans-serif",
+                        }}>
+                          Edit
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {filtered.length === 0 && (
+                  <tr><td colSpan={7} style={{ textAlign: 'center', padding: 48, color: '#888888', fontSize: 14 }}>No products found</td></tr>
+                )}
+              </tbody>
+            </table>
+          )}
+        </div>
       </div>
 
-      {/* Add / Edit Modal */}
+      {/* ── Add / Edit Modal ── */}
       {showModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-          <div style={{ background: '#13120e', border: `1px solid ${BORDER}`, borderRadius: 6, width: '100%', maxWidth: 480, padding: 28 }}>
-            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, color: TEXT, marginBottom: 24 }}>
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
+          zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
+        }}>
+          <div style={{
+            background: '#ffffff', border: '1px solid #e0e0e0',
+            borderRadius: 12, width: '100%', maxWidth: 480, padding: 32,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+          }}>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: '#111111', marginBottom: 24, margin: '0 0 24px' }}>
               {editProduct ? 'Edit Product' : 'Add Product'}
-            </div>
+            </h2>
             {[
               { label: 'Product Name *', key: 'name', placeholder: 'e.g. Fuse Pec 150' },
               { label: 'Category *', key: 'category', placeholder: 'e.g. Swift' },
@@ -210,20 +261,34 @@ export default function ProductsPage() {
               { label: 'Min Stock', key: 'minStock', placeholder: '0', type: 'number' },
               { label: 'SKU', key: 'sku', placeholder: 'optional' },
             ].map(f => (
-              <div key={f.key} style={{ marginBottom: 14 }}>
-                <div style={{ fontSize: 9, letterSpacing: '0.15em', color: MUTED, textTransform: 'uppercase', marginBottom: 5 }}>{f.label}</div>
-                <input type={f.type || 'text'} placeholder={f.placeholder} value={form[f.key]}
+              <div key={f.key} style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 10, letterSpacing: '0.15em', color: '#888888', textTransform: 'uppercase', marginBottom: 6, fontWeight: 600 }}>{f.label}</div>
+                <input
+                  type={f.type || 'text'} placeholder={f.placeholder} value={form[f.key]}
                   onChange={e => setForm(prev => ({ ...prev, [f.key]: e.target.value }))}
-                  style={{ width: '100%', background: '#0d0d0b', border: `0.5px solid ${BORDER}`, borderRadius: 3, padding: '8px 12px', color: TEXT, fontSize: 12, outline: 'none', boxSizing: 'border-box' }} />
+                  style={{
+                    width: '100%', background: '#3d4a5c', border: 'none',
+                    borderRadius: 6, padding: '10px 14px', color: '#ffffff',
+                    fontSize: 14, outline: 'none', boxSizing: 'border-box',
+                    fontFamily: "'Sora', sans-serif",
+                  }}
+                />
               </div>
             ))}
-            <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
-              <button onClick={handleSave} disabled={saving}
-                style={{ flex: 1, padding: '9px 0', background: GOLD, color: '#0a0a07', border: 'none', borderRadius: 3, fontWeight: 700, fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}>
+            <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
+              <button onClick={handleSave} disabled={saving} style={{
+                flex: 1, padding: '11px 0', background: '#000000', color: '#ffffff',
+                border: 'none', borderRadius: 6, fontWeight: 700, fontSize: 13,
+                letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer',
+                fontFamily: "'Sora', sans-serif", transition: 'background 0.15s',
+              }}>
                 {saving ? 'Saving...' : editProduct ? 'Save Changes' : 'Create Product'}
               </button>
-              <button onClick={() => { setShowModal(false); setForm(EMPTY_FORM); setEditProduct(null); }}
-                style={{ padding: '9px 20px', background: 'transparent', color: MUTED, border: `0.5px solid ${BORDER}`, borderRadius: 3, fontSize: 11, cursor: 'pointer' }}>
+              <button onClick={() => { setShowModal(false); setForm(EMPTY_FORM); setEditProduct(null); }} style={{
+                padding: '11px 20px', background: 'transparent', color: '#555555',
+                border: '1px solid #dddddd', borderRadius: 6, fontSize: 13,
+                cursor: 'pointer', fontFamily: "'Sora', sans-serif",
+              }}>
                 Cancel
               </button>
             </div>
