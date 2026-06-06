@@ -54,10 +54,14 @@ export default function VendorListPage() {
 
       {/* Header */}
       <div style={{ marginBottom: '8px' }}>
-        <p style={{ fontSize: '11px', fontWeight: 600, color: '#888', letterSpacing: '1.2px', textTransform: 'uppercase', margin: '0 0 6px' }}>CATALOGUE</p>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h1 style={{ fontSize: '26px', fontWeight: 700, color: '#111', margin: 0, fontFamily: "'Cormorant Garamond', serif" }}>Vendor List</h1>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
+          <h1 style={{
+            fontSize: '50px', fontWeight: 700, color: '#111', margin: 0,
+            fontFamily: "'Cormorant Garamond', serif",
+            position: 'absolute', left: '50%', transform: 'translateX(-50%)',
+          }}>Vendor List</h1>
           <button onClick={() => { setShowForm(true); setEditId(null); setForm(EMPTY); }} style={{
+            marginLeft: 'auto',
             background: '#000', color: '#fff', padding: '9px 18px',
             borderRadius: '8px', border: 'none', cursor: 'pointer',
             fontSize: '13px', fontWeight: 600, fontFamily: "'Sora', sans-serif",
@@ -67,7 +71,7 @@ export default function VendorListPage() {
             onMouseLeave={e => e.target.style.background = '#000'}
           >+ Add Vendor</button>
         </div>
-        <p style={{ color: '#888', fontSize: '13px', margin: '6px 0 0' }}>{vendors.length} vendors registered</p>
+        <p style={{ color: '#888', fontSize: '13px', margin: '60px 0 0' }}>{vendors.length} vendors registered</p>
       </div>
 
       {/* Search */}
