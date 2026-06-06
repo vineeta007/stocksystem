@@ -51,7 +51,7 @@ export default function StatCard({ label, value, sublabel, dotColor = 'teal' }) 
 
       {/* Value */}
       <div style={{
-        fontSize: '48px', fontWeight: 700,
+        fontSize: '32px', fontWeight: 700,
         color: '#111111', letterSpacing: '-1.5px', lineHeight: 1,
       }}>
         {value}
