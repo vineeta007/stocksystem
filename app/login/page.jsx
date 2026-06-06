@@ -49,15 +49,11 @@ function LoginForm() {
             alt="Kreativ Lift"
             className={styles.logo}
           />
-          <p className={styles.tagline}>KREATIV LIFT</p>
-          <span className={styles.divider} />
-          <p className={styles.taglineSub}>ELEVATE WITH US</p>
         </div>
       </div>
 
       <div className={styles.rightPanel}>
         <div className={styles.rightInner}>
-          <p className={styles.portalLabel}>ADMIN PORTAL</p>
           <h1 className={styles.heading}>Sign In</h1>
 
           <form onSubmit={handleLogin} className={styles.form}>
