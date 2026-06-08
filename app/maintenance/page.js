@@ -105,7 +105,7 @@ export default function MaintenancePage() {
         marginBottom: '20px', position: 'relative',
       }}>
         <h1 style={{
-          fontSize: '50px', fontWeight: 700, color: '#111', margin: 0,
+          fontSize: '40px', fontWeight: 700, color: '#111', margin: 0,
           fontFamily: "'Cormorant Garamond', serif",
           position: 'absolute', left: '50%', transform: 'translateX(-50%)',
         }}>Customer List</h1>
