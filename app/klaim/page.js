@@ -58,13 +58,22 @@ export default function KlaimPage() {
     <div className="page-container">
 
       {/* Header */}
-      <div className="page-header">
-        <div>
-          <h1>📦 Klaim Sparepart</h1>
-          <p className="subtitle">Kelola klaim sparepart dari teknisi / customer</p>
-        </div>
-        <button className="btn-primary" onClick={() => setShowForm(true)}>+ Buat Klaim</button>
-      </div>
+<div style={{
+  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+  padding: '32px 0 32px', borderBottom: '1px solid #e0e0e0',
+  marginBottom: '20px', position: 'relative',
+}}>
+  <h1 style={{
+    fontSize: '50px', fontWeight: 700, color: '#111', margin: 0,
+    fontFamily: "'Cormorant Garamond', serif",
+    position: 'absolute', left: '50%', transform: 'translateX(-50%)',
+    display: 'flex', alignItems: 'center', gap: '12px',
+    whiteSpace: 'nowrap',
+  }}>📦 Klaim Sparepart</h1>
+  <button className="btn-primary" style={{ marginLeft: 'auto' }} onClick={() => setShowForm(true)}>
+    + Buat Klaim
+  </button>
+</div>
 
       {/* Summary Cards */}
       <div className="summary-row">
