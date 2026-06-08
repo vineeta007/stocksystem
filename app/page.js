@@ -71,7 +71,7 @@ export default function Dashboard() {
         position: 'relative',
       }}>
         <h1 style={{
-          fontSize: '50px', fontWeight: 700, color: C.text,
+          fontSize: '40px', fontWeight: 700, color: C.text,
           letterSpacing: '-0.5px', margin: 0,
           fontFamily: "var(--font-cormorant), serif",
           position: 'absolute', left: '50%', transform: 'translateX(-50%)',
