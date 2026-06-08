@@ -106,7 +106,7 @@ export default function ProductsPage() {
   background: '#f5f5f5', position: 'relative',
 }}>
         <h1 style={{
-          fontSize: 50, fontWeight: 700, color: '#111111', margin: 0,
+          fontSize: 40, fontWeight: 700, color: '#111111', margin: 0,
           letterSpacing: '-0.3px', fontFamily: "'Cormorant Garamond', serif",
           position: 'absolute', left: '50%', transform: 'translateX(-50%)',
         }}>Products</h1>
