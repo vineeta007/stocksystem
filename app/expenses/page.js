@@ -86,7 +86,7 @@ export default function ExpensesPage() {
       {/* Header */}
       <div style={{ padding: '18px 28px 14px', borderBottom: `0.5px solid ${BORDER}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
   <div style={{ flex: 1, textAlign: 'center' }}>
-    <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 38, fontWeight: 700, color: '#000000', letterSpacing: '0.02em' }}>Expenses</div>
+    <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 50, fontWeight: 700, color: '#000000', letterSpacing: '0.02em', display: 'flex', alignItems: 'center', gap: '10px' }}>💸 Expenses</div>
   </div>
   <div style={{ display: 'flex', alignItems: 'center', gap: 8, position: 'absolute', right: 28 }}>
     <span style={{ fontSize: 11, color: MUTED }}>
