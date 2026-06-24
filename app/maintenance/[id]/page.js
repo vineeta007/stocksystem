@@ -11,6 +11,13 @@ function fmtRp(n) {
   if (!n && n !== 0) return 'Rp 0'
   return 'Rp ' + Number(n).toLocaleString('id-ID')
 }
+// yyyy-mm-dd for <input type="date">
+function toInputDate(d) {
+  if (!d) return ''
+  const dt = new Date(d)
+  if (isNaN(dt.getTime())) return ''
+  return dt.toISOString().slice(0, 10)
+}
 
 // ── fetch logo as base64 ──────────────────────────────────────────────────────
 async function fetchLogoBase64() {
@@ -259,6 +266,12 @@ export default function ClientDetailPage() {
   const [qLoading, setQLoading]     = useState(false)
   const [visits, setVisits]         = useState([])
 
+  // ── Visit history editing state ──────────────────────────────────────────
+  const [editingVisits, setEditingVisits] = useState(false)
+  const [visitForm, setVisitForm]         = useState([])
+  const [visitMeta, setVisitMeta]         = useState({ lastVisitDate: '', nextVisitDate: '', visitCount: 0 })
+  const [savingVisits, setSavingVisits]   = useState(false)
+
   const fetchCustomer = useCallback(async () => {
     setLoading(true)
     const res  = await fetch(`/api/maintenance/${id}`)
@@ -422,6 +435,62 @@ export default function ClientDetailPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: val }),
     })
+    fetchCustomer()
+  }
+
+  // ── Visit history editing handlers ───────────────────────────────────────
+  function startEditVisits() {
+    setVisitForm(
+      (visits || []).map(v => ({
+        date:  toInputDate(v.date),
+        notes: v.notes || '',
+      }))
+    )
+    setVisitMeta({
+      lastVisitDate: toInputDate(customer.lastVisitDate),
+      nextVisitDate: toInputDate(customer.nextVisitDate),
+      visitCount:    customer.visitCount ?? visits.length ?? 0,
+    })
+    setEditingVisits(true)
+  }
+
+  function cancelEditVisits() {
+    setEditingVisits(false)
+  }
+
+  function addVisitRow() {
+    setVisitForm([...visitForm, { date: '', notes: '' }])
+  }
+
+  function updateVisitRow(idx, field, value) {
+    setVisitForm(visitForm.map((v, i) => i === idx ? { ...v, [field]: value } : v))
+  }
+
+  function removeVisitRow(idx) {
+    setVisitForm(visitForm.filter((_, i) => i !== idx))
+  }
+
+  async function saveVisits() {
+    setSavingVisits(true)
+    const cleanedVisits = visitForm
+      .filter(v => v.date) // require a date
+      .map(v => ({ date: v.date, notes: v.notes || '' }))
+
+    const payload = {
+      visitHistory:   cleanedVisits,
+      visitCount:     Number(visitMeta.visitCount) || cleanedVisits.length,
+      lastVisitDate:  visitMeta.lastVisitDate || null,
+      nextVisitDate:  visitMeta.nextVisitDate || null,
+    }
+
+    await fetch(`/api/maintenance/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+
+    setSavingVisits(false)
+    setEditingVisits(false)
     fetchCustomer()
   }
 
@@ -747,40 +816,113 @@ export default function ClientDetailPage() {
       {/* ── VISIT HISTORY TAB ── */}
       {activeTab === 'visit history' && (
         <div>
+          {/* Edit / Save / Cancel controls */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px', gap: '8px' }}>
+            {!editingVisits ? (
+              <button onClick={startEditVisits} style={ghostBtn}>✏ EDIT</button>
+            ) : (
+              <>
+                <button onClick={saveVisits} disabled={savingVisits}
+                  style={{ ...ghostBtn, color: '#16a34a', borderColor: '#bbf7d0' }}>
+                  {savingVisits ? 'Saving...' : 'Save'}
+                </button>
+                <button onClick={cancelEditVisits} style={ghostBtn}>Cancel</button>
+              </>
+            )}
+          </div>
+
           <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', overflow: 'hidden' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
               <thead>
                 <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-                  {['#', 'DATE', 'NOTES'].map(h => (
-                    <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: '#9ca3af',
+                  {['#', 'DATE', 'NOTES', editingVisits ? '' : null].filter(h => h !== null).map(h => (
+                    <th key={h || 'actions'} style={{ padding: '10px 16px', textAlign: 'left', color: '#9ca3af',
                       fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {visits.length === 0 ? (
-                  <tr><td colSpan={3} style={{ padding: '2.5rem', textAlign: 'center', color: '#9ca3af' }}>No visit history yet.</td></tr>
-                ) : visits.map((v, i) => (
-                  <tr key={i} style={{ borderBottom: i < visits.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
-                    <td style={{ padding: '12px 16px', color: '#9ca3af' }}>{i + 1}</td>
-                    <td style={{ padding: '12px 16px', color: '#111', fontWeight: 500 }}>{fmt(v.date)}</td>
-                    <td style={{ padding: '12px 16px', color: '#374151' }}>{v.notes || '—'}</td>
-                  </tr>
-                ))}
+                {!editingVisits ? (
+                  visits.length === 0 ? (
+                    <tr><td colSpan={3} style={{ padding: '2.5rem', textAlign: 'center', color: '#9ca3af' }}>No visit history yet.</td></tr>
+                  ) : visits.map((v, i) => (
+                    <tr key={i} style={{ borderBottom: i < visits.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
+                      <td style={{ padding: '12px 16px', color: '#9ca3af' }}>{i + 1}</td>
+                      <td style={{ padding: '12px 16px', color: '#111', fontWeight: 500 }}>{fmt(v.date)}</td>
+                      <td style={{ padding: '12px 16px', color: '#374151' }}>{v.notes || '—'}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <>
+                    {visitForm.length === 0 ? (
+                      <tr><td colSpan={4} style={{ padding: '2rem', textAlign: 'center', color: '#9ca3af' }}>No visits yet. Add one below.</td></tr>
+                    ) : visitForm.map((v, i) => (
+                      <tr key={i} style={{ borderBottom: i < visitForm.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
+                        <td style={{ padding: '10px 16px', color: '#9ca3af' }}>{i + 1}</td>
+                        <td style={{ padding: '10px 16px' }}>
+                          {/* Native date input = calendar picker */}
+                          <input type="date" value={v.date}
+                            onChange={e => updateVisitRow(i, 'date', e.target.value)}
+                            style={{ ...inputStyle, width: '160px' }} />
+                        </td>
+                        <td style={{ padding: '10px 16px' }}>
+                          <input value={v.notes} onChange={e => updateVisitRow(i, 'notes', e.target.value)}
+                            placeholder="Notes" style={{ ...inputStyle, width: '100%', minWidth: '160px' }} />
+                        </td>
+                        <td style={{ padding: '10px 16px' }}>
+                          <button onClick={() => removeVisitRow(i)}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontSize: '1rem' }}>✕</button>
+                        </td>
+                      </tr>
+                    ))}
+                    <tr>
+                      <td colSpan={4} style={{ padding: '10px 16px' }}>
+                        <button onClick={addVisitRow} style={outlineBtn}>+ Add Visit</button>
+                      </td>
+                    </tr>
+                  </>
+                )}
               </tbody>
             </table>
           </div>
+
+          {/* Summary cards */}
           <div style={{ marginTop: '16px', display: 'flex', gap: '12px' }}>
-            {[
-              { label: 'Total Visits', val: customer.visitCount || 0 },
-              { label: 'Last Visit',   val: fmt(customer.lastVisitDate) },
-              { label: 'Next Visit',   val: fmt(customer.nextVisitDate) },
-            ].map(({ label, val }) => (
-              <div key={label} style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '14px 18px', flex: 1 }}>
-                <p style={{ fontSize: '0.72rem', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 4px' }}>{label}</p>
-                <p style={{ fontSize: '1rem', fontWeight: 700, color: '#111', margin: 0 }}>{val}</p>
-              </div>
-            ))}
+            {/* Total Visits */}
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '14px 18px', flex: 1 }}>
+              <p style={{ fontSize: '0.72rem', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 4px' }}>Total Visits</p>
+              {!editingVisits ? (
+                <p style={{ fontSize: '1rem', fontWeight: 700, color: '#111', margin: 0 }}>{customer.visitCount || 0}</p>
+              ) : (
+                <input type="number" min="0" value={visitMeta.visitCount}
+                  onChange={e => setVisitMeta({ ...visitMeta, visitCount: e.target.value })}
+                  style={{ ...inputStyle, fontWeight: 700 }} />
+              )}
+            </div>
+
+            {/* Last Visit — date picker */}
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '14px 18px', flex: 1 }}>
+              <p style={{ fontSize: '0.72rem', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 4px' }}>Last Visit</p>
+              {!editingVisits ? (
+                <p style={{ fontSize: '1rem', fontWeight: 700, color: '#111', margin: 0 }}>{fmt(customer.lastVisitDate)}</p>
+              ) : (
+                <input type="date" value={visitMeta.lastVisitDate}
+                  onChange={e => setVisitMeta({ ...visitMeta, lastVisitDate: e.target.value })}
+                  style={{ ...inputStyle, fontWeight: 700 }} />
+              )}
+            </div>
+
+            {/* Next Visit — date picker */}
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '14px 18px', flex: 1 }}>
+              <p style={{ fontSize: '0.72rem', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 4px' }}>Next Visit</p>
+              {!editingVisits ? (
+                <p style={{ fontSize: '1rem', fontWeight: 700, color: '#111', margin: 0 }}>{fmt(customer.nextVisitDate)}</p>
+              ) : (
+                <input type="date" value={visitMeta.nextVisitDate}
+                  onChange={e => setVisitMeta({ ...visitMeta, nextVisitDate: e.target.value })}
+                  style={{ ...inputStyle, fontWeight: 700 }} />
+              )}
+            </div>
           </div>
         </div>
       )}
