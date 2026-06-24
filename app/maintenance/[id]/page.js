@@ -478,7 +478,7 @@ export default function ClientDetailPage() {
 
       {/* ── OVERVIEW TAB ── */}
       {activeTab === 'overview' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
 
           {/* Client Information */}
           <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '20px' }}>
@@ -520,45 +520,6 @@ export default function ClientDetailPage() {
                 )}
               </div>
             ))}
-          </div>
-
-          {/* Project Details */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '20px' }}>
-              <span style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#6b7280', display: 'block', marginBottom: '16px' }}>
-                PROJECT DETAILS
-              </span>
-              {[
-                { label: 'PROJECT',   value: customer.unitType || '—' },
-                { label: 'AREA',      value: customer.kota || '—' },
-                { label: 'BAST DATE', value: fmt(customer.bastDate) },
-                { label: 'LAST VISIT',value: fmt(customer.lastVisitDate) },
-                { label: 'NEXT VISIT',value: fmt(customer.nextVisitDate) },
-                { label: 'STATUS',    value: customer.status },
-              ].map(({ label, value }) => (
-                <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '9px 0', borderBottom: '1px solid #f3f4f6' }}>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#9ca3af', letterSpacing: '0.08em' }}>{label}</span>
-                  <span style={{ fontSize: '0.85rem', color: '#111', fontWeight: 500 }}>{value}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Reminders */}
-            <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
-                <span>🔔</span>
-                <span style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#6b7280' }}>REMINDERS</span>
-              </div>
-              {customer.daysUntilNextVisit !== null && customer.daysUntilNextVisit <= 14 ? (
-                <p style={{ fontSize: '0.82rem', color: '#d97706' }}>
-                  ⚠ Next visit in {customer.daysUntilNextVisit} days
-                </p>
-              ) : (
-                <p style={{ fontSize: '0.82rem', color: '#9ca3af', fontStyle: 'italic' }}>
-                  No active reminders — all clear!
-                </p>
-              )}
-            </div>
           </div>
 
           {/* Comments — full width */}
