@@ -55,31 +55,27 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
 
   const rows = items.map((item, i) => `
     <tr>
-      <td style="text-align:center; padding:10px 8px; border-bottom:1px solid #e5e7eb;">${i + 1}</td>
-      <td style="padding:10px 8px; border-bottom:1px solid #e5e7eb; font-weight:600;">${item.nama || ''}</td>
-      <td style="text-align:center; padding:10px 8px; border-bottom:1px solid #e5e7eb;">${item.jumlahUnit || 1}</td>
-      <td style="text-align:center; padding:10px 8px; border-bottom:1px solid #e5e7eb;">${item.tipe || 'Service'}</td>
-      <td style="padding:10px 8px; border-bottom:1px solid #e5e7eb;">
-        <table style="width:100%; border-collapse:collapse;">
-          <tr>
-            <td style="width:20px; color:#333;">Rp</td>
-            <td style="text-align:right; color:#333;">${Number(item.hargaPerUnit || 0).toLocaleString('id-ID')}</td>
-          </tr>
-        </table>
+      <td style="text-align:center; padding:9px 8px; border:1px solid #ccc;">${i + 1}</td>
+      <td style="padding:9px 8px; border:1px solid #ccc; font-weight:700;">${item.nama || ''}</td>
+      <td style="text-align:center; padding:9px 8px; border:1px solid #ccc;">${item.jumlahUnit || 1}</td>
+      <td style="text-align:center; padding:9px 8px; border:1px solid #ccc;">${item.tipe || 'Service'}</td>
+      <td style="padding:9px 8px; border:1px solid #ccc;">
+        <table style="width:100%; border-collapse:collapse;"><tr>
+          <td style="width:18px;">Rp</td>
+          <td style="text-align:right;">${Number(item.hargaPerUnit || 0).toLocaleString('id-ID')}</td>
+        </tr></table>
       </td>
-      <td style="padding:10px 8px; border-bottom:1px solid #e5e7eb;">
-        <table style="width:100%; border-collapse:collapse;">
-          <tr>
-            <td style="width:20px; color:#333;">Rp</td>
-            <td style="text-align:right; color:#333;">${Number((item.jumlahUnit || 1) * (item.hargaPerUnit || 0)).toLocaleString('id-ID')}</td>
-          </tr>
-        </table>
+      <td style="padding:9px 8px; border:1px solid #ccc;">
+        <table style="width:100%; border-collapse:collapse;"><tr>
+          <td style="width:18px;">Rp</td>
+          <td style="text-align:right;">${Number((item.jumlahUnit || 1) * (item.hargaPerUnit || 0)).toLocaleString('id-ID')}</td>
+        </tr></table>
       </td>
     </tr>
   `).join('')
 
   const logoHTML = logoBase64
-    ? `<img src="${logoBase64}" style="height:52px; object-fit:contain; display:block;" />`
+    ? `<img src="${logoBase64}" style="height:72px; object-fit:contain; display:block; margin-left:auto;" />`
     : `<div style="font-size:22px; font-weight:800; color:#CC2020; letter-spacing:-0.5px;">✕ KREATIV LIFT</div>`
 
   return `<!DOCTYPE html>
@@ -87,8 +83,8 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
 <head>
 <meta charset="utf-8"/>
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family: Arial, sans-serif; font-size: 12px; color: #000; padding: 36px 48px; background: #fff; }
+  * { margin:0; padding:0; box-sizing:border-box; color:#000; }
+  body { font-family: Arial, sans-serif; font-size: 11.5px; color: #000; padding: 36px 44px; background: #fff; }
   .header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; }
   .to-block { font-size:12px; line-height:2; }
   .to-block .name { font-size:13px; font-weight:700; }
@@ -134,7 +130,6 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
     </div>
     <div class="logo-area">
       ${logoHTML}
-      <div class="logo-sub">Elevate With Us</div>
     </div>
   </div>
 
@@ -172,9 +167,9 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
     <tr>
       <td style="border:none; width:55%;"></td>
       <td style="border:none; padding:0; vertical-align:top;">
-        <table style="width:100%; border-collapse:collapse; font-size:12px; border:1px solid #ccc; border-top:none;">
+        <table style="width:100%; border-collapse:collapse; font-size:11.5px; border:1px solid #ccc; border-top:none; background:#f9f9f9;">
           <tr>
-            <td style="text-align:right; padding:6px 12px 3px; font-weight:600; white-space:nowrap;">Total Biaya :</td>
+            <td style="text-align:right; padding:5px 10px 3px; white-space:nowrap;">Total Biaya :</td>
             <td style="width:20px; padding:6px 4px 3px;">Rp</td>
             <td style="text-align:right; padding:6px 12px 3px; min-width:110px;">${Number(totalBiaya).toLocaleString('id-ID')}</td>
           </tr>
@@ -183,10 +178,10 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
             <td style="width:20px; padding:3px 4px;">Rp</td>
             <td style="text-align:right; padding:3px 12px;">${Number(ppn).toLocaleString('id-ID')}</td>
           </tr>
-          <tr>
-            <td style="text-align:right; padding:3px 12px 7px; font-weight:700; white-space:nowrap;">Jumlah Pembayaran :</td>
-            <td style="width:20px; padding:3px 4px 7px; font-weight:700;">Rp</td>
-            <td style="text-align:right; padding:3px 12px 7px; font-weight:700;">${Number(grand).toLocaleString('id-ID')}</td>
+          <tr style="background:#e8e8e8;">
+            <td style="text-align:right; padding:3px 10px 6px; font-weight:700; white-space:nowrap;">Jumlah Pembayaran :</td>
+            <td style="width:18px; padding:3px 4px 6px; font-weight:700;">Rp</td>
+            <td style="text-align:right; padding:3px 10px 6px; font-weight:700;">${Number(grand).toLocaleString('id-ID')}</td>
           </tr>
         </table>
       </td>
@@ -203,15 +198,14 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Apabila terdapat oli rembes, tidak dikenakan biaya apa pun termasuk cleaning site.<br/>
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Garansi akan berlanjut 3 bulan lagi sejak tanggal cleaning (jika diperlukan).</span></li>
     </ol>
-  </div>
-
-  <div class="payment">
-    <h4>Informasi Pembayaran</h4>
+  <div style="margin-top:12px;">
+      <div style="font-weight:700; font-size:11.5px; margin-bottom:5px;">Informasi Pembayaran</div>
     <table>
       <tr><td>Bank</td><td>: BCA Cab Kelapa Gading</td></tr>
       <tr><td>No. Rekening (IDR)</td><td>: 8310203000</td></tr>
       <tr><td>Atas Nama</td><td>: PT. Inter Kreativ Lift Indonesia</td></tr>
     </table>
+    </div>
   </div>
 
   <div class="closing">
