@@ -75,7 +75,7 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
   `).join('')
 
   const logoHTML = logoBase64
-    ? `<img src="${logoBase64}" style="height:96px; object-fit:contain; display:block; margin-left:auto;" />`
+    ? `<img src="${logoBase64}" style="height:150px; object-fit:contain; display:block; margin-left:auto;" />`
     : `<div style="font-size:22px; font-weight:800; color:#CC2020; letter-spacing:-0.5px;">✕ KREATIV LIFT</div>`
 
   return `<!DOCTYPE html>
@@ -164,25 +164,25 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
     <tbody>${rows}</tbody>
   </table>
 
-  <table style="width:100%; border-collapse:collapse; font-size:12px;">
+  <table style="width:100%; border-collapse:collapse; margin-top:0; font-size:12px;">
     <tr>
       <td style="border:none; width:55%;"></td>
       <td style="border:none; padding:0; vertical-align:top;">
-        <table style="width:100%; border-collapse:collapse; font-size:11.5px; border:1px solid #ccc; border-top:none; background:#f9f9f9;">
+        <table style="width:100%; border-collapse:collapse; font-size:11.5px;">
           <tr>
-            <td style="text-align:right; padding:5px 10px 3px; white-space:nowrap;">Total Biaya :</td>
-            <td style="width:20px; padding:6px 4px 3px;">Rp</td>
-            <td style="text-align:right; padding:6px 12px 3px; min-width:110px;">${Number(totalBiaya).toLocaleString('id-ID')}</td>
+            <td style="text-align:right; padding:6px 10px 3px; white-space:nowrap; font-weight:600; color:#000;">Total Biaya :</td>
+            <td style="width:22px; padding:6px 4px 3px; color:#000;">Rp</td>
+            <td style="text-align:right; padding:6px 14px 3px; min-width:110px; color:#000;">${Number(totalBiaya).toLocaleString('id-ID')}</td>
           </tr>
           <tr>
-            <td style="text-align:right; padding:3px 12px; font-weight:600; white-space:nowrap;">PPN 11%</td>
-            <td style="width:20px; padding:3px 4px;">Rp</td>
-            <td style="text-align:right; padding:3px 12px;">${Number(ppn).toLocaleString('id-ID')}</td>
+            <td style="text-align:right; padding:3px 10px; font-weight:600; white-space:nowrap; color:#000;">PPN 11%</td>
+            <td style="width:22px; padding:3px 4px; color:#000;">Rp</td>
+            <td style="text-align:right; padding:3px 14px; color:#000;">${Number(ppn).toLocaleString('id-ID')}</td>
           </tr>
-          <tr style="background:#e8e8e8;">
-            <td style="text-align:right; padding:3px 10px 6px; font-weight:700; white-space:nowrap;">Jumlah Pembayaran :</td>
-            <td style="width:18px; padding:3px 4px 6px; font-weight:700;">Rp</td>
-            <td style="text-align:right; padding:3px 10px 6px; font-weight:700;">${Number(grand).toLocaleString('id-ID')}</td>
+          <tr style="border-top:2px solid #000;">
+            <td style="text-align:right; padding:5px 10px 6px; font-weight:700; white-space:nowrap; color:#000;">Jumlah Pembayaran :</td>
+            <td style="width:22px; padding:5px 4px 6px; font-weight:700; color:#000;">Rp</td>
+            <td style="text-align:right; padding:5px 14px 6px; font-weight:700; color:#000;">${Number(grand).toLocaleString('id-ID')}</td>
           </tr>
         </table>
       </td>
