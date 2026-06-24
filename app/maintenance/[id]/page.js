@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -12,27 +12,55 @@ function fmtRp(n) {
   return 'Rp ' + Number(n).toLocaleString('id-ID')
 }
 
-// ── PDF generator (client-side, using html + window.print) ───────────────────
-function generatePDFHTML(customer, items, quotation) {
-  const totalBiaya = items.reduce((s, i) => s + (i.jumlahUnit * i.hargaPerUnit), 0)
+// ── fetch logo as base64 ──────────────────────────────────────────────────────
+async function fetchLogoBase64() {
+  try {
+    const res  = await fetch('/kreativlogo1.png')
+    const blob = await res.blob()
+    return await new Promise(resolve => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result)
+      reader.readAsDataURL(blob)
+    })
+  } catch (_) {
+    return null
+  }
+}
+
+// ── ref no formatter: KL/1-DDMMYY/P ─────────────────────────────────────────
+function formatRefNo(refNo) {
+  if (!refNo) return '—'
+  // If already in KL/1-XXXXXX/P format, return as-is
+  if (/^KL\//.test(refNo)) return refNo
+  // If it's TDE-YYYY-XXXX format from DB, convert display
+  return refNo
+}
+
+// ── PDF generator ─────────────────────────────────────────────────────────────
+function generatePDFHTML(customer, items, quotation, logoBase64) {
+  const totalBiaya = items.reduce((s, i) => s + ((i.jumlahUnit || 1) * (i.hargaPerUnit || 0)), 0)
   const ppn        = Math.round(totalBiaya * 0.11)
   const grand      = totalBiaya + ppn
   const today      = new Date()
   const dateStr    = today.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '.')
-  const refNo      = quotation?.refNo || `KL/1-${Date.now()}/P`
+  const refNo      = formatRefNo(quotation?.refNo) || `KL/1-${dateStr.replace(/\./g, '')}/P`
 
   const rows = items.map((item, i) => `
     <tr>
-      <td>${i + 1}</td>
-      <td>${item.nama}</td>
-      <td>${item.jumlahUnit}</td>
-      <td>${item.tipe || 'Service'}</td>
-      <td>Rp</td>
-      <td style="text-align:right">${Number(item.hargaPerUnit).toLocaleString('id-ID')}</td>
-      <td>Rp</td>
-      <td style="text-align:right">${Number(item.jumlahUnit * item.hargaPerUnit).toLocaleString('id-ID')}</td>
+      <td style="text-align:center">${i + 1}</td>
+      <td>${item.nama || ''}</td>
+      <td style="text-align:center">${item.jumlahUnit || 1}</td>
+      <td style="text-align:center">${item.tipe || 'Service'}</td>
+      <td style="text-align:right">Rp</td>
+      <td style="text-align:right">${Number(item.hargaPerUnit || 0).toLocaleString('id-ID')}</td>
+      <td style="text-align:right">Rp</td>
+      <td style="text-align:right">${Number((item.jumlahUnit || 1) * (item.hargaPerUnit || 0)).toLocaleString('id-ID')}</td>
     </tr>
   `).join('')
+
+  const logoHTML = logoBase64
+    ? `<img src="${logoBase64}" style="height:48px; object-fit:contain; display:block; margin-left:auto;" />`
+    : `<div style="font-size:18px;font-weight:700;color:#CC2020;">✕ KREATIV LIFT</div>`
 
   return `<!DOCTYPE html>
 <html>
@@ -43,95 +71,116 @@ function generatePDFHTML(customer, items, quotation) {
   body { font-family: Arial, sans-serif; font-size: 11px; color: #000; padding: 30px 40px; }
   .header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; }
   .logo-area { text-align:right; }
-  .logo-area img { height:50px; }
-  .logo-text { font-size:18px; font-weight:700; color:#CC2020; }
-  .logo-sub { font-size:9px; color:#555; letter-spacing:2px; }
-  .address-block { font-size:11px; line-height:1.6; }
-  .ref-block { text-align:right; margin-top:10px; }
-  .ref-block table { margin-left:auto; font-size:11px; }
-  .ref-block td { padding:2px 8px; }
-  .ref-block td:first-child { font-weight:700; }
+  .logo-sub { font-size:9px; color:#555; letter-spacing:2px; margin-top:4px; text-align:right; }
+  .address-block { font-size:11px; line-height:1.8; }
+  .ref-block { display:flex; justify-content:flex-end; margin-top:14px; margin-bottom:4px; }
+  .ref-table { border-collapse:collapse; font-size:11px; }
+  .ref-table th { font-weight:700; padding:2px 16px 2px 0; text-align:left; }
+  .ref-table td { padding:2px 16px 2px 0; }
   .perihal { margin:18px 0 6px; }
   .perihal strong { text-decoration:underline; font-size:11px; }
-  .intro { margin-bottom:14px; line-height:1.7; }
+  .intro { margin-bottom:14px; line-height:1.8; font-size:11px; }
   table.items { width:100%; border-collapse:collapse; margin-bottom:10px; }
   table.items th {
-    background:#d0d0d0; border:1px solid #999; padding:5px 6px;
-    text-align:center; font-size:10px;
+    background:#d0d0d0; border:1px solid #999; padding:6px;
+    text-align:center; font-size:10px; font-weight:700;
   }
   table.items td { border:1px solid #ccc; padding:5px 6px; font-size:10px; }
-  .total-section { width:100%; }
-  .total-section td { padding:3px 6px; font-size:11px; }
-  .total-section .lbl { text-align:right; font-weight:600; padding-right:10px; }
+  .total-table { margin-left:auto; border-collapse:collapse; font-size:11px; min-width:260px; }
+  .total-table td { padding:3px 6px; }
+  .total-table .lbl { text-align:right; font-weight:600; }
+  .total-table .grand { font-weight:700; }
   .syarat { margin-top:16px; }
   .syarat h4 { font-size:11px; font-weight:700; margin-bottom:6px; }
-  .syarat ol { padding-left:18px; line-height:1.8; }
+  .syarat ol { padding-left:18px; line-height:1.9; font-size:11px; }
   .payment { margin-top:14px; }
   .payment h4 { font-size:11px; font-weight:700; margin-bottom:4px; }
   .payment table td { padding:2px 0; font-size:11px; min-width:160px; }
-  .closing { margin-top:14px; line-height:1.7; font-size:11px; }
-  .sign { margin-top:40px; display:flex; justify-content:space-between; }
+  .closing { margin-top:14px; line-height:1.8; font-size:11px; }
+  .sign-row { margin-top:40px; display:flex; justify-content:space-between; align-items:flex-end; }
   .sign-block { font-size:11px; }
-  .sign-block .name { margin-top:50px; font-weight:700; border-top:1px solid #000; padding-top:4px; display:inline-block; min-width:120px; }
-  .footer { margin-top:30px; text-align:center; font-size:9px; color:#555; border-top:1px solid #ccc; padding-top:8px; line-height:1.6; }
+  .sign-block .sig-img { height:60px; display:block; margin:8px 0 2px; }
+  .sign-block .name-line { font-weight:700; border-top:1px solid #000; padding-top:4px; display:inline-block; min-width:120px; font-size:11px; }
+  .footer-block { text-align:right; font-size:9px; color:#555; border-top:1px solid #ccc; padding-top:8px; line-height:1.8; }
+  .telp-line { margin-top:30px; display:flex; justify-content:space-between; font-size:9px; color:#555; border-top:1px solid #eee; padding-top:6px; }
   @media print { body { padding:15px 20px; } }
 </style>
 </head>
 <body>
+
   <div class="header">
     <div class="address-block">
       Kepada Yth,<br/>
-      ${customer.customerName || ''}<br/>
+      <strong>${customer.customerName || ''}</strong><br/>
       ${customer.address || customer.kota || ''}
     </div>
     <div class="logo-area">
-      <div class="logo-text">✕ KREATIV LIFT</div>
+      ${logoHTML}
       <div class="logo-sub">Elevate With Us</div>
     </div>
   </div>
 
-  <div style="margin-bottom:10px;">U.P.</div>
+  <div style="font-size:11px; margin-bottom:10px;">U.P.</div>
 
   <div class="ref-block">
-    <table>
-      <tr><td>No. Penawaran</td><td>Tanggal</td></tr>
-      <tr><td>${refNo}</td><td>${dateStr}</td></tr>
+    <table class="ref-table">
+      <tr>
+        <th>No. Penawaran</th>
+        <th>Tanggal</th>
+      </tr>
+      <tr>
+        <td>${refNo}</td>
+        <td>${dateStr}</td>
+      </tr>
     </table>
   </div>
 
   <div class="perihal"><strong>Perihal: Penawaran Biaya Maintenance Per Kunjungan</strong></div>
 
-  <div class="intro">
+  <div class="intro" style="margin-top:14px;">
     Dengan Hormat,<br/>
-    Berikut kami sertakan rincian biaya untuk maintenance perkunjungan:
+    Berikut kami sertakan &nbsp; rincian biaya untuk maitenance perkunjungan:
   </div>
 
   <table class="items">
     <thead>
       <tr>
-        <th style="width:30px">No.</th>
+        <th style="width:32px">No.</th>
         <th>Nama</th>
-        <th style="width:60px">Jumlah Unit</th>
-        <th style="width:70px">Tipe</th>
-        <th colspan="2">Harga per unit</th>
-        <th colspan="2">Biaya</th>
+        <th style="width:64px">Jumlah Unit</th>
+        <th style="width:72px">Tipe</th>
+        <th colspan="2" style="width:140px">Harga per unit</th>
+        <th colspan="2" style="width:140px">Biaya</th>
       </tr>
     </thead>
     <tbody>
       ${rows}
     </tbody>
-    <tfoot>
-      <tr>
-        <td colspan="6" style="border:none"></td>
-        <td colspan="2" style="border:none; padding:0">
-          <table class="total-section" style="margin-left:auto">
-            <tr><td class="lbl">Total Biaya :</td><td>Rp</td><td style="text-align:right">${Number(totalBiaya).toLocaleString('id-ID')}</td></tr>
-            <tr><td class="lbl">PPN 11%</td><td>Rp</td><td style="text-align:right">${Number(ppn).toLocaleString('id-ID')}</td></tr>
-            <tr style="font-weight:700"><td class="lbl">Jumlah Pembayaran :</td><td>Rp</td><td style="text-align:right">${Number(grand).toLocaleString('id-ID')}</td></tr>
-          </table>
-        </td>
-      </tr>
-    </tfoot>
+  </table>
+
+  <table style="width:100%; border-collapse:collapse;">
+    <tr>
+      <td style="border:none; width:55%;"></td>
+      <td style="border:none; padding:0;">
+        <table class="total-table">
+          <tr>
+            <td class="lbl">Total Biaya :</td>
+            <td>Rp</td>
+            <td style="text-align:right">${Number(totalBiaya).toLocaleString('id-ID')}</td>
+          </tr>
+          <tr>
+            <td class="lbl">PPN 11%</td>
+            <td>Rp</td>
+            <td style="text-align:right">${Number(ppn).toLocaleString('id-ID')}</td>
+          </tr>
+          <tr class="grand">
+            <td class="lbl">Jumlah Pembayaran :</td>
+            <td>Rp</td>
+            <td style="text-align:right">${Number(grand).toLocaleString('id-ID')}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
   </table>
 
   <div class="syarat">
@@ -160,56 +209,56 @@ function generatePDFHTML(customer, items, quotation) {
     Atas perhatian dan kerja samanya kami ucapkan terima kasih.
   </div>
 
-  <div class="sign">
+  <div class="sign-row">
     <div class="sign-block">
-      Hormat kami,<br/>
-      <span class="name">Asha Aranda</span>
+      Hormat kami,<br/><br/><br/><br/>
+      <span class="name-line">Asha Aranda</span>
     </div>
-    <div class="footer">
+    <div class="footer-block">
       PT. Inter Kreativ Lift Indonesia<br/>
       Ruko Commercial Kendington Blok C No. 10<br/>
       Kelapa Gading<br/>
       Jakarta Utara - Indonesia
     </div>
   </div>
+
+  <div class="telp-line">
+    <span>Telp. 021 - 2452 0983</span>
+    <span>info@kreativlift.co.id</span>
+  </div>
+
 </body>
 </html>`
 }
 
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function ClientDetailPage() {
-  const { id }        = useParams()
-  const router        = useRouter()
-  const searchParams  = useSearchParams()
-  const initialTab    = searchParams.get('tab') || 'overview'
+  const { id }       = useParams()
+  const router       = useRouter()
+  const searchParams = useSearchParams()
+  const initialTab   = searchParams.get('tab') || 'overview'
 
-  const [activeTab, setActiveTab]     = useState(initialTab)
-  const [customer, setCustomer]       = useState(null)
-  const [loading, setLoading]         = useState(true)
+  const [activeTab, setActiveTab]   = useState(initialTab)
+  const [customer, setCustomer]     = useState(null)
+  const [loading, setLoading]       = useState(true)
 
-  // Overview
-  const [editing, setEditing]         = useState(false)
-  const [editForm, setEditForm]       = useState({})
-  const [comment, setComment]         = useState('')
-  const [comments, setComments]       = useState([])
+  const [editing, setEditing]       = useState(false)
+  const [editForm, setEditForm]     = useState({})
+  const [comment, setComment]       = useState('')
+  const [comments, setComments]     = useState([])
 
-  // Cart
-  const [cartItems, setCartItems]     = useState([])
-  const [products, setProducts]       = useState([])
+  const [cartItems, setCartItems]   = useState([])
+  const [products, setProducts]     = useState([])
   const [showProductPicker, setShowProductPicker] = useState(false)
   const [productSearch, setProductSearch]         = useState('')
-  const [manualItem, setManualItem]   = useState({ nama: '', jumlahUnit: 1, tipe: 'Service', hargaPerUnit: 0 })
-  const [showManual, setShowManual]   = useState(false)
-  const [generatingPDF, setGenerating]= useState(false)
+  const [manualItem, setManualItem] = useState({ nama: '', jumlahUnit: 1, tipe: 'Service', hargaPerUnit: 0 })
+  const [showManual, setShowManual] = useState(false)
+  const [generatingPDF, setGenerating] = useState(false)
 
-  // Quotations
-  const [quotations, setQuotations]   = useState([])
-  const [qLoading, setQLoading]       = useState(false)
+  const [quotations, setQuotations] = useState([])
+  const [qLoading, setQLoading]     = useState(false)
+  const [visits, setVisits]         = useState([])
 
-  // Visit history (from visitCount + dates stored)
-  const [visits, setVisits]           = useState([])
-
-  // ── fetch customer ──────────────────────────────────────────────────────────
   const fetchCustomer = useCallback(async () => {
     setLoading(true)
     const res  = await fetch(`/api/maintenance/${id}`)
@@ -218,27 +267,25 @@ export default function ClientDetailPage() {
     setCustomer(c)
     setEditForm({
       customerName: c.customerName || '',
-      phone:        c.phone || '',
-      address:      c.address || '',
-      kota:         c.kota || '',
-      unitType:     c.unitType || '',
+      phone:        c.phone        || '',
+      address:      c.address      || '',
+      kota:         c.kota         || '',
+      unitType:     c.unitType     || '',
       serialNumber: c.serialNumber || '',
-      status:       c.status || 'New',
-      notes:        c.notes || '',
+      status:       c.status       || 'New',
+      notes:        c.notes        || '',
     })
-    setComments(c.comments || [])
-    setVisits(c.visitHistory || [])
+    setComments(c.comments     || [])
+    setVisits(c.visitHistory   || [])
     setLoading(false)
   }, [id])
 
-  // ── fetch products ──────────────────────────────────────────────────────────
   const fetchProducts = useCallback(async () => {
     const res  = await fetch('/api/products')
     const json = await res.json()
     setProducts(json.data || json.products || [])
   }, [])
 
-  // ── fetch quotations for this customer ──────────────────────────────────────
   const fetchQuotations = useCallback(async () => {
     setQLoading(true)
     const res  = await fetch(`/api/quotations?customerId=${id}`)
@@ -251,7 +298,6 @@ export default function ClientDetailPage() {
   useEffect(() => { fetchProducts() }, [fetchProducts])
   useEffect(() => { if (activeTab === 'quotations') fetchQuotations() }, [activeTab, fetchQuotations])
 
-  // ── save edits ──────────────────────────────────────────────────────────────
   async function saveEdit() {
     await fetch(`/api/maintenance/${id}`, {
       method: 'PATCH',
@@ -262,7 +308,6 @@ export default function ClientDetailPage() {
     fetchCustomer()
   }
 
-  // ── add comment ─────────────────────────────────────────────────────────────
   async function addComment() {
     if (!comment.trim()) return
     const updated = [...comments, { text: comment, date: new Date().toISOString() }]
@@ -275,7 +320,6 @@ export default function ClientDetailPage() {
     setComment('')
   }
 
-  // ── cart helpers ────────────────────────────────────────────────────────────
   function addProductToCart(product) {
     const exists = cartItems.find(i => i.productId === product._id)
     if (exists) {
@@ -285,12 +329,12 @@ export default function ClientDetailPage() {
       ))
     } else {
       setCartItems([...cartItems, {
-        productId:   product._id,
-        nama:        product.name,
-        jumlahUnit:  1,
-        tipe:        product.tipeItem || 'Other',
-        hargaPerUnit:product.price || 0,
-        biaya:       product.price || 0,
+        productId:    product._id,
+        nama:         product.name,
+        jumlahUnit:   1,
+        tipe:         product.tipeItem || 'Other',
+        hargaPerUnit: product.price    || 0,
+        biaya:        product.price    || 0,
       }])
     }
     setShowProductPicker(false)
@@ -299,10 +343,7 @@ export default function ClientDetailPage() {
 
   function addManualItem() {
     if (!manualItem.nama) return
-    setCartItems([...cartItems, {
-      ...manualItem,
-      biaya: manualItem.jumlahUnit * manualItem.hargaPerUnit,
-    }])
+    setCartItems([...cartItems, { ...manualItem, biaya: manualItem.jumlahUnit * manualItem.hargaPerUnit }])
     setManualItem({ nama: '', jumlahUnit: 1, tipe: 'Service', hargaPerUnit: 0 })
     setShowManual(false)
   }
@@ -320,14 +361,16 @@ export default function ClientDetailPage() {
     setCartItems(cartItems.filter((_, i) => i !== idx))
   }
 
-  const cartTotal  = cartItems.reduce((s, i) => s + (i.jumlahUnit * i.hargaPerUnit), 0)
-  const cartPPN    = Math.round(cartTotal * 0.11)
-  const cartGrand  = cartTotal + cartPPN
+  const cartTotal = cartItems.reduce((s, i) => s + (i.jumlahUnit * i.hargaPerUnit), 0)
+  const cartPPN   = Math.round(cartTotal * 0.11)
+  const cartGrand = cartTotal + cartPPN
 
-  // ── generate PDF ─────────────────────────────────────────────────────────────
   async function generatePDF() {
     if (cartItems.length === 0) return alert('Cart is empty!')
     setGenerating(true)
+
+    // Fetch logo
+    const logoBase64 = await fetchLogoBase64()
 
     // Save quotation to DB
     const res = await fetch('/api/quotations', {
@@ -352,20 +395,27 @@ export default function ClientDetailPage() {
     const json = await res.json()
     const quot = json.data
 
-    // Open print window
-    const html = generatePDFHTML(customer, cartItems, quot)
+    const html = generatePDFHTML(customer, cartItems, quot, logoBase64)
     const win  = window.open('', '_blank')
     win.document.write(html)
     win.document.close()
     win.focus()
-    setTimeout(() => { win.print() }, 500)
+    setTimeout(() => { win.print() }, 600)
 
     setGenerating(false)
     setCartItems([])
     fetchQuotations()
   }
 
-  // ── status update ────────────────────────────────────────────────────────────
+  async function reprintPDF(q) {
+    const logoBase64 = await fetchLogoBase64()
+    const html = generatePDFHTML(customer, q.items, q, logoBase64)
+    const win  = window.open('', '_blank')
+    win.document.write(html)
+    win.document.close()
+    setTimeout(() => win.print(), 600)
+  }
+
   async function updateStatus(val) {
     await fetch(`/api/maintenance/${id}`, {
       method: 'PATCH',
@@ -398,10 +448,8 @@ export default function ClientDetailPage() {
 
       {/* Breadcrumb */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px' }}>
-        <button
-          onClick={() => router.push('/maintenance')}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.85rem', color: '#9ca3af', padding: 0 }}
-        >
+        <button onClick={() => router.push('/maintenance')}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.85rem', color: '#9ca3af', padding: 0 }}>
           ← Back
         </button>
         <span style={{ color: '#d1d5db' }}>|</span>
@@ -421,54 +469,35 @@ export default function ClientDetailPage() {
           </p>
         </div>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <select
-            value={customer.status}
-            onChange={e => updateStatus(e.target.value)}
-            style={{
-              padding: '7px 12px', border: '1px solid #d1d5db', borderRadius: '7px',
-              fontSize: '0.82rem', color: '#374151', background: '#fff',
-              fontFamily: "'Sora', sans-serif", cursor: 'pointer',
-            }}
-          >
+          <select value={customer.status} onChange={e => updateStatus(e.target.value)}
+            style={{ padding: '7px 12px', border: '1px solid #d1d5db', borderRadius: '7px',
+              fontSize: '0.82rem', color: '#374151', background: '#fff', fontFamily: "'Sora', sans-serif", cursor: 'pointer' }}>
             <option>New</option>
             <option>Active</option>
             <option>Inactive</option>
           </select>
-          <button
-            onClick={() => { setActiveTab('cart'); setShowManual(false) }}
-            style={{
-              display: 'flex', alignItems: 'center', gap: '6px',
+          <button onClick={() => { setActiveTab('cart'); setShowManual(false) }}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px',
               padding: '8px 16px', background: '#2a2a2a', color: '#fff',
               border: 'none', borderRadius: '7px', cursor: 'pointer',
-              fontSize: '0.82rem', fontWeight: 600, fontFamily: "'Sora', sans-serif",
-            }}
-          >
+              fontSize: '0.82rem', fontWeight: 600, fontFamily: "'Sora', sans-serif" }}>
             📄 GENERATE QUOTE
           </button>
         </div>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '0', borderBottom: '1px solid #e5e7eb', marginBottom: '1.5rem', marginTop: '1rem' }}>
+      <div style={{ display: 'flex', borderBottom: '1px solid #e5e7eb', marginBottom: '1.5rem', marginTop: '1rem' }}>
         {TABS.map(tab => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            style={{
-              padding: '10px 18px',
-              border: 'none',
-              borderBottom: activeTab === tab ? '2px solid #111' : '2px solid transparent',
-              background: 'none',
-              cursor: 'pointer',
-              fontSize: '0.8rem',
-              fontWeight: activeTab === tab ? 700 : 500,
-              color: activeTab === tab ? '#111' : '#9ca3af',
-              textTransform: 'uppercase',
-              letterSpacing: '0.06em',
-              fontFamily: "'Sora', sans-serif",
-              marginBottom: '-1px',
-            }}
-          >
+          <button key={tab} onClick={() => setActiveTab(tab)} style={{
+            padding: '10px 18px', border: 'none',
+            borderBottom: activeTab === tab ? '2px solid #111' : '2px solid transparent',
+            background: 'none', cursor: 'pointer', fontSize: '0.8rem',
+            fontWeight: activeTab === tab ? 700 : 500,
+            color: activeTab === tab ? '#111' : '#9ca3af',
+            textTransform: 'uppercase', letterSpacing: '0.06em',
+            fontFamily: "'Sora', sans-serif", marginBottom: '-1px',
+          }}>
             {tab === 'quotations'
               ? `QUOTATIONS${quotations.length > 0 ? ` (${quotations.length})` : ''}`
               : tab.toUpperCase()}
@@ -496,6 +525,7 @@ export default function ClientDetailPage() {
               )}
             </div>
 
+            {/* Editable fields */}
             {[
               { label: 'NAME',   field: 'customerName' },
               { label: 'PHONE',  field: 'phone' },
@@ -508,11 +538,9 @@ export default function ClientDetailPage() {
               <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #f3f4f6' }}>
                 <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#9ca3af', letterSpacing: '0.08em' }}>{label}</span>
                 {editing && field ? (
-                  <input
-                    value={editForm[field] || ''}
+                  <input value={editForm[field] || ''}
                     onChange={e => setEditForm({ ...editForm, [field]: e.target.value })}
-                    style={{ border: '1px solid #e5e7eb', borderRadius: '6px', padding: '4px 8px', fontSize: '0.82rem', color: '#111', textAlign: 'right', width: '55%' }}
-                  />
+                    style={{ border: '1px solid #e5e7eb', borderRadius: '6px', padding: '4px 8px', fontSize: '0.82rem', color: '#111', textAlign: 'right', width: '55%' }} />
                 ) : (
                   <span style={{ fontSize: '0.85rem', color: field ? '#111' : '#9ca3af', fontWeight: field ? 500 : 400 }}>
                     {field ? (customer[field] || '—') : '—'}
@@ -520,10 +548,23 @@ export default function ClientDetailPage() {
                 )}
               </div>
             ))}
+
+            {/* Read-only date fields */}
+            {[
+              { label: 'BAST DATE',  value: fmt(customer.bastDate) },
+              { label: 'LAST VISIT', value: fmt(customer.lastVisitDate) },
+              { label: 'NEXT VISIT', value: fmt(customer.nextVisitDate) },
+              { label: 'STATUS',     value: customer.status },
+            ].map(({ label, value }) => (
+              <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #f3f4f6' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#9ca3af', letterSpacing: '0.08em' }}>{label}</span>
+                <span style={{ fontSize: '0.85rem', color: '#111', fontWeight: 500 }}>{value}</span>
+              </div>
+            ))}
           </div>
 
-          {/* Comments — full width */}
-          <div style={{ gridColumn: '1/-1', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '20px' }}>
+          {/* Comments */}
+          <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '20px' }}>
             <span style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#6b7280', display: 'block', marginBottom: '12px' }}>
               COMMENTS
             </span>
@@ -538,17 +579,13 @@ export default function ClientDetailPage() {
                   ))}
                 </div>
             }
-            <textarea
-              value={comment}
-              onChange={e => setComment(e.target.value)}
-              placeholder="Add a comment..."
-              rows={3}
-              style={{ width: '100%', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '10px 12px', fontSize: '0.85rem', resize: 'vertical', fontFamily: "'Sora', sans-serif", boxSizing: 'border-box' }}
-            />
-            <button
-              onClick={addComment}
-              style={{ marginTop: '8px', padding: '8px 18px', background: '#111', color: '#fff', border: 'none', borderRadius: '7px', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 600 }}
-            >
+            <textarea value={comment} onChange={e => setComment(e.target.value)}
+              placeholder="Add a comment..." rows={3}
+              style={{ width: '100%', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '10px 12px',
+                fontSize: '0.85rem', resize: 'vertical', fontFamily: "'Sora', sans-serif", boxSizing: 'border-box' }} />
+            <button onClick={addComment}
+              style={{ marginTop: '8px', padding: '8px 18px', background: '#111', color: '#fff',
+                border: 'none', borderRadius: '7px', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 600 }}>
               ADD COMMENT
             </button>
           </div>
@@ -558,7 +595,6 @@ export default function ClientDetailPage() {
       {/* ── CART TAB ── */}
       {activeTab === 'cart' && (
         <div>
-          {/* Action bar */}
           <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', flexWrap: 'wrap' }}>
             <button onClick={() => { setShowProductPicker(true); setShowManual(false) }} style={darkBtn}>
               + Add from Products
@@ -567,38 +603,31 @@ export default function ClientDetailPage() {
               + Add Manually
             </button>
             {cartItems.length > 0 && (
-              <button onClick={generatePDF} disabled={generatingPDF} style={{ ...darkBtn, background: '#CC2020', marginLeft: 'auto' }}>
+              <button onClick={generatePDF} disabled={generatingPDF}
+                style={{ ...darkBtn, background: '#CC2020', marginLeft: 'auto' }}>
                 {generatingPDF ? 'Generating...' : '📄 Generate PDF'}
               </button>
             )}
           </div>
 
-          {/* Product picker */}
           {showProductPicker && (
             <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '16px', marginBottom: '16px', background: '#fafafa' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
                 <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>Select Product</span>
                 <button onClick={() => setShowProductPicker(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af' }}>✕</button>
               </div>
-              <input
-                value={productSearch}
-                onChange={e => setProductSearch(e.target.value)}
+              <input value={productSearch} onChange={e => setProductSearch(e.target.value)}
                 placeholder="Search products..."
-                style={{ width: '100%', border: '1px solid #e5e7eb', borderRadius: '7px', padding: '8px 12px', fontSize: '0.85rem', marginBottom: '10px', boxSizing: 'border-box' }}
-              />
+                style={{ width: '100%', border: '1px solid #e5e7eb', borderRadius: '7px', padding: '8px 12px',
+                  fontSize: '0.85rem', marginBottom: '10px', boxSizing: 'border-box' }} />
               <div style={{ maxHeight: '200px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 {filteredProducts.map(p => (
-                  <div
-                    key={p._id}
-                    onClick={() => addProductToCart(p)}
-                    style={{
-                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  <div key={p._id} onClick={() => addProductToCart(p)}
+                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                       padding: '8px 12px', borderRadius: '7px', cursor: 'pointer',
-                      background: '#fff', border: '1px solid #e5e7eb',
-                    }}
+                      background: '#fff', border: '1px solid #e5e7eb' }}
                     onMouseEnter={e => e.currentTarget.style.background = '#f9fafb'}
-                    onMouseLeave={e => e.currentTarget.style.background = '#fff'}
-                  >
+                    onMouseLeave={e => e.currentTarget.style.background = '#fff'}>
                     <div>
                       <span style={{ fontSize: '0.85rem', fontWeight: 500, color: '#111' }}>{p.name}</span>
                       <span style={{ fontSize: '0.75rem', color: '#9ca3af', marginLeft: '8px' }}>{p.tipeItem}</span>
@@ -610,7 +639,6 @@ export default function ClientDetailPage() {
             </div>
           )}
 
-          {/* Manual add form */}
           {showManual && (
             <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '16px', marginBottom: '16px', background: '#fafafa' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
@@ -624,7 +652,8 @@ export default function ClientDetailPage() {
                 </div>
                 <div>
                   <label style={labelStyle}>Jumlah Unit</label>
-                  <input type="number" min="1" value={manualItem.jumlahUnit} onChange={e => setManualItem({ ...manualItem, jumlahUnit: parseInt(e.target.value) || 1 })} style={inputStyle} />
+                  <input type="number" min="1" value={manualItem.jumlahUnit}
+                    onChange={e => setManualItem({ ...manualItem, jumlahUnit: parseInt(e.target.value) || 1 })} style={inputStyle} />
                 </div>
                 <div>
                   <label style={labelStyle}>Tipe</label>
@@ -634,14 +663,14 @@ export default function ClientDetailPage() {
                 </div>
                 <div>
                   <label style={labelStyle}>Harga per Unit</label>
-                  <input type="number" min="0" value={manualItem.hargaPerUnit} onChange={e => setManualItem({ ...manualItem, hargaPerUnit: parseFloat(e.target.value) || 0 })} style={inputStyle} />
+                  <input type="number" min="0" value={manualItem.hargaPerUnit}
+                    onChange={e => setManualItem({ ...manualItem, hargaPerUnit: parseFloat(e.target.value) || 0 })} style={inputStyle} />
                 </div>
               </div>
               <button onClick={addManualItem} style={darkBtn}>Add to Cart</button>
             </div>
           )}
 
-          {/* Cart table */}
           {cartItems.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '3rem', color: '#9ca3af', border: '1px dashed #e5e7eb', borderRadius: '10px' }}>
               <p style={{ fontSize: '0.9rem' }}>Cart is empty.</p>
@@ -654,7 +683,8 @@ export default function ClientDetailPage() {
                   <thead>
                     <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
                       {['NO.','NAMA','JUMLAH UNIT','TIPE','HARGA PER UNIT','BIAYA',''].map(h => (
-                        <th key={h} style={{ padding: '10px 12px', textAlign: 'left', color: '#9ca3af', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{h}</th>
+                        <th key={h} style={{ padding: '10px 12px', textAlign: 'left', color: '#9ca3af',
+                          fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -663,10 +693,13 @@ export default function ClientDetailPage() {
                       <tr key={idx} style={{ borderBottom: idx < cartItems.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
                         <td style={{ padding: '10px 12px', color: '#9ca3af' }}>{idx + 1}</td>
                         <td style={{ padding: '10px 12px' }}>
-                          <input value={item.nama} onChange={e => updateCartItem(idx, 'nama', e.target.value)} style={{ ...inputStyle, width: '100%', minWidth: '140px' }} />
+                          <input value={item.nama} onChange={e => updateCartItem(idx, 'nama', e.target.value)}
+                            style={{ ...inputStyle, width: '100%', minWidth: '140px' }} />
                         </td>
                         <td style={{ padding: '10px 12px' }}>
-                          <input type="number" min="1" value={item.jumlahUnit} onChange={e => updateCartItem(idx, 'jumlahUnit', parseInt(e.target.value) || 1)} style={{ ...inputStyle, width: '70px' }} />
+                          <input type="number" min="1" value={item.jumlahUnit}
+                            onChange={e => updateCartItem(idx, 'jumlahUnit', parseInt(e.target.value) || 1)}
+                            style={{ ...inputStyle, width: '70px' }} />
                         </td>
                         <td style={{ padding: '10px 12px' }}>
                           <select value={item.tipe} onChange={e => updateCartItem(idx, 'tipe', e.target.value)} style={inputStyle}>
@@ -674,28 +707,30 @@ export default function ClientDetailPage() {
                           </select>
                         </td>
                         <td style={{ padding: '10px 12px' }}>
-                          <input type="number" min="0" value={item.hargaPerUnit} onChange={e => updateCartItem(idx, 'hargaPerUnit', parseFloat(e.target.value) || 0)} style={{ ...inputStyle, width: '120px' }} />
+                          <input type="number" min="0" value={item.hargaPerUnit}
+                            onChange={e => updateCartItem(idx, 'hargaPerUnit', parseFloat(e.target.value) || 0)}
+                            style={{ ...inputStyle, width: '120px' }} />
                         </td>
                         <td style={{ padding: '10px 12px', fontWeight: 600, color: '#111' }}>
                           {fmtRp(item.jumlahUnit * item.hargaPerUnit)}
                         </td>
                         <td style={{ padding: '10px 12px' }}>
-                          <button onClick={() => removeCartItem(idx)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontSize: '1rem' }}>✕</button>
+                          <button onClick={() => removeCartItem(idx)}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontSize: '1rem' }}>✕</button>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-
-              {/* Totals */}
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px' }}>
                 <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '16px 24px', minWidth: '280px' }}>
                   {[
                     { label: 'Total Biaya', val: fmtRp(cartTotal) },
                     { label: 'PPN 11%',     val: fmtRp(cartPPN) },
                   ].map(({ label, val }) => (
-                    <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #f3f4f6', fontSize: '0.85rem', color: '#374151' }}>
+                    <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0',
+                      borderBottom: '1px solid #f3f4f6', fontSize: '0.85rem', color: '#374151' }}>
                       <span>{label}</span><span>{val}</span>
                     </div>
                   ))}
@@ -717,7 +752,8 @@ export default function ClientDetailPage() {
               <thead>
                 <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
                   {['#', 'DATE', 'NOTES'].map(h => (
-                    <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: '#9ca3af', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{h}</th>
+                    <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: '#9ca3af',
+                      fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -734,13 +770,11 @@ export default function ClientDetailPage() {
               </tbody>
             </table>
           </div>
-
-          {/* Summary */}
           <div style={{ marginTop: '16px', display: 'flex', gap: '12px' }}>
             {[
-              { label: 'Total Visits',    val: customer.visitCount || 0 },
-              { label: 'Last Visit',      val: fmt(customer.lastVisitDate) },
-              { label: 'Next Visit',      val: fmt(customer.nextVisitDate) },
+              { label: 'Total Visits', val: customer.visitCount || 0 },
+              { label: 'Last Visit',   val: fmt(customer.lastVisitDate) },
+              { label: 'Next Visit',   val: fmt(customer.nextVisitDate) },
             ].map(({ label, val }) => (
               <div key={label} style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '14px 18px', flex: 1 }}>
                 <p style={{ fontSize: '0.72rem', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 4px' }}>{label}</p>
@@ -760,13 +794,13 @@ export default function ClientDetailPage() {
             </p>
             <button onClick={() => setActiveTab('cart')} style={darkBtn}>+ New Quote</button>
           </div>
-
           <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', overflow: 'hidden' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
               <thead>
                 <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
                   {['REF NO.','DATE','ITEMS','AMOUNT','STATUS','ACTIONS'].map(h => (
-                    <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: '#9ca3af', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{h}</th>
+                    <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: '#9ca3af',
+                      fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -792,19 +826,8 @@ export default function ClientDetailPage() {
                       </span>
                     </td>
                     <td style={{ padding: '12px 16px' }}>
-                      <div style={{ display: 'flex', gap: '10px' }}>
-                        <button
-                          title="Reprint PDF"
-                          onClick={() => {
-                            const html = generatePDFHTML(customer, q.items, q)
-                            const win  = window.open('', '_blank')
-                            win.document.write(html)
-                            win.document.close()
-                            setTimeout(() => win.print(), 500)
-                          }}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', fontSize: '1rem' }}
-                        >⬇</button>
-                      </div>
+                      <button title="Reprint PDF" onClick={() => reprintPDF(q)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', fontSize: '1rem' }}>⬇</button>
                     </td>
                   </tr>
                 ))}
@@ -817,7 +840,6 @@ export default function ClientDetailPage() {
   )
 }
 
-// ── shared micro-styles ───────────────────────────────────────────────────────
 const ghostBtn = {
   padding: '5px 12px', border: '1px solid #e5e7eb', borderRadius: '6px',
   background: '#fff', color: '#374151', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 500,
