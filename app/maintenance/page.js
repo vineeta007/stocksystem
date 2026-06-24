@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 
 const KOTA_LIST = [
   'Semua Kota','Jakarta','Surabaya','Bandung','Medan','Semarang',
@@ -19,6 +20,8 @@ function warrantyBadge(status) {
 }
 
 export default function MaintenancePage() {
+  const router = useRouter()
+
   const [customers, setCustomers]       = useState([])
   const [loading, setLoading]           = useState(true)
   const [kotaFilter, setKotaFilter]     = useState('Semua Kota')
@@ -185,7 +188,13 @@ export default function MaintenancePage() {
                 <tr key={c._id} className={c.daysUntilNextVisit !== null && c.daysUntilNextVisit <= 14 ? 'row-warning' : ''}>
                   <td>{i + 1}</td>
                   <td>
-                    <div className="customer-name">{c.customerName}</div>
+                    {/* ── Clickable customer name ── */}
+                    <div
+                      className="customer-name customer-name-link"
+                      onClick={() => router.push(`/maintenance/${c._id}`)}
+                    >
+                      {c.customerName}
+                    </div>
                     <div className="customer-addr">{c.address}</div>
                   </td>
                   <td>{c.kota}</td>
@@ -283,7 +292,6 @@ export default function MaintenancePage() {
         }
         .subtitle { color: #6b7280; margin: 4px 0 0; font-size: 0.9rem; }
 
-        /* Reminder */
         .reminder-banner {
           background: #fffbeb; border: 1px solid #f59e0b; border-radius: 8px;
           padding: 10px 16px; margin-bottom: 1rem; font-size: 0.9rem;
@@ -292,7 +300,6 @@ export default function MaintenancePage() {
         .reminder-banner.active { background: #fffbeb; border-color: #f59e0b; }
         .reminder-link { margin-left: 8px; color: #d97706; font-weight: 600; }
 
-        /* Filters */
         .filter-row { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
         .filter-row select {
           padding: 6px 10px; border: 1px solid #e5e7eb; border-radius: 6px;
@@ -300,7 +307,6 @@ export default function MaintenancePage() {
           width: auto; min-width: 160px;
         }
 
-        /* Table */
         .table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid #e5e7eb; }
         .data-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
         .data-table th {
@@ -315,12 +321,23 @@ export default function MaintenancePage() {
         .data-table tbody tr:last-child td { border-bottom: none; }
         .data-table tbody tr:hover td { background: #f9fafb; }
         .row-warning td { background: rgba(245,158,11,0.06) !important; }
+
+        /* ── Clickable customer name ── */
         .customer-name { font-weight: 600; color: #111111; }
+        .customer-name-link {
+          cursor: pointer;
+          transition: color 0.15s;
+          display: inline-block;
+        }
+        .customer-name-link:hover {
+          color: #CC2020;
+          text-decoration: underline;
+        }
+
         .customer-addr { font-size: 0.78rem; color: #9ca3af; }
         .text-muted { font-size: 0.78rem; color: #9ca3af; }
         .text-center { text-align: center; }
 
-        /* Badges */
         .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
         .badge-danger    { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
         .badge-warning   { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
@@ -329,20 +346,17 @@ export default function MaintenancePage() {
         .badge-secondary { background: #f9fafb; color: #6b7280; border: 1px solid #e5e7eb; }
         .ml-2 { margin-left: 8px; }
 
-        /* Status pills */
         .status-pill { padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
         .status-active   { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
         .status-inactive { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
         .status-new      { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
 
-        /* Action buttons */
         .action-btns { display: flex; gap: 4px; }
         .btn-sm { padding: 4px 10px; border-radius: 6px; font-size: 0.72rem; cursor: pointer; border: 1px solid; font-weight: 600; }
         .btn-visit { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
         .btn-edit  { background: #f5f3ff; color: #7c3aed; border-color: #ddd6fe; }
         .btn-del   { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
 
-        /* Primary / ghost buttons */
         .btn-primary {
           background: #111111; color: #fff; padding: 9px 18px; border-radius: 8px;
           border: none; cursor: pointer; font-size: 0.875rem; font-weight: 600; white-space: nowrap;
@@ -353,7 +367,6 @@ export default function MaintenancePage() {
           padding: 8px 14px; border-radius: 7px; cursor: pointer; font-size: 0.875rem;
         }
 
-        /* States */
         .loading-text { color: #9ca3af; padding: 2rem; text-align: center; }
         .empty-state {
           text-align: center; padding: 3rem; color: #9ca3af;
@@ -361,7 +374,6 @@ export default function MaintenancePage() {
         }
         .empty-state p { margin-bottom: 1rem; }
 
-        /* Modal */
         .modal-overlay {
           position: fixed; inset: 0; background: rgba(0,0,0,0.3);
           display: flex; align-items: center; justify-content: center; z-index: 100;
@@ -383,9 +395,7 @@ export default function MaintenancePage() {
           border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 10px;
           font-size: 0.875rem; background: #ffffff; color: #111111; outline: none;
         }
-        .form-grid input:focus, .form-grid select:focus, .form-grid textarea:focus {
-          border-color: #111111;
-        }
+        .form-grid input:focus, .form-grid select:focus, .form-grid textarea:focus { border-color: #111111; }
         .full-width { grid-column: 1 / -1; }
         .form-actions { display: flex; justify-content: flex-end; gap: 8px; padding-top: 4px; }
       `}</style>
