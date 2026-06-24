@@ -407,10 +407,17 @@ export default function ClientDetailPage() {
       }),
     })
     const json = await res.json()
-    const quot = json.data
+    const quot = json.data || {}
 
     const html = generatePDFHTML(customer, cartItems, quot, logoBase64)
     const win  = window.open('', '_blank')
+
+    if (!win) {
+      setGenerating(false)
+      alert('Popup was blocked. Please allow popups for this site and try again.')
+      return
+    }
+
     win.document.write(html)
     win.document.close()
     win.focus()
