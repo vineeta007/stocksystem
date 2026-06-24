@@ -75,7 +75,7 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
   `).join('')
 
   const logoHTML = logoBase64
-    ? `<img src="${logoBase64}" style="height:60px; object-fit:contain; display:block;" />`
+    ? `<img src="${logoBase64}" style="height:120px; object-fit:contain; display:block;" />`
     : `<div style="display:flex;align-items:center;gap:8px;">
         <span style="color:#cc2020;font-size:28px;font-weight:900;line-height:1;">✕</span>
         <div>
