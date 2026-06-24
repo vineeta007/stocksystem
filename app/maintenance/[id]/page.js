@@ -55,27 +55,27 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
 
   const rows = items.map((item, i) => `
     <tr>
-      <td style="text-align:center; padding:9px 8px; border:1px solid #ccc;">${i + 1}</td>
-      <td style="padding:9px 8px; border:1px solid #ccc; font-weight:700;">${item.nama || ''}</td>
-      <td style="text-align:center; padding:9px 8px; border:1px solid #ccc;">${item.jumlahUnit || 1}</td>
-      <td style="text-align:center; padding:9px 8px; border:1px solid #ccc;">${item.tipe || 'Service'}</td>
-      <td style="padding:9px 8px; border:1px solid #ccc;">
+      <td style="text-align:center; padding:11px 8px; border-bottom:1px solid #e0e0e0;">${i + 1}</td>
+      <td style="padding:11px 8px; border-bottom:1px solid #e0e0e0; font-weight:700;">${item.nama || ''}</td>
+      <td style="text-align:center; padding:11px 8px; border-bottom:1px solid #e0e0e0;">${item.jumlahUnit || 1}</td>
+      <td style="text-align:center; padding:11px 8px; border-bottom:1px solid #e0e0e0;">${item.tipe || 'Service'}</td>
+      <td style="padding:11px 8px; border-bottom:1px solid #e0e0e0;">
         <table style="width:100%; border-collapse:collapse;"><tr>
-          <td style="width:18px;">Rp</td>
-          <td style="text-align:right;">${Number(item.hargaPerUnit || 0).toLocaleString('id-ID')}</td>
+          <td style="width:18px; color:#000;">Rp</td>
+          <td style="text-align:right; color:#000;">${Number(item.hargaPerUnit || 0).toLocaleString('id-ID')}</td>
         </tr></table>
       </td>
-      <td style="padding:9px 8px; border:1px solid #ccc;">
+      <td style="padding:11px 8px; border-bottom:1px solid #e0e0e0;">
         <table style="width:100%; border-collapse:collapse;"><tr>
-          <td style="width:18px;">Rp</td>
-          <td style="text-align:right;">${Number((item.jumlahUnit || 1) * (item.hargaPerUnit || 0)).toLocaleString('id-ID')}</td>
+          <td style="width:18px; color:#000;">Rp</td>
+          <td style="text-align:right; color:#000;">${Number((item.jumlahUnit || 1) * (item.hargaPerUnit || 0)).toLocaleString('id-ID')}</td>
         </tr></table>
       </td>
     </tr>
   `).join('')
 
   const logoHTML = logoBase64
-    ? `<img src="${logoBase64}" style="height:72px; object-fit:contain; display:block; margin-left:auto;" />`
+    ? `<img src="${logoBase64}" style="height:96px; object-fit:contain; display:block; margin-left:auto;" />`
     : `<div style="font-size:22px; font-weight:800; color:#CC2020; letter-spacing:-0.5px;">✕ KREATIV LIFT</div>`
 
   return `<!DOCTYPE html>
@@ -100,8 +100,8 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
   table.items { width:100%; border-collapse:collapse; font-size:12px; }
   table.items thead tr { background:#d0d0d0; }
   table.items th { border:1px solid #aaa; padding:9px 8px; text-align:center; font-size:11.5px; font-weight:700; }
-  table.items tbody tr td { border-left:1px solid #ccc; border-right:1px solid #ccc; font-size:12px; }
-  table.items tbody tr:last-child td { border-bottom:1px solid #ccc; }
+  table.items tbody tr td { border-bottom:1px solid #e0e0e0; font-size:11.5px; }
+  table.items tbody tr:last-child td { border-bottom:1px solid #bbb; }
   .syarat { margin-top:20px; font-size:12px; }
   .syarat h4 { font-weight:700; font-size:12px; margin-bottom:6px; text-decoration:underline; }
   .syarat ol { list-style:none; padding:0; margin:0; }
