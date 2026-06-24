@@ -75,7 +75,7 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
   `).join('')
 
   const logoHTML = logoBase64
-    ? `<img src="${logoBase64}" style="height:120px; object-fit:contain; display:block;" />`
+    ? `<img src="${logoBase64}" style="height:130px; object-fit:contain; display:block;" />`
     : `<div style="display:flex;align-items:center;gap:8px;">
         <span style="color:#cc2020;font-size:28px;font-weight:900;line-height:1;">✕</span>
         <div>
@@ -93,7 +93,7 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
   body { font-family: Arial, sans-serif; font-size: 11.5px; color: #000; padding: 36px 44px; background: #fff; }
   .header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; }
   .to-block { font-size:12px; line-height:1.8; }
-  .up-line { font-size:12px; margin-bottom:16px; }
+  .up-line { font-size:12px; margin-bottom:16px; margin-top:-10px; }
   .ref-outer { display:flex; justify-content:flex-end; margin-bottom:16px; }
   .ref-table { border-collapse:collapse; font-size:12px; }
   .ref-table th { font-weight:700; padding:2px 40px 4px 0; text-align:left; }
