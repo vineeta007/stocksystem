@@ -55,19 +55,19 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
 
   const rows = items.map((item, i) => `
     <tr>
-      <td style="text-align:center; padding:11px 8px; border-bottom:1px solid #e0e0e0;">${i + 1}</td>
-      <td style="padding:11px 8px; border-bottom:1px solid #e0e0e0; font-weight:700;">${item.nama || ''}</td>
-      <td style="text-align:center; padding:11px 8px; border-bottom:1px solid #e0e0e0;">${item.jumlahUnit || 1}</td>
-      <td style="text-align:center; padding:11px 8px; border-bottom:1px solid #e0e0e0;">${item.tipe || 'Service'}</td>
-      <td style="padding:11px 8px; border-bottom:1px solid #e0e0e0;">
+      <td style="text-align:center; padding:13px 8px; border-bottom:1px solid #e8e8e8; color:#000;">${i + 1}</td>
+      <td style="padding:13px 8px; border-bottom:1px solid #e8e8e8; font-weight:700; color:#000;">${item.nama || ''}</td>
+      <td style="text-align:center; padding:13px 8px; border-bottom:1px solid #e8e8e8; color:#000;">${item.jumlahUnit || 1}</td>
+      <td style="text-align:center; padding:13px 8px; border-bottom:1px solid #e8e8e8; color:#000;">${item.tipe || 'Service'}</td>
+      <td style="padding:13px 8px; border-bottom:1px solid #e8e8e8;">
         <table style="width:100%; border-collapse:collapse;"><tr>
-          <td style="width:18px; color:#000;">Rp</td>
+          <td style="width:22px; color:#000;">Rp</td>
           <td style="text-align:right; color:#000;">${Number(item.hargaPerUnit || 0).toLocaleString('id-ID')}</td>
         </tr></table>
       </td>
-      <td style="padding:11px 8px; border-bottom:1px solid #e0e0e0;">
+      <td style="padding:13px 8px; border-bottom:1px solid #e8e8e8;">
         <table style="width:100%; border-collapse:collapse;"><tr>
-          <td style="width:18px; color:#000;">Rp</td>
+          <td style="width:22px; color:#000;">Rp</td>
           <td style="text-align:right; color:#000;">${Number((item.jumlahUnit || 1) * (item.hargaPerUnit || 0)).toLocaleString('id-ID')}</td>
         </tr></table>
       </td>
@@ -99,9 +99,10 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
   .intro { font-size:12px; line-height:2; margin-bottom:16px; }
   table.items { width:100%; border-collapse:collapse; font-size:12px; }
   table.items thead tr { background:#d0d0d0; }
-  table.items th { border:1px solid #aaa; padding:9px 8px; text-align:center; font-size:11.5px; font-weight:700; }
-  table.items tbody tr td { border-bottom:1px solid #e0e0e0; font-size:11.5px; }
-  table.items tbody tr:last-child td { border-bottom:1px solid #bbb; }
+  table.items th { border-bottom:1px solid #bbb; padding:10px 8px; text-align:center; font-size:11px; font-weight:700; background:#d8d8d8; color:#000; }
+  table.items tbody tr td { border-bottom:1px solid #e8e8e8; font-size:11.5px; color:#000; }
+  table.items tbody tr:last-child td { border-bottom:none; }
+  table.items { border:1px solid #bbb; border-collapse:collapse; }
   .syarat { margin-top:20px; font-size:12px; }
   .syarat h4 { font-weight:700; font-size:12px; margin-bottom:6px; text-decoration:underline; }
   .syarat ol { list-style:none; padding:0; margin:0; }
