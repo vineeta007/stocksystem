@@ -8,7 +8,7 @@ function statusStyle(quantity, minStock) {
   return { bg: 'rgba(22,163,74,0.08)', color: '#16a34a', border: 'rgba(22,163,74,0.25)', label: 'IN STOCK' };
 }
 
-const EMPTY_FORM = { name: '', category: '', stock: '', minStock: '', sku: '' };
+const EMPTY_FORM = { name: '', category: '', stock: '', minStock: '', price: '', sku: '' };
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
@@ -40,7 +40,14 @@ export default function ProductsPage() {
 
   function openEdit(p) {
     setEditProduct(p);
-    setForm({ name: p.name, category: p.category, stock: String(p.quantity ?? 0), minStock: String(p.minStock ?? 0), sku: p.sku || '' });
+    setForm({
+      name: p.name,
+      category: p.category,
+      stock: String(p.quantity ?? 0),
+      minStock: String(p.minStock ?? 0),
+      price: String(p.price ?? 0),
+      sku: p.sku || '',
+    });
     setShowModal(true);
   }
 
@@ -48,16 +55,20 @@ export default function ProductsPage() {
     if (!form.name.trim() || !form.category.trim()) return alert('Name and category are required');
     setSaving(true);
 
+    const payload = {
+      name: form.name,
+      category: form.category,
+      quantity: Number(form.stock) || 0,
+      minStock: Number(form.minStock) || 0,
+      price: Number(form.price) || 0,
+      sku: form.sku,
+    };
+
     if (editProduct) {
       const res = await fetch(`/api/products/${editProduct._id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: form.name, category: form.category,
-          quantity: Number(form.stock) || 0,
-          minStock: Number(form.minStock) || 0,
-          sku: form.sku,
-        }),
+        body: JSON.stringify(payload),
       });
       const json = await res.json();
       setSaving(false);
@@ -67,12 +78,7 @@ export default function ProductsPage() {
       const res = await fetch('/api/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: form.name, category: form.category,
-          quantity: Number(form.stock) || 0,
-          minStock: Number(form.minStock) || 0,
-          sku: form.sku,
-        }),
+        body: JSON.stringify(payload),
       });
       const json = await res.json();
       setSaving(false);
@@ -99,12 +105,12 @@ export default function ProductsPage() {
   return (
     <div style={{ minHeight: '100vh', background: '#f5f5f5', fontFamily: "'Sora', sans-serif" }}>
 
-      {/* ── Header ── */}
+      {/* Header */}
       <div style={{
-  padding: '32px 28px 20px', borderBottom: '1px solid #e0e0e0',
-  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-  background: '#f5f5f5', position: 'relative',
-}}>
+        padding: '32px 28px 20px', borderBottom: '1px solid #e0e0e0',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        background: '#f5f5f5', position: 'relative',
+      }}>
         <h1 style={{
           fontSize: 40, fontWeight: 700, color: '#111111', margin: 0,
           letterSpacing: '-0.3px', fontFamily: "'Cormorant Garamond', serif",
@@ -115,20 +121,19 @@ export default function ProductsPage() {
             padding: '9px 18px', fontSize: 12, letterSpacing: '0.08em',
             textTransform: 'uppercase', background: '#000000', color: '#ffffff',
             border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700,
-            fontFamily: "'Sora', sans-serif", transition: 'background 0.15s',
+            fontFamily: "'Sora', sans-serif",
           }}>
             + Add Product
           </button>
         </div>
       </div>
 
-      {/* ── Filters ── */}
+      {/* Filters */}
       <div style={{
         padding: '18px 28px 28px', borderBottom: '1px solid #e0e0e0',
         display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center',
         background: '#ffffff',
       }}>
-        {/* Search */}
         <input
           value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Search products..."
@@ -139,10 +144,8 @@ export default function ProductsPage() {
           }}
         />
 
-        {/* Divider */}
         <div style={{ width: '1px', height: '24px', background: '#e0e0e0', flexShrink: 0 }} />
 
-        {/* Category filters */}
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {categories.map(cat => (
             <button key={cat} onClick={() => setCategory(cat)} style={{
@@ -159,7 +162,6 @@ export default function ProductsPage() {
           ))}
         </div>
 
-        {/* Right side: stat boxes + divider + status filters */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
           <span style={{
             padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
@@ -174,10 +176,8 @@ export default function ProductsPage() {
             background: 'rgba(204,32,32,0.08)', border: '1px solid rgba(204,32,32,0.3)', color: '#CC2020',
           }}>{out} out</span>
 
-          {/* Divider */}
           <div style={{ width: '1px', height: '24px', background: '#e0e0e0' }} />
 
-          {/* Status filters */}
           <div style={{ display: 'flex', gap: 6 }}>
             {['All', 'In Stock', 'Low', 'Out'].map(s => (
               <button key={s} onClick={() => setStatusFilter(s)} style={{
@@ -195,7 +195,7 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      {/* ── Table ── */}
+      {/* Table */}
       <div style={{ padding: '16px 28px 40px' }}>
         <div style={{ background: '#ffffff', border: '1px solid #e0e0e0', borderRadius: 12, overflow: 'visible', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
           {loading ? (
@@ -204,7 +204,7 @@ export default function ProductsPage() {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid #eeeeee', background: '#fafafa' }}>
-                  {['#', 'Product Name', 'Category', 'Stock', 'Min Stock', 'Status', ''].map((h, idx) => (
+                  {['#', 'Product Name', 'Category', 'Stock', 'Min Stock', 'Price', 'Status', ''].map((h, idx) => (
                     <th key={idx} style={{
                       padding: '12px 16px', textAlign: 'left',
                       fontSize: 10, letterSpacing: '0.15em',
@@ -220,19 +220,20 @@ export default function ProductsPage() {
                     <tr key={p._id} style={{
                       borderBottom: '1px solid #f0f0f0',
                       background: i % 2 === 0 ? '#ffffff' : '#fafafa',
-                      transition: 'background 0.1s',
                     }}>
                       <td style={{ padding: '13px 16px', color: '#aaaaaa', fontSize: 13 }}>{i + 1}</td>
                       <td style={{ padding: '13px 16px', color: '#111111', fontWeight: 600, fontSize: 14 }}>{p.name}</td>
                       <td style={{ padding: '13px 16px' }}>
                         <span style={{
                           fontSize: 11, padding: '3px 10px', borderRadius: 20,
-                          background: '#f0f0f0', color: '#555555', border: '1px solid #e0e0e0',
-                          fontWeight: 500,
+                          background: '#f0f0f0', color: '#555555', border: '1px solid #e0e0e0', fontWeight: 500,
                         }}>{p.category}</span>
                       </td>
                       <td style={{ padding: '13px 16px', fontWeight: 700, color: '#111111', fontSize: 14 }}>{p.quantity ?? 0}</td>
                       <td style={{ padding: '13px 16px', color: '#888888', fontSize: 13 }}>{p.minStock ?? 0}</td>
+                      <td style={{ padding: '13px 16px', color: '#111111', fontSize: 13, fontWeight: 500 }}>
+                        {p.price ? 'Rp ' + Number(p.price).toLocaleString('id-ID') : '—'}
+                      </td>
                       <td style={{ padding: '13px 16px' }}>
                         <div style={{ position: 'relative', display: 'inline-block' }}>
                           <span
@@ -274,7 +275,6 @@ export default function ProductsPage() {
                                     padding: '10px 14px', fontSize: 12, cursor: 'pointer',
                                     color: '#111111', fontWeight: 500,
                                     borderBottom: '1px solid #f0f0f0',
-                                    transition: 'background 0.1s',
                                   }}
                                   onMouseEnter={e => e.currentTarget.style.background = '#f5f5f5'}
                                   onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
@@ -301,7 +301,7 @@ export default function ProductsPage() {
                   );
                 })}
                 {filtered.length === 0 && (
-                  <tr><td colSpan={7} style={{ textAlign: 'center', padding: 48, color: '#888888', fontSize: 14 }}>No products found</td></tr>
+                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: 48, color: '#888888', fontSize: 14 }}>No products found</td></tr>
                 )}
               </tbody>
             </table>
@@ -309,7 +309,7 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      {/* ── Add / Edit Modal ── */}
+      {/* Add / Edit Modal */}
       {showModal && (
         <div style={{
           position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
@@ -320,7 +320,7 @@ export default function ProductsPage() {
             borderRadius: 12, width: '100%', maxWidth: 480, padding: 32,
             boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
           }}>
-            <h2 style={{ fontSize: 22, fontWeight: 700, color: '#111111', marginBottom: 24, margin: '0 0 24px' }}>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: '#111111', margin: '0 0 24px' }}>
               {editProduct ? 'Edit Product' : 'Add Product'}
             </h2>
             {[
@@ -328,6 +328,7 @@ export default function ProductsPage() {
               { label: 'Category *', key: 'category', placeholder: 'e.g. Swift' },
               { label: 'Stock', key: 'stock', placeholder: '0', type: 'number' },
               { label: 'Min Stock', key: 'minStock', placeholder: '0', type: 'number' },
+              { label: 'Price (Rp)', key: 'price', placeholder: '0', type: 'number' },
               { label: 'SKU', key: 'sku', placeholder: 'optional' },
             ].map(f => (
               <div key={f.key} style={{ marginBottom: 16 }}>
@@ -349,7 +350,7 @@ export default function ProductsPage() {
                 flex: 1, padding: '11px 0', background: '#000000', color: '#ffffff',
                 border: 'none', borderRadius: 6, fontWeight: 700, fontSize: 13,
                 letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer',
-                fontFamily: "'Sora', sans-serif", transition: 'background 0.15s',
+                fontFamily: "'Sora', sans-serif",
               }}>
                 {saving ? 'Saving...' : editProduct ? 'Save Changes' : 'Create Product'}
               </button>
