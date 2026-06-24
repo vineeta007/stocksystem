@@ -37,9 +37,7 @@ async function fetchLogoBase64() {
 // ── ref no formatter: KL/1-DDMMYY/P ─────────────────────────────────────────
 function formatRefNo(refNo) {
   if (!refNo) return '—'
-  // If already in KL/1-XXXXXX/P format, return as-is
   if (/^KL\//.test(refNo)) return refNo
-  // If it's TDE-YYYY-XXXX format from DB, convert display
   return refNo
 }
 
@@ -269,7 +267,7 @@ export default function ClientDetailPage() {
   // ── Visit history editing state ──────────────────────────────────────────
   const [editingVisits, setEditingVisits] = useState(false)
   const [visitForm, setVisitForm]         = useState([])
-  const [visitMeta, setVisitMeta]         = useState({ lastVisitDate: '', nextVisitDate: '', visitCount: 0 })
+  const [visitMeta, setVisitMeta]         = useState({ lastVisitDate: '', nextVisitDate: '' })
   const [savingVisits, setSavingVisits]   = useState(false)
 
   const fetchCustomer = useCallback(async () => {
@@ -382,10 +380,8 @@ export default function ClientDetailPage() {
     if (cartItems.length === 0) return alert('Cart is empty!')
     setGenerating(true)
 
-    // Fetch logo
     const logoBase64 = await fetchLogoBase64()
 
-    // Save quotation to DB
     const res = await fetch('/api/quotations', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -439,17 +435,22 @@ export default function ClientDetailPage() {
   }
 
   // ── Visit history editing handlers ───────────────────────────────────────
+  // FIX 1: seed table from lastVisitDate if visitHistory is empty
   function startEditVisits() {
-    setVisitForm(
-      (visits || []).map(v => ({
-        date:  toInputDate(v.date),
-        notes: v.notes || '',
-      }))
-    )
+    let initialForm = (visits || []).map(v => ({
+      date:  toInputDate(v.date),
+      notes: v.notes || '',
+    }))
+
+    // If table is empty but lastVisitDate exists, seed it as the first row
+    if (initialForm.length === 0 && customer.lastVisitDate) {
+      initialForm = [{ date: toInputDate(customer.lastVisitDate), notes: '' }]
+    }
+
+    setVisitForm(initialForm)
     setVisitMeta({
       lastVisitDate: toInputDate(customer.lastVisitDate),
       nextVisitDate: toInputDate(customer.nextVisitDate),
-      visitCount:    customer.visitCount ?? visits.length ?? 0,
     })
     setEditingVisits(true)
   }
@@ -470,17 +471,22 @@ export default function ClientDetailPage() {
     setVisitForm(visitForm.filter((_, i) => i !== idx))
   }
 
+  // FIX 2: derive visitCount and lastVisitDate from table rows on save
   async function saveVisits() {
     setSavingVisits(true)
     const cleanedVisits = visitForm
-      .filter(v => v.date) // require a date
+      .filter(v => v.date)
       .map(v => ({ date: v.date, notes: v.notes || '' }))
 
+    // Auto-derive lastVisitDate from the most recent row
+    const sorted = [...cleanedVisits].sort((a, b) => new Date(b.date) - new Date(a.date))
+    const derivedLastVisit = sorted[0]?.date || visitMeta.lastVisitDate || null
+
     const payload = {
-      visitHistory:   cleanedVisits,
-      visitCount:     Number(visitMeta.visitCount) || cleanedVisits.length,
-      lastVisitDate:  visitMeta.lastVisitDate || null,
-      nextVisitDate:  visitMeta.nextVisitDate || null,
+      visitHistory:  cleanedVisits,
+      visitCount:    cleanedVisits.length,            // always row count
+      lastVisitDate: derivedLastVisit,                // always latest row date
+      nextVisitDate: visitMeta.nextVisitDate || null, // still manual
     }
 
     await fetch(`/api/maintenance/${id}`, {
@@ -594,7 +600,6 @@ export default function ClientDetailPage() {
               )}
             </div>
 
-            {/* Editable fields */}
             {[
               { label: 'NAME',   field: 'customerName' },
               { label: 'PHONE',  field: 'phone' },
@@ -618,7 +623,6 @@ export default function ClientDetailPage() {
               </div>
             ))}
 
-            {/* Read-only date fields */}
             {[
               { label: 'BAST DATE',  value: fmt(customer.bastDate) },
               { label: 'LAST VISIT', value: fmt(customer.lastVisitDate) },
@@ -816,7 +820,6 @@ export default function ClientDetailPage() {
       {/* ── VISIT HISTORY TAB ── */}
       {activeTab === 'visit history' && (
         <div>
-          {/* Edit / Save / Cancel controls */}
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px', gap: '8px' }}>
             {!editingVisits ? (
               <button onClick={startEditVisits} style={ghostBtn}>✏ EDIT</button>
@@ -860,7 +863,6 @@ export default function ClientDetailPage() {
                       <tr key={i} style={{ borderBottom: i < visitForm.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
                         <td style={{ padding: '10px 16px', color: '#9ca3af' }}>{i + 1}</td>
                         <td style={{ padding: '10px 16px' }}>
-                          {/* Native date input = calendar picker */}
                           <input type="date" value={v.date}
                             onChange={e => updateVisitRow(i, 'date', e.target.value)}
                             style={{ ...inputStyle, width: '160px' }} />
@@ -888,19 +890,16 @@ export default function ClientDetailPage() {
 
           {/* Summary cards */}
           <div style={{ marginTop: '16px', display: 'flex', gap: '12px' }}>
-            {/* Total Visits */}
+
+            {/* FIX 3: Total Visits — live count from table rows, not manual input */}
             <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '14px 18px', flex: 1 }}>
               <p style={{ fontSize: '0.72rem', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 4px' }}>Total Visits</p>
-              {!editingVisits ? (
-                <p style={{ fontSize: '1rem', fontWeight: 700, color: '#111', margin: 0 }}>{customer.visitCount || 0}</p>
-              ) : (
-                <input type="number" min="0" value={visitMeta.visitCount}
-                  onChange={e => setVisitMeta({ ...visitMeta, visitCount: e.target.value })}
-                  style={{ ...inputStyle, fontWeight: 700 }} />
-              )}
+              <p style={{ fontSize: '1rem', fontWeight: 700, color: '#111', margin: 0 }}>
+                {editingVisits ? visitForm.filter(v => v.date).length : (customer.visitCount || 0)}
+              </p>
             </div>
 
-            {/* Last Visit — date picker */}
+            {/* Last Visit — still editable manually, but overridden by latest row on save */}
             <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '14px 18px', flex: 1 }}>
               <p style={{ fontSize: '0.72rem', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 4px' }}>Last Visit</p>
               {!editingVisits ? (
@@ -912,7 +911,7 @@ export default function ClientDetailPage() {
               )}
             </div>
 
-            {/* Next Visit — date picker */}
+            {/* Next Visit — fully manual */}
             <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '14px 18px', flex: 1 }}>
               <p style={{ fontSize: '0.72rem', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 4px' }}>Next Visit</p>
               {!editingVisits ? (
