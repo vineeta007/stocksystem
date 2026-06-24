@@ -56,10 +56,8 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
       <td>${item.nama || ''}</td>
       <td style="text-align:center">${item.jumlahUnit || 1}</td>
       <td style="text-align:center">${item.tipe || 'Service'}</td>
-      <td style="text-align:right">Rp</td>
-      <td style="text-align:right">${Number(item.hargaPerUnit || 0).toLocaleString('id-ID')}</td>
-      <td style="text-align:right">Rp</td>
-      <td style="text-align:right">${Number((item.jumlahUnit || 1) * (item.hargaPerUnit || 0)).toLocaleString('id-ID')}</td>
+      <td style="text-align:right">Rp ${Number(item.hargaPerUnit || 0).toLocaleString('id-ID')}</td>
+      <td style="text-align:right">Rp ${Number((item.jumlahUnit || 1) * (item.hargaPerUnit || 0)).toLocaleString('id-ID')}</td>
     </tr>
   `).join('')
 
@@ -154,8 +152,8 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
         <th>Nama</th>
         <th style="width:64px">Jumlah Unit</th>
         <th style="width:72px">Tipe</th>
-        <th colspan="2" style="width:140px">Harga per unit</th>
-        <th colspan="2" style="width:140px">Biaya</th>
+        <th style="width:140px">Harga per unit</th>
+        <th style="width:140px">Biaya</th>
       </tr>
     </thead>
     <tbody>
