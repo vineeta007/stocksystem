@@ -192,7 +192,6 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
 function ProductCatalogModal({ products, onDone, onClose, initialSelected = [] }) {
   const [search, setSearch]         = useState('')
   const [selected, setSelected]     = useState(() => {
-    // map: productId -> { ...product, jumlahUnit }
     const map = {}
     initialSelected.forEach(item => {
       if (item.productId) map[item.productId] = { ...item }
@@ -206,7 +205,6 @@ function ProductCatalogModal({ products, onDone, onClose, initialSelected = [] }
     (p.category || '').toLowerCase().includes(search.toLowerCase())
   )
 
-  // Group by category
   const grouped = filtered.reduce((acc, p) => {
     const cat = p.category || p.tipeItem || 'Other'
     if (!acc[cat]) acc[cat] = []
@@ -253,7 +251,6 @@ function ProductCatalogModal({ products, onDone, onClose, initialSelected = [] }
       background: '#faf9f7', display: 'flex', flexDirection: 'column',
       fontFamily: "'Sora', sans-serif",
     }}>
-      {/* Header */}
       <div style={{
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         padding: '20px 32px 16px',
@@ -285,7 +282,6 @@ function ProductCatalogModal({ products, onDone, onClose, initialSelected = [] }
         </div>
       </div>
 
-      {/* Search */}
       <div style={{ padding: '14px 32px', background: '#faf9f7', borderBottom: '1px solid #e8e5df' }}>
         <input
           value={search} onChange={e => setSearch(e.target.value)}
@@ -299,14 +295,12 @@ function ProductCatalogModal({ products, onDone, onClose, initialSelected = [] }
         />
       </div>
 
-      {/* Product list */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '0 32px 32px' }}>
         {Object.keys(grouped).length === 0 ? (
           <p style={{ padding: '3rem', textAlign: 'center', color: '#a89f91', fontSize: '0.9rem' }}>No products found.</p>
         ) : (
           Object.entries(grouped).map(([category, items]) => (
             <div key={category}>
-              {/* Category header */}
               <div style={{
                 padding: '16px 0 10px',
                 borderBottom: '1px solid #e8e5df',
@@ -376,7 +370,7 @@ function ProductCatalogModal({ products, onDone, onClose, initialSelected = [] }
                         <span style={{
                           fontSize: '0.72rem', color: '#a89f91', minWidth: '60px', textAlign: 'right',
                           letterSpacing: '0.06em',
-                        }}>NO ·</span>
+                        }}>TAP TO ADD</span>
                       )}
                     </div>
                   </div>
@@ -407,9 +401,8 @@ export default function ClientDetailPage() {
   const [comment, setComment]       = useState('')
   const [comments, setComments]     = useState([])
 
-  // ── Persistent cart state ────────────────────────────────────────────────
   const [cartItems, setCartItems]   = useState([])
-  const [cartSaved, setCartSaved]   = useState(true)   // true = no unsaved changes
+  const [cartSaved, setCartSaved]   = useState(true)
   const [cartSaving, setCartSaving] = useState(false)
 
   const [products, setProducts]     = useState([])
@@ -445,7 +438,6 @@ export default function ClientDetailPage() {
     })
     setComments(c.comments     || [])
     setVisits(c.visitHistory   || [])
-    // ── Load persisted cart from customer record ──
     if (c.draftCart && c.draftCart.length > 0) {
       setCartItems(c.draftCart)
     }
@@ -471,13 +463,11 @@ export default function ClientDetailPage() {
   useEffect(() => { fetchQuotations() }, [fetchQuotations])
   useEffect(() => { if (activeTab === 'quotations') fetchQuotations() }, [activeTab, fetchQuotations])
 
-  // ── Mark cart dirty whenever items change ────────────────────────────────
   function markCartDirty(newItems) {
     setCartItems(newItems)
     setCartSaved(false)
   }
 
-  // ── Save cart to MongoDB ──────────────────────────────────────────────────
   async function saveCart() {
     setCartSaving(true)
     await fetch(`/api/maintenance/${id}`, {
@@ -511,9 +501,7 @@ export default function ClientDetailPage() {
     setComment('')
   }
 
-  // ── Catalog done → merge into cart ───────────────────────────────────────
   function handleCatalogDone(selectedProducts) {
-    // Merge: keep manually added items, replace product-sourced items
     const manualItems = cartItems.filter(i => !i.productId)
     const merged = [...manualItems, ...selectedProducts]
     markCartDirty(merged)
@@ -591,11 +579,21 @@ export default function ClientDetailPage() {
     setTimeout(() => { win.print() }, 600)
 
     setGenerating(false)
-    // DO NOT clear cart — user may want to reuse or reference it
     setCartSaved(true)
-    // Switch to quotations tab so user sees the newly created quotation
     setActiveTab('quotations')
     fetchQuotations()
+  }
+
+  // ── Print PDF for a draft (cart) — no refNo yet ───────────────────────────
+  async function generateDraftPDF() {
+    if (cartItems.length === 0) return
+    const logoBase64 = await fetchLogoBase64()
+    const html = generatePDFHTML(customer, cartItems, { refNo: 'DRAFT' }, logoBase64)
+    const win  = window.open('', '_blank')
+    if (!win) { alert('Popup was blocked.'); return }
+    win.document.write(html)
+    win.document.close()
+    setTimeout(() => win.print(), 600)
   }
 
   async function reprintPDF(q) {
@@ -661,7 +659,6 @@ export default function ClientDetailPage() {
     fetchCustomer()
   }
 
-  // ── Quotation status update ────────────────────────────────────────────────
   async function updateQuotationStatus(quotId, status) {
     await fetch(`/api/quotations/${quotId}`, {
       method: 'PATCH',
@@ -685,9 +682,12 @@ export default function ClientDetailPage() {
 
   const TABS = ['overview', 'cart', 'visit history', 'quotations']
 
+  // ── Draft row: cart items shown in Quotations tab ─────────────────────────
+  const hasDraftCart = cartItems.length > 0
+  const draftTotal   = cartGrand
+
   return (
     <>
-      {/* Catalog Modal */}
       {showCatalog && (
         <ProductCatalogModal
           products={products}
@@ -752,7 +752,7 @@ export default function ClientDetailPage() {
               fontFamily: "'Sora', sans-serif", marginBottom: '-1px',
             }}>
               {tab === 'quotations'
-                ? `QUOTATIONS${quotations.length > 0 ? ` (${quotations.length})` : ''}`
+                ? `QUOTATIONS${(quotations.length + (hasDraftCart ? 1 : 0)) > 0 ? ` (${quotations.length + (hasDraftCart ? 1 : 0)})` : ''}`
                 : tab === 'cart'
                   ? `CART${cartItems.length > 0 ? ` (${cartItems.length})` : ''}`
                   : tab.toUpperCase()}
@@ -854,7 +854,6 @@ export default function ClientDetailPage() {
               </button>
 
               <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px', alignItems: 'center' }}>
-                {/* Save Cart button */}
                 {cartItems.length > 0 && (
                   <button
                     onClick={saveCart}
@@ -879,7 +878,6 @@ export default function ClientDetailPage() {
               </div>
             </div>
 
-            {/* Unsaved notice */}
             {!cartSaved && cartItems.length > 0 && (
               <div style={{
                 background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '8px',
@@ -1102,7 +1100,7 @@ export default function ClientDetailPage() {
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <p style={{ color: '#6b7280', fontSize: '0.85rem', margin: 0 }}>
-                {quotations.length} quotation{quotations.length !== 1 ? 's' : ''} for <strong>{customer.customerName}</strong>
+                {quotations.length + (hasDraftCart ? 1 : 0)} quotation{(quotations.length + (hasDraftCart ? 1 : 0)) !== 1 ? 's' : ''} for <strong>{customer.customerName}</strong>
               </p>
               <button onClick={() => setActiveTab('cart')} style={darkBtn}>+ New Quote</button>
             </div>
@@ -1111,7 +1109,7 @@ export default function ClientDetailPage() {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                 <thead>
                   <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-                    {['REF NO.', 'DATE', 'ITEMS', 'AMOUNT (incl. PPN)', 'STATUS', 'DOWNLOAD'].map(h => (
+                    {['REF NO.', 'CLIENT', 'DATE', 'ITEMS', 'AMOUNT (incl. PPN)', 'STATUS', 'ACTIONS'].map(h => (
                       <th key={h} style={{
                         padding: '11px 16px', textAlign: 'left', color: '#9ca3af',
                         fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase',
@@ -1121,74 +1119,175 @@ export default function ClientDetailPage() {
                 </thead>
                 <tbody>
                   {qLoading ? (
-                    <tr><td colSpan={6} style={{ padding: '2.5rem', textAlign: 'center', color: '#9ca3af' }}>Loading...</td></tr>
-                  ) : quotations.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: '#9ca3af' }}>
-                        <p style={{ margin: '0 0 6px', fontSize: '0.9rem' }}>No quotations yet.</p>
-                        <p style={{ margin: 0, fontSize: '0.8rem' }}>Generate one from the Cart tab.</p>
-                      </td>
-                    </tr>
-                  ) : quotations.map((q, i) => (
-                    <tr key={q._id} style={{
-                      borderBottom: i < quotations.length - 1 ? '1px solid #f3f4f6' : 'none',
-                      background: i % 2 === 0 ? '#fff' : '#fafafa',
-                    }}>
-                      {/* REF NO */}
-                      <td style={{ padding: '13px 16px' }}>
-                        <span style={{ fontFamily: 'monospace', fontSize: '0.82rem', color: '#b45309', fontWeight: 700 }}>
-                          {q.refNo || '—'}
-                        </span>
-                      </td>
-                      {/* DATE */}
-                      <td style={{ padding: '13px 16px', color: '#374151', fontSize: '0.84rem' }}>
-                        {fmt(q.quoteDate || q.createdAt)}
-                      </td>
-                      {/* ITEMS */}
-                      <td style={{ padding: '13px 16px', color: '#6b7280', fontSize: '0.83rem' }}>
-                        {q.items?.length || 0} item{(q.items?.length || 0) !== 1 ? 's' : ''}
-                      </td>
-                      {/* AMOUNT */}
-                      <td style={{ padding: '13px 16px' }}>
-                        <span style={{ fontWeight: 700, color: '#111', fontSize: '0.9rem' }}>
-                          {fmtRp(q.grandTotal || ((q.items || []).reduce((s, it) => s + ((it.jumlahUnit || 1) * (it.hargaPerUnit || 0)), 0) * 1.11))}
-                        </span>
-                      </td>
-                      {/* STATUS */}
-                      <td style={{ padding: '13px 16px' }}>
-                        <select
-                          value={q.status || 'Draft'}
-                          onChange={e => updateQuotationStatus(q._id, e.target.value)}
-                          style={{
-                            padding: '4px 10px', borderRadius: '20px', fontSize: '0.73rem',
-                            fontWeight: 600, border: '1px solid', cursor: 'pointer',
-                            fontFamily: "'Sora', sans-serif",
-                            background: q.status === 'Paid' ? '#f0fdf4' : q.status === 'Sent' ? '#eff6ff' : q.status === 'Cancelled' ? '#fef2f2' : '#f9fafb',
-                            color: q.status === 'Paid' ? '#16a34a' : q.status === 'Sent' ? '#2563eb' : q.status === 'Cancelled' ? '#dc2626' : '#6b7280',
-                            borderColor: q.status === 'Paid' ? '#bbf7d0' : q.status === 'Sent' ? '#bfdbfe' : q.status === 'Cancelled' ? '#fecaca' : '#e5e7eb',
-                          }}>
-                          {['Draft', 'Sent', 'Paid', 'Cancelled'].map(s => <option key={s}>{s}</option>)}
-                        </select>
-                      </td>
-                      {/* DOWNLOAD */}
-                      <td style={{ padding: '13px 16px' }}>
-                        <button
-                          title="Download / Print PDF"
-                          onClick={() => reprintPDF(q)}
-                          style={{
-                            display: 'inline-flex', alignItems: 'center', gap: '5px',
-                            padding: '6px 12px', border: '1px solid #e5e7eb', borderRadius: '6px',
-                            background: '#fff', color: '#374151', cursor: 'pointer',
-                            fontSize: '0.75rem', fontWeight: 600, fontFamily: "'Sora', sans-serif",
-                          }}
-                          onMouseEnter={e => { e.currentTarget.style.background = '#f9fafb'; e.currentTarget.style.borderColor = '#d1d5db' }}
-                          onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e5e7eb' }}
-                        >
-                          ⬇ PDF
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                    <tr><td colSpan={7} style={{ padding: '2.5rem', textAlign: 'center', color: '#9ca3af' }}>Loading...</td></tr>
+                  ) : (
+                    <>
+                      {/* ── Draft row from Cart ── */}
+                      {hasDraftCart && (
+                        <tr style={{ background: '#fffdf5', borderBottom: '1px solid #f3f4f6' }}>
+                          {/* REF NO */}
+                          <td style={{ padding: '13px 16px' }}>
+                            <span style={{
+                              display: 'inline-flex', alignItems: 'center', gap: '6px',
+                              fontFamily: 'monospace', fontSize: '0.82rem', color: '#92400e', fontWeight: 700,
+                            }}>
+                              DRAFT
+                              <span style={{
+                                fontSize: '0.62rem', background: '#fef3c7', color: '#92400e',
+                                border: '1px solid #fde68a', borderRadius: '4px',
+                                padding: '1px 6px', fontFamily: "'Sora', sans-serif", fontWeight: 600,
+                                letterSpacing: '0.06em',
+                              }}>CART</span>
+                            </span>
+                          </td>
+                          {/* CLIENT */}
+                          <td style={{ padding: '13px 16px', color: '#374151', fontSize: '0.84rem', fontWeight: 500 }}>
+                            {customer.customerName}
+                          </td>
+                          {/* DATE */}
+                          <td style={{ padding: '13px 16px', color: '#374151', fontSize: '0.84rem' }}>
+                            {fmt(new Date().toISOString())}
+                          </td>
+                          {/* ITEMS */}
+                          <td style={{ padding: '13px 16px', color: '#6b7280', fontSize: '0.83rem' }}>
+                            {cartItems.length} item{cartItems.length !== 1 ? 's' : ''}
+                          </td>
+                          {/* AMOUNT */}
+                          <td style={{ padding: '13px 16px' }}>
+                            <span style={{ fontWeight: 700, color: '#111', fontSize: '0.9rem' }}>
+                              {fmtRp(draftTotal)}
+                            </span>
+                          </td>
+                          {/* STATUS */}
+                          <td style={{ padding: '13px 16px' }}>
+                            <span style={{
+                              padding: '4px 10px', borderRadius: '20px', fontSize: '0.73rem',
+                              fontWeight: 600, border: '1px solid #fde68a',
+                              background: '#fef9ee', color: '#92400e',
+                              fontFamily: "'Sora', sans-serif",
+                            }}>
+                              Draft
+                            </span>
+                          </td>
+                          {/* ACTIONS */}
+                          <td style={{ padding: '13px 16px' }}>
+                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                              {/* Edit cart */}
+                              <button
+                                title="Edit cart"
+                                onClick={() => setActiveTab('cart')}
+                                style={{
+                                  display: 'inline-flex', alignItems: 'center', gap: '4px',
+                                  padding: '6px 10px', border: '1px solid #e5e7eb', borderRadius: '6px',
+                                  background: '#fff', color: '#374151', cursor: 'pointer',
+                                  fontSize: '0.75rem', fontWeight: 600, fontFamily: "'Sora', sans-serif",
+                                }}>
+                                ✏
+                              </button>
+                              {/* Print draft PDF */}
+                              <button
+                                title="Print draft PDF"
+                                onClick={generateDraftPDF}
+                                style={{
+                                  display: 'inline-flex', alignItems: 'center', gap: '4px',
+                                  padding: '6px 10px', border: '1px solid #e5e7eb', borderRadius: '6px',
+                                  background: '#fff', color: '#374151', cursor: 'pointer',
+                                  fontSize: '0.75rem', fontWeight: 600, fontFamily: "'Sora', sans-serif",
+                                }}>
+                                ⬇ PDF
+                              </button>
+                              {/* Confirm & save as real quotation */}
+                              <button
+                                title="Confirm & save quotation"
+                                onClick={generatePDF}
+                                disabled={generatingPDF}
+                                style={{
+                                  display: 'inline-flex', alignItems: 'center', gap: '4px',
+                                  padding: '6px 12px', border: 'none', borderRadius: '6px',
+                                  background: '#CC2020', color: '#fff', cursor: 'pointer',
+                                  fontSize: '0.75rem', fontWeight: 700, fontFamily: "'Sora', sans-serif",
+                                }}>
+                                {generatingPDF ? '...' : '📄 Confirm'}
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+
+                      {/* ── Saved quotations ── */}
+                      {quotations.length === 0 && !hasDraftCart ? (
+                        <tr>
+                          <td colSpan={7} style={{ padding: '3rem', textAlign: 'center', color: '#9ca3af' }}>
+                            <p style={{ margin: '0 0 6px', fontSize: '0.9rem' }}>No quotations yet.</p>
+                            <p style={{ margin: 0, fontSize: '0.8rem' }}>Add items to Cart to get started.</p>
+                          </td>
+                        </tr>
+                      ) : quotations.map((q, i) => (
+                        <tr key={q._id} style={{
+                          borderBottom: i < quotations.length - 1 ? '1px solid #f3f4f6' : 'none',
+                          background: i % 2 === 0 ? '#fff' : '#fafafa',
+                        }}>
+                          {/* REF NO */}
+                          <td style={{ padding: '13px 16px' }}>
+                            <span style={{ fontFamily: 'monospace', fontSize: '0.82rem', color: '#b45309', fontWeight: 700 }}>
+                              {q.refNo || '—'}
+                            </span>
+                          </td>
+                          {/* CLIENT */}
+                          <td style={{ padding: '13px 16px', color: '#374151', fontSize: '0.84rem', fontWeight: 500 }}>
+                            {customer.customerName}
+                          </td>
+                          {/* DATE */}
+                          <td style={{ padding: '13px 16px', color: '#374151', fontSize: '0.84rem' }}>
+                            {fmt(q.quoteDate || q.createdAt)}
+                          </td>
+                          {/* ITEMS */}
+                          <td style={{ padding: '13px 16px', color: '#6b7280', fontSize: '0.83rem' }}>
+                            {q.items?.length || 0} item{(q.items?.length || 0) !== 1 ? 's' : ''}
+                          </td>
+                          {/* AMOUNT */}
+                          <td style={{ padding: '13px 16px' }}>
+                            <span style={{ fontWeight: 700, color: '#111', fontSize: '0.9rem' }}>
+                              {fmtRp(q.grandTotal || ((q.items || []).reduce((s, it) => s + ((it.jumlahUnit || 1) * (it.hargaPerUnit || 0)), 0) * 1.11))}
+                            </span>
+                          </td>
+                          {/* STATUS */}
+                          <td style={{ padding: '13px 16px' }}>
+                            <select
+                              value={q.status || 'Draft'}
+                              onChange={e => updateQuotationStatus(q._id, e.target.value)}
+                              style={{
+                                padding: '4px 10px', borderRadius: '20px', fontSize: '0.73rem',
+                                fontWeight: 600, border: '1px solid', cursor: 'pointer',
+                                fontFamily: "'Sora', sans-serif",
+                                background: q.status === 'Paid' ? '#f0fdf4' : q.status === 'Sent' ? '#eff6ff' : q.status === 'Cancelled' ? '#fef2f2' : '#f9fafb',
+                                color: q.status === 'Paid' ? '#16a34a' : q.status === 'Sent' ? '#2563eb' : q.status === 'Cancelled' ? '#dc2626' : '#6b7280',
+                                borderColor: q.status === 'Paid' ? '#bbf7d0' : q.status === 'Sent' ? '#bfdbfe' : q.status === 'Cancelled' ? '#fecaca' : '#e5e7eb',
+                              }}>
+                              {['Draft', 'Sent', 'Paid', 'Cancelled'].map(s => <option key={s}>{s}</option>)}
+                            </select>
+                          </td>
+                          {/* ACTIONS */}
+                          <td style={{ padding: '13px 16px' }}>
+                            <button
+                              title="Download / Print PDF"
+                              onClick={() => reprintPDF(q)}
+                              style={{
+                                display: 'inline-flex', alignItems: 'center', gap: '5px',
+                                padding: '6px 12px', border: '1px solid #e5e7eb', borderRadius: '6px',
+                                background: '#fff', color: '#374151', cursor: 'pointer',
+                                fontSize: '0.75rem', fontWeight: 600, fontFamily: "'Sora', sans-serif",
+                              }}
+                              onMouseEnter={e => { e.currentTarget.style.background = '#f9fafb'; e.currentTarget.style.borderColor = '#d1d5db' }}
+                              onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e5e7eb' }}
+                            >
+                              ⬇ PDF
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </>
+                  )}
                 </tbody>
               </table>
             </div>
