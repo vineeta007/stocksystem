@@ -47,23 +47,40 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
   const ppn        = Math.round(totalBiaya * 0.11)
   const grand      = totalBiaya + ppn
   const today      = new Date()
-  const dateStr    = today.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '.')
-  const refNo      = formatRefNo(quotation?.refNo) || `KL/1-${dateStr.replace(/\./g, '')}/P`
+  const dd   = String(today.getDate()).padStart(2, '0')
+  const mm   = String(today.getMonth() + 1).padStart(2, '0')
+  const yyyy = today.getFullYear()
+  const dateStr = `${dd}.${mm}.${yyyy}`
+  const refNo = formatRefNo(quotation?.refNo) || '—'
 
   const rows = items.map((item, i) => `
     <tr>
-      <td style="text-align:center">${i + 1}</td>
-      <td>${item.nama || ''}</td>
-      <td style="text-align:center">${item.jumlahUnit || 1}</td>
-      <td style="text-align:center">${item.tipe || 'Service'}</td>
-      <td style="text-align:right">Rp ${Number(item.hargaPerUnit || 0).toLocaleString('id-ID')}</td>
-      <td style="text-align:right">Rp ${Number((item.jumlahUnit || 1) * (item.hargaPerUnit || 0)).toLocaleString('id-ID')}</td>
+      <td style="text-align:center; padding:10px 8px; border-bottom:1px solid #e5e7eb;">${i + 1}</td>
+      <td style="padding:10px 8px; border-bottom:1px solid #e5e7eb; font-weight:600;">${item.nama || ''}</td>
+      <td style="text-align:center; padding:10px 8px; border-bottom:1px solid #e5e7eb;">${item.jumlahUnit || 1}</td>
+      <td style="text-align:center; padding:10px 8px; border-bottom:1px solid #e5e7eb;">${item.tipe || 'Service'}</td>
+      <td style="padding:10px 8px; border-bottom:1px solid #e5e7eb;">
+        <table style="width:100%; border-collapse:collapse;">
+          <tr>
+            <td style="width:20px; color:#333;">Rp</td>
+            <td style="text-align:right; color:#333;">${Number(item.hargaPerUnit || 0).toLocaleString('id-ID')}</td>
+          </tr>
+        </table>
+      </td>
+      <td style="padding:10px 8px; border-bottom:1px solid #e5e7eb;">
+        <table style="width:100%; border-collapse:collapse;">
+          <tr>
+            <td style="width:20px; color:#333;">Rp</td>
+            <td style="text-align:right; color:#333;">${Number((item.jumlahUnit || 1) * (item.hargaPerUnit || 0)).toLocaleString('id-ID')}</td>
+          </tr>
+        </table>
+      </td>
     </tr>
   `).join('')
 
   const logoHTML = logoBase64
-    ? `<img src="${logoBase64}" style="height:48px; object-fit:contain; display:block; margin-left:auto;" />`
-    : `<div style="font-size:18px;font-weight:700;color:#CC2020;">✕ KREATIV LIFT</div>`
+    ? `<img src="${logoBase64}" style="height:52px; object-fit:contain; display:block;" />`
+    : `<div style="font-size:22px; font-weight:800; color:#CC2020; letter-spacing:-0.5px;">✕ KREATIV LIFT</div>`
 
   return `<!DOCTYPE html>
 <html>
@@ -71,50 +88,48 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
 <meta charset="utf-8"/>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family: Arial, sans-serif; font-size: 11px; color: #000; padding: 30px 40px; }
-  .header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; }
+  body { font-family: Arial, sans-serif; font-size: 12px; color: #000; padding: 36px 48px; background: #fff; }
+  .header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; }
+  .to-block { font-size:12px; line-height:2; }
+  .to-block .name { font-size:13px; font-weight:700; }
   .logo-area { text-align:right; }
-  .logo-sub { font-size:9px; color:#555; letter-spacing:2px; margin-top:4px; text-align:right; }
-  .address-block { font-size:11px; line-height:1.8; }
-  .ref-block { display:flex; justify-content:flex-end; margin-top:14px; margin-bottom:4px; }
-  .ref-table { border-collapse:collapse; font-size:11px; }
-  .ref-table th { font-weight:700; padding:2px 16px 2px 0; text-align:left; }
-  .ref-table td { padding:2px 16px 2px 0; }
-  .perihal { margin:18px 0 6px; }
-  .perihal strong { text-decoration:underline; font-size:11px; }
-  .intro { margin-bottom:14px; line-height:1.8; font-size:11px; }
-  table.items { width:100%; border-collapse:collapse; margin-bottom:10px; }
-  table.items th {
-    background:#d0d0d0; border:1px solid #999; padding:6px;
-    text-align:center; font-size:10px; font-weight:700;
-  }
-  table.items td { border:1px solid #ccc; padding:5px 6px; font-size:10px; }
-  .total-table { margin-left:auto; border-collapse:collapse; font-size:11px; min-width:260px; }
-  .total-table td { padding:3px 6px; }
-  .total-table .lbl { text-align:right; font-weight:600; }
-  .total-table .grand { font-weight:700; }
-  .syarat { margin-top:16px; }
-  .syarat h4 { font-size:11px; font-weight:700; margin-bottom:6px; }
-  .syarat ol { padding-left:18px; line-height:1.9; font-size:11px; }
-  .payment { margin-top:14px; }
-  .payment h4 { font-size:11px; font-weight:700; margin-bottom:4px; }
-  .payment table td { padding:2px 0; font-size:11px; min-width:160px; }
-  .closing { margin-top:14px; line-height:1.8; font-size:11px; }
-  .sign-row { margin-top:40px; display:flex; justify-content:space-between; align-items:flex-end; }
-  .sign-block { font-size:11px; }
-  .sign-block .sig-img { height:60px; display:block; margin:8px 0 2px; }
-  .sign-block .name-line { font-weight:700; border-top:1px solid #000; padding-top:4px; display:inline-block; min-width:120px; font-size:11px; }
-  .footer-block { text-align:right; font-size:9px; color:#555; border-top:1px solid #ccc; padding-top:8px; line-height:1.8; }
-  .telp-line { margin-top:30px; display:flex; justify-content:space-between; font-size:9px; color:#555; border-top:1px solid #eee; padding-top:6px; }
-  @media print { body { padding:15px 20px; } }
+  .logo-sub { font-size:9.5px; color:#666; letter-spacing:2.5px; margin-top:5px; text-align:right; text-transform:uppercase; }
+  .up-line { font-size:12px; margin-bottom:20px; }
+  .ref-outer { display:flex; justify-content:flex-end; margin-bottom:18px; }
+  .ref-table { border-collapse:collapse; font-size:12px; }
+  .ref-table th { font-weight:700; padding:2px 24px 4px 0; text-align:left; font-size:12px; }
+  .ref-table td { padding:2px 24px 2px 0; font-size:12px; }
+  .perihal { font-size:12px; font-weight:700; text-decoration:underline; margin-bottom:16px; }
+  .intro { font-size:12px; line-height:2; margin-bottom:16px; }
+  table.items { width:100%; border-collapse:collapse; font-size:12px; }
+  table.items thead tr { background:#d0d0d0; }
+  table.items th { border:1px solid #aaa; padding:9px 8px; text-align:center; font-size:11.5px; font-weight:700; }
+  table.items tbody tr td { border-left:1px solid #ccc; border-right:1px solid #ccc; font-size:12px; }
+  table.items tbody tr:last-child td { border-bottom:1px solid #ccc; }
+  .syarat { margin-top:20px; font-size:12px; }
+  .syarat h4 { font-weight:700; font-size:12px; margin-bottom:6px; text-decoration:underline; }
+  .syarat ol { list-style:none; padding:0; margin:0; }
+  .syarat ol li { display:flex; gap:6px; padding:1px 0; line-height:1.85; }
+  .syarat ol li .num { min-width:22px; }
+  .payment { margin-top:16px; font-size:12px; }
+  .payment h4 { font-weight:700; font-size:12px; margin-bottom:6px; }
+  .payment table { border-collapse:collapse; }
+  .payment table td { padding:2px 0; vertical-align:top; font-size:12px; min-width:148px; line-height:1.9; }
+  .closing { margin-top:16px; font-size:12px; line-height:2; }
+  .sign-row { margin-top:36px; display:flex; justify-content:space-between; align-items:flex-end; }
+  .sign-left { font-size:12px; line-height:2; }
+  .sign-name { display:inline-block; font-weight:700; font-size:12px; border-top:1.5px solid #000; padding-top:4px; min-width:110px; margin-top:2px; }
+  .sign-right { text-align:right; font-size:11px; color:#333; line-height:1.9; }
+  .footer-line { margin-top:28px; display:flex; justify-content:space-between; font-size:9.5px; color:#666; border-top:1px solid #ddd; padding-top:7px; }
+  @media print { body { padding:18px 24px; } }
 </style>
 </head>
 <body>
 
   <div class="header">
-    <div class="address-block">
+    <div class="to-block">
       Kepada Yth,<br/>
-      <strong>${customer.customerName || ''}</strong><br/>
+      <span class="name">${customer.customerName || ''}</span><br/>
       ${customer.address || customer.kota || ''}
     </div>
     <div class="logo-area">
@@ -123,24 +138,18 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
     </div>
   </div>
 
-  <div style="font-size:11px; margin-bottom:10px;">U.P.</div>
+  <div class="up-line">U.P.</div>
 
-  <div class="ref-block">
+  <div class="ref-outer">
     <table class="ref-table">
-      <tr>
-        <th>No. Penawaran</th>
-        <th>Tanggal</th>
-      </tr>
-      <tr>
-        <td>${refNo}</td>
-        <td>${dateStr}</td>
-      </tr>
+      <thead><tr><th>No. Penawaran</th><th>Tanggal</th></tr></thead>
+      <tbody><tr><td>${refNo}</td><td>${dateStr}</td></tr></tbody>
     </table>
   </div>
 
-  <div class="perihal"><strong>Perihal: Penawaran Biaya Maintenance Per Kunjungan</strong></div>
+  <div class="perihal">Perihal: Penawaran Biaya Maintenance Per Kunjungan</div>
 
-  <div class="intro" style="margin-top:14px;">
+  <div class="intro">
     Dengan Hormat,<br/>
     Berikut kami sertakan &nbsp; rincian biaya untuk maitenance perkunjungan:
   </div>
@@ -148,38 +157,36 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
   <table class="items">
     <thead>
       <tr>
-        <th style="width:32px">No.</th>
-        <th>Nama</th>
-        <th style="width:64px">Jumlah Unit</th>
-        <th style="width:72px">Tipe</th>
-        <th style="width:140px">Harga per unit</th>
-        <th style="width:140px">Biaya</th>
+        <th style="width:38px;">No.</th>
+        <th style="text-align:left;">Nama</th>
+        <th style="width:70px;">Jumlah<br/>Unit</th>
+        <th style="width:80px;">Tipe</th>
+        <th style="width:160px;">Harga per unit</th>
+        <th style="width:160px;">Biaya</th>
       </tr>
     </thead>
-    <tbody>
-      ${rows}
-    </tbody>
+    <tbody>${rows}</tbody>
   </table>
 
-  <table style="width:100%; border-collapse:collapse;">
+  <table style="width:100%; border-collapse:collapse; font-size:12px;">
     <tr>
       <td style="border:none; width:55%;"></td>
-      <td style="border:none; padding:0;">
-        <table class="total-table">
+      <td style="border:none; padding:0; vertical-align:top;">
+        <table style="width:100%; border-collapse:collapse; font-size:12px; border:1px solid #ccc; border-top:none;">
           <tr>
-            <td class="lbl">Total Biaya :</td>
-            <td>Rp</td>
-            <td style="text-align:right">${Number(totalBiaya).toLocaleString('id-ID')}</td>
+            <td style="text-align:right; padding:6px 12px 3px; font-weight:600; white-space:nowrap;">Total Biaya :</td>
+            <td style="width:20px; padding:6px 4px 3px;">Rp</td>
+            <td style="text-align:right; padding:6px 12px 3px; min-width:110px;">${Number(totalBiaya).toLocaleString('id-ID')}</td>
           </tr>
           <tr>
-            <td class="lbl">PPN 11%</td>
-            <td>Rp</td>
-            <td style="text-align:right">${Number(ppn).toLocaleString('id-ID')}</td>
+            <td style="text-align:right; padding:3px 12px; font-weight:600; white-space:nowrap;">PPN 11%</td>
+            <td style="width:20px; padding:3px 4px;">Rp</td>
+            <td style="text-align:right; padding:3px 12px;">${Number(ppn).toLocaleString('id-ID')}</td>
           </tr>
-          <tr class="grand">
-            <td class="lbl">Jumlah Pembayaran :</td>
-            <td>Rp</td>
-            <td style="text-align:right">${Number(grand).toLocaleString('id-ID')}</td>
+          <tr>
+            <td style="text-align:right; padding:3px 12px 7px; font-weight:700; white-space:nowrap;">Jumlah Pembayaran :</td>
+            <td style="width:20px; padding:3px 4px 7px; font-weight:700;">Rp</td>
+            <td style="text-align:right; padding:3px 12px 7px; font-weight:700;">${Number(grand).toLocaleString('id-ID')}</td>
           </tr>
         </table>
       </td>
@@ -189,12 +196,12 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
   <div class="syarat">
     <h4>Syarat dan Kondisi :</h4>
     <ol>
-      <li>Harga sudah termasuk biaya akomodasi teknisi</li>
-      <li>Pembayaran 100% dimuka</li>
-      <li>Biaya Maintenance per sekali kunjungan</li>
-      <li>Garansi berlaku 3 bulan sejak maintenance.<br/>
-          Apabila terdapat oli rembes, tidak dikenakan biaya apa pun termasuk cleaning site.<br/>
-          Garansi akan berlanjut 3 bulan lagi sejak tanggal cleaning (jika diperlukan).</li>
+      <li><span class="num">1 .</span><span>Harga sudah termasuk biaya akomodasi teknisi</span></li>
+      <li><span class="num">2 .</span><span>Pembayaran 100% dimuka</span></li>
+      <li><span class="num">3 .</span><span>Biaya Maintenance per sekali kunjungan</span></li>
+      <li><span class="num">4 .</span><span>Garansi berlaku 3 bulan sejak maintenance.<br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Apabila terdapat oli rembes, tidak dikenakan biaya apa pun termasuk cleaning site.<br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Garansi akan berlanjut 3 bulan lagi sejak tanggal cleaning (jika diperlukan).</span></li>
     </ol>
   </div>
 
@@ -213,11 +220,11 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
   </div>
 
   <div class="sign-row">
-    <div class="sign-block">
-      Hormat kami,<br/><br/><br/><br/>
-      <span class="name-line">Asha Aranda</span>
+    <div class="sign-left">
+      Hormat kami,<br/><br/><br/><br/><br/>
+      <span class="sign-name">Asha Aranda</span>
     </div>
-    <div class="footer-block">
+    <div class="sign-right">
       PT. Inter Kreativ Lift Indonesia<br/>
       Ruko Commercial Kendington Blok C No. 10<br/>
       Kelapa Gading<br/>
@@ -225,7 +232,7 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
     </div>
   </div>
 
-  <div class="telp-line">
+  <div class="footer-line">
     <span>Telp. 021 - 2452 0983</span>
     <span>info@kreativlift.co.id</span>
   </div>
