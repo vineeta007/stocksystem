@@ -468,6 +468,7 @@ export default function ClientDetailPage() {
 
   useEffect(() => { fetchCustomer() }, [fetchCustomer])
   useEffect(() => { fetchProducts() }, [fetchProducts])
+  useEffect(() => { fetchQuotations() }, [fetchQuotations])
   useEffect(() => { if (activeTab === 'quotations') fetchQuotations() }, [activeTab, fetchQuotations])
 
   // ── Mark cart dirty whenever items change ────────────────────────────────
@@ -559,6 +560,9 @@ export default function ClientDetailPage() {
         clientAddress: customer.address,
         clientPhone:   customer.phone,
         project:       customer.unitType || customer.kota,
+        totalBiaya:    cartTotal,
+        ppn:           cartPPN,
+        grandTotal:    cartGrand,
         items:         cartItems.map((item, idx) => ({
           no:           idx + 1,
           nama:         item.nama,
@@ -586,16 +590,11 @@ export default function ClientDetailPage() {
     win.focus()
     setTimeout(() => { win.print() }, 600)
 
-    // Clear cart from DB after generating
-    await fetch(`/api/maintenance/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ draftCart: [] }),
-    })
-
     setGenerating(false)
-    setCartItems([])
+    // DO NOT clear cart — user may want to reuse or reference it
     setCartSaved(true)
+    // Switch to quotations tab so user sees the newly created quotation
+    setActiveTab('quotations')
     fetchQuotations()
   }
 
@@ -1101,9 +1100,9 @@ export default function ClientDetailPage() {
         {/* ── QUOTATIONS TAB ── */}
         {activeTab === 'quotations' && (
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <p style={{ color: '#6b7280', fontSize: '0.85rem' }}>
-                {quotations.length} quotation{quotations.length !== 1 ? 's' : ''} generated for {customer.customerName}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <p style={{ color: '#6b7280', fontSize: '0.85rem', margin: 0 }}>
+                {quotations.length} quotation{quotations.length !== 1 ? 's' : ''} for <strong>{customer.customerName}</strong>
               </p>
               <button onClick={() => setActiveTab('cart')} style={darkBtn}>+ New Quote</button>
             </div>
@@ -1112,62 +1111,81 @@ export default function ClientDetailPage() {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                 <thead>
                   <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-                    {['REF NO.','CLIENT','PROJECT','DATE','STATUS','AMOUNT','ACTIONS'].map(h => (
-                      <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: '#9ca3af',
-                        fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{h}</th>
+                    {['REF NO.', 'DATE', 'ITEMS', 'AMOUNT (incl. PPN)', 'STATUS', 'DOWNLOAD'].map(h => (
+                      <th key={h} style={{
+                        padding: '11px 16px', textAlign: 'left', color: '#9ca3af',
+                        fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase',
+                      }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {qLoading ? (
-                    <tr><td colSpan={7} style={{ padding: '2.5rem', textAlign: 'center', color: '#9ca3af' }}>Loading...</td></tr>
+                    <tr><td colSpan={6} style={{ padding: '2.5rem', textAlign: 'center', color: '#9ca3af' }}>Loading...</td></tr>
                   ) : quotations.length === 0 ? (
-                    <tr><td colSpan={7} style={{ padding: '2.5rem', textAlign: 'center', color: '#9ca3af' }}>No quotations yet.</td></tr>
+                    <tr>
+                      <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: '#9ca3af' }}>
+                        <p style={{ margin: '0 0 6px', fontSize: '0.9rem' }}>No quotations yet.</p>
+                        <p style={{ margin: 0, fontSize: '0.8rem' }}>Generate one from the Cart tab.</p>
+                      </td>
+                    </tr>
                   ) : quotations.map((q, i) => (
-                    <tr key={q._id} style={{ borderBottom: i < quotations.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
-                      {/* REF NO — styled like Image 3: amber/gold monospace */}
-                      <td style={{ padding: '12px 16px' }}>
-                        <span style={{
-                          fontFamily: 'monospace', fontSize: '0.8rem',
-                          color: '#b45309', fontWeight: 600,
-                        }}>{q.refNo}</span>
-                      </td>
-                      {/* CLIENT */}
-                      <td style={{ padding: '12px 16px', color: '#111', fontWeight: 500 }}>
-                        {q.clientName || customer.customerName}
-                      </td>
-                      {/* PROJECT */}
-                      <td style={{ padding: '12px 16px', color: '#374151' }}>
-                        {q.project || customer.unitType || '—'}
+                    <tr key={q._id} style={{
+                      borderBottom: i < quotations.length - 1 ? '1px solid #f3f4f6' : 'none',
+                      background: i % 2 === 0 ? '#fff' : '#fafafa',
+                    }}>
+                      {/* REF NO */}
+                      <td style={{ padding: '13px 16px' }}>
+                        <span style={{ fontFamily: 'monospace', fontSize: '0.82rem', color: '#b45309', fontWeight: 700 }}>
+                          {q.refNo || '—'}
+                        </span>
                       </td>
                       {/* DATE */}
-                      <td style={{ padding: '12px 16px', color: '#374151' }}>{fmt(q.quoteDate)}</td>
-                      {/* STATUS — inline dropdown */}
-                      <td style={{ padding: '12px 16px' }}>
+                      <td style={{ padding: '13px 16px', color: '#374151', fontSize: '0.84rem' }}>
+                        {fmt(q.quoteDate || q.createdAt)}
+                      </td>
+                      {/* ITEMS */}
+                      <td style={{ padding: '13px 16px', color: '#6b7280', fontSize: '0.83rem' }}>
+                        {q.items?.length || 0} item{(q.items?.length || 0) !== 1 ? 's' : ''}
+                      </td>
+                      {/* AMOUNT */}
+                      <td style={{ padding: '13px 16px' }}>
+                        <span style={{ fontWeight: 700, color: '#111', fontSize: '0.9rem' }}>
+                          {fmtRp(q.grandTotal || ((q.items || []).reduce((s, it) => s + ((it.jumlahUnit || 1) * (it.hargaPerUnit || 0)), 0) * 1.11))}
+                        </span>
+                      </td>
+                      {/* STATUS */}
+                      <td style={{ padding: '13px 16px' }}>
                         <select
                           value={q.status || 'Draft'}
                           onChange={e => updateQuotationStatus(q._id, e.target.value)}
                           style={{
-                            padding: '4px 8px', borderRadius: '6px', fontSize: '0.75rem',
-                            fontWeight: 600, border: '1px solid',
-                            fontFamily: "'Sora', sans-serif", cursor: 'pointer',
+                            padding: '4px 10px', borderRadius: '20px', fontSize: '0.73rem',
+                            fontWeight: 600, border: '1px solid', cursor: 'pointer',
+                            fontFamily: "'Sora', sans-serif",
                             background: q.status === 'Paid' ? '#f0fdf4' : q.status === 'Sent' ? '#eff6ff' : q.status === 'Cancelled' ? '#fef2f2' : '#f9fafb',
                             color: q.status === 'Paid' ? '#16a34a' : q.status === 'Sent' ? '#2563eb' : q.status === 'Cancelled' ? '#dc2626' : '#6b7280',
                             borderColor: q.status === 'Paid' ? '#bbf7d0' : q.status === 'Sent' ? '#bfdbfe' : q.status === 'Cancelled' ? '#fecaca' : '#e5e7eb',
                           }}>
-                          {['Draft','Sent','Paid','Cancelled'].map(s => <option key={s}>{s}</option>)}
+                          {['Draft', 'Sent', 'Paid', 'Cancelled'].map(s => <option key={s}>{s}</option>)}
                         </select>
                       </td>
-                      {/* AMOUNT — styled like Image 3 */}
-                      <td style={{ padding: '12px 16px', fontWeight: 700, color: '#111', fontSize: '0.88rem' }}>
-                        {fmtRp(q.grandTotal)}
-                      </td>
-                      {/* ACTIONS */}
-                      <td style={{ padding: '12px 16px' }}>
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                          <button title="Reprint PDF" onClick={() => reprintPDF(q)}
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', fontSize: '1rem' }}>⬇</button>
-                        </div>
+                      {/* DOWNLOAD */}
+                      <td style={{ padding: '13px 16px' }}>
+                        <button
+                          title="Download / Print PDF"
+                          onClick={() => reprintPDF(q)}
+                          style={{
+                            display: 'inline-flex', alignItems: 'center', gap: '5px',
+                            padding: '6px 12px', border: '1px solid #e5e7eb', borderRadius: '6px',
+                            background: '#fff', color: '#374151', cursor: 'pointer',
+                            fontSize: '0.75rem', fontWeight: 600, fontFamily: "'Sora', sans-serif",
+                          }}
+                          onMouseEnter={e => { e.currentTarget.style.background = '#f9fafb'; e.currentTarget.style.borderColor = '#d1d5db' }}
+                          onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e5e7eb' }}
+                        >
+                          ⬇ PDF
+                        </button>
                       </td>
                     </tr>
                   ))}
