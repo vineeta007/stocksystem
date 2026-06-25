@@ -138,8 +138,11 @@ export default function ExpensesPage() {
 
       {/* Filters */}
       <div style={{ padding: '14px 28px', borderBottom: `0.5px solid ${BORDER}`, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder={`Search ${CATEGORIES.find(c => c.key === activeCategory)?.label}...`}
-          style={{ background: '#111109', border: `0.5px solid ${BORDER}`, borderRadius: 3, padding: '7px 12px', color: TEXT, fontSize: 11, outline: 'none', width: 200 }} />
+        <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+  <span style={{ position: 'absolute', left: 9, color: MUTED, fontSize: 12, pointerEvents: 'none' }}>🔍</span>
+  <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search expenses..."
+    style={{ background: '#111109', border: `0.5px solid ${BORDER}`, borderRadius: 3, padding: '7px 12px 7px 28px', color: TEXT, fontSize: 11, outline: 'none', width: 200 }} />
+</div>
         <div style={{ display: 'flex', gap: 4, marginLeft: 'auto', flexWrap: 'wrap', alignItems: 'center' }}>
           <button onClick={openAdd}
             style={{ padding: '5px 12px', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', background: GOLD, color: '#0a0a07', border: 'none', borderRadius: 3, cursor: 'pointer', fontWeight: 700 }}>
