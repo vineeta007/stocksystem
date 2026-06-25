@@ -13,12 +13,6 @@ const _cache = {
   stats:     null,
 };
 
-const vendorFallback = [
-  { _id: '1', name: 'Paleo Enclosures',     type: 'Supplier' },
-  { _id: '2', name: 'Forty Cities Pvt Ltd', type: 'Distributor' },
-  { _id: '3', name: 'Online Minimum',       type: 'Online' },
-];
-
 const C = {
   base:    '#f5f5f5',
   card:    '#ffffff',
@@ -118,8 +112,7 @@ export default function Dashboard() {
   // Initialise from cache immediately — no loading flash on re-mount
   const [products,  setProducts]  = useState(_cache.products  ?? []);
   const [customers, setCustomers] = useState(_cache.customers ?? []);
-  const [vendors,   setVendors]   = useState(_cache.vendors   ?? vendorFallback);
-  const [lowStock,  setLowStock]  = useState(_cache.lowStock  ?? []);
+  const [vendors,   setVendors]   = useState(_cache.vendors   ?? []);  const [lowStock,  setLowStock]  = useState(_cache.lowStock  ?? []);
   const [stats,     setStats]     = useState(_cache.stats ?? null);
   const [loading,   setLoading]   = useState(_cache.products === null); // only show loading on first ever mount
 
@@ -130,10 +123,10 @@ export default function Dashboard() {
     async function load() {
       try {
         const [pRes, cRes, vRes] = await Promise.all([
-          fetch('/api/products'),
-          fetch('/api/maintenance'),
-          Promise.resolve(null),
-        ]);
+  fetch('/api/products'),
+  fetch('/api/maintenance'),
+  fetch('/api/vendors'),
+]);
 
         const pJson = await pRes.json();
         const cJson = await cRes.json();
@@ -166,7 +159,7 @@ export default function Dashboard() {
           status: (p.quantity ?? p.stock ?? 0) === 0 ? 'out' : 'low',
         }));
 
-        let vends = vendorFallback;
+        let vends = [];
         if (vRes && vRes.ok) {
           const vJson = await vRes.json();
           const raw = vJson.data || vJson.vendors || (Array.isArray(vJson) ? vJson : []);
@@ -177,7 +170,8 @@ export default function Dashboard() {
         _cache.products  = sortedProds;
         _cache.customers = sortedCusts;
         _cache.vendors   = vends;
-        _cache.lowStock  = lowList.length > 0 ? lowList : lowStockFallback;
+        _cache.lowStock  = lowList;
+
         _cache.stats     = newStats;
 
         // Update state
@@ -287,7 +281,7 @@ export default function Dashboard() {
             <ListRow
               key={v._id || i}
               primary={v.name || v.vendorName || '—'}
-              secondary={v.type || v.category || '—'}
+              secondary={v.speciality || '—'}
               dot={C.amber}
               last={i === vendors.length - 1}
             />
