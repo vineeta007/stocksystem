@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-const EMPTY = { name: '', phone: '', type: 'Supplier', email: '', address: '', notes: '' };
+const EMPTY = { name: '', phone: '', speciality: '', email: '', address: '', notes: '' };
 
 export default function VendorListPage() {
   const [vendors, setVendors] = useState([]);
@@ -44,7 +44,14 @@ export default function VendorListPage() {
 
   function handleEdit(v) {
     setEditId(v._id);
-    setForm({ name: v.name, phone: v.phone, type: v.type, email: v.email, address: v.address, notes: v.notes });
+    setForm({
+      name: v.name || '',
+      phone: v.phone || '',
+      speciality: v.speciality || '',
+      email: v.email || '',
+      address: v.address || '',
+      notes: v.notes || '',
+    });
     setShowForm(true);
   }
 
@@ -55,8 +62,8 @@ export default function VendorListPage() {
   }
 
   const filtered = vendors.filter(v =>
-    v.name.toLowerCase().includes(search.toLowerCase()) ||
-    (v.type || '').toLowerCase().includes(search.toLowerCase()) ||
+    (v.name || '').toLowerCase().includes(search.toLowerCase()) ||
+    (v.speciality || '').toLowerCase().includes(search.toLowerCase()) ||
     (v.address || '').toLowerCase().includes(search.toLowerCase())
   );
 
@@ -91,7 +98,7 @@ export default function VendorListPage() {
 
       {/* Search */}
       <input
-        placeholder="Search by name, type or address..."
+        placeholder="Search by name, speciality or address..."
         value={search}
         onChange={e => setSearch(e.target.value)}
         style={{
@@ -108,7 +115,7 @@ export default function VendorListPage() {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
           <thead>
             <tr style={{ background: '#f9f9f9' }}>
-              {['#', 'Name', 'Phone', 'Type', 'Email', 'Actions'].map(h => (
+              {['#', 'Name', 'Phone', 'Speciality', 'Email', 'Address', 'Notes', 'Actions'].map(h => (
                 <th key={h} style={{
                   color: '#888', padding: '12px 16px', textAlign: 'left',
                   fontWeight: 600, fontSize: '11px', textTransform: 'uppercase',
@@ -121,13 +128,13 @@ export default function VendorListPage() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: '#aaa', fontSize: '14px' }}>
+                <td colSpan={8} style={{ padding: '3rem', textAlign: 'center', color: '#aaa', fontSize: '14px' }}>
                   Loading...
                 </td>
               </tr>
             ) : filtered.length === 0 ? (
               <tr>
-                <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: '#aaa', fontSize: '14px' }}>
+                <td colSpan={8} style={{ padding: '3rem', textAlign: 'center', color: '#aaa', fontSize: '14px' }}>
                   No vendors yet. Click "+ Add Vendor" to get started.
                 </td>
               </tr>
@@ -141,12 +148,16 @@ export default function VendorListPage() {
                 <td style={{ padding: '13px 16px', fontWeight: 600, color: '#111' }}>{v.name}</td>
                 <td style={{ padding: '13px 16px', color: '#555' }}>{v.phone || '—'}</td>
                 <td style={{ padding: '13px 16px' }}>
-                  <span style={{
-                    background: 'rgba(29,158,117,0.12)', color: '#1D9E75',
-                    padding: '3px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: 600,
-                  }}>{v.type}</span>
+                  {v.speciality ? (
+                    <span style={{
+                      background: 'rgba(29,158,117,0.12)', color: '#1D9E75',
+                      padding: '3px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: 600,
+                    }}>{v.speciality}</span>
+                  ) : '—'}
                 </td>
                 <td style={{ padding: '13px 16px', color: '#555' }}>{v.email || '—'}</td>
+                <td style={{ padding: '13px 16px', color: '#555' }}>{v.address || '—'}</td>
+                <td style={{ padding: '13px 16px', color: '#555', maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v.notes || '—'}</td>
                 <td style={{ padding: '13px 16px' }}>
                   <div style={{ display: 'flex', gap: '6px' }}>
                     <button onClick={() => handleEdit(v)} style={{
@@ -182,6 +193,7 @@ export default function VendorListPage() {
             style={{
               background: '#fff', border: '1px solid #e0e0e0', borderRadius: '14px',
               width: '480px', maxWidth: '95vw', boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+              maxHeight: '90vh', overflowY: 'auto',
             }}
             onClick={e => e.stopPropagation()}
           >
@@ -195,6 +207,7 @@ export default function VendorListPage() {
               {[
                 { label: 'Name *', key: 'name', required: true, placeholder: 'Vendor name' },
                 { label: 'Phone', key: 'phone', placeholder: '+91 xxxxx xxxxx' },
+                { label: 'Speciality', key: 'speciality', placeholder: 'e.g. Flooring, Lighting...' },
                 { label: 'Email', key: 'email', placeholder: 'vendor@email.com' },
                 { label: 'Address', key: 'address', placeholder: 'City / full address' },
                 { label: 'Notes', key: 'notes', placeholder: 'Any extra info...' },
@@ -215,25 +228,6 @@ export default function VendorListPage() {
                   />
                 </label>
               ))}
-
-              {/* Type dropdown */}
-              <label style={{ display: 'flex', flexDirection: 'column', gap: '5px', fontSize: '12px', color: '#888', fontWeight: 600, fontFamily: "'Sora', sans-serif" }}>
-                Type
-                <select
-                  value={form.type}
-                  onChange={e => setForm({ ...form, type: e.target.value })}
-                  style={{
-                    padding: '9px 12px', borderRadius: '7px',
-                    border: '1px solid #e0e0e0', background: '#f9f9f9',
-                    color: '#111', fontSize: '14px', outline: 'none',
-                    fontFamily: "'Sora', sans-serif",
-                  }}
-                >
-                  {['Supplier', 'Distributor', 'Online', 'Other'].map(t => (
-                    <option key={t} value={t}>{t}</option>
-                  ))}
-                </select>
-              </label>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '4px' }}>
                 <button type="button" onClick={() => setShowForm(false)} style={{
