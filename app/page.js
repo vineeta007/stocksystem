@@ -132,7 +132,7 @@ export default function Dashboard() {
         const [pRes, cRes, vRes] = await Promise.all([
           fetch('/api/products'),
           fetch('/api/maintenance'),
-          fetch('/api/vendors').catch(() => null),
+          Promise.resolve(null),
         ]);
 
         const pJson = await pRes.json();
@@ -214,13 +214,13 @@ export default function Dashboard() {
           position: 'absolute', left: '50%', transform: 'translateX(-50%)',
         }}>Dashboard</h1>
         <div style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>
-          <Link href="/transactions?type=in" style={{
+          <Link href="/products" style={{
             display: 'flex', alignItems: 'center', gap: '6px',
             background: C.tealDim, border: `1px solid ${C.teal}`,
             color: C.teal, padding: '8px 16px', borderRadius: '8px',
             fontSize: '12px', fontWeight: 600, textDecoration: 'none',
           }}>↓ STOCK IN</Link>
-          <Link href="/transactions?type=out" style={{
+          <Link href="/products" style={{
             display: 'flex', alignItems: 'center', gap: '6px',
             background: C.redDim, border: `1px solid rgba(204,32,32,0.3)`,
             color: C.red, padding: '8px 16px', borderRadius: '8px',
