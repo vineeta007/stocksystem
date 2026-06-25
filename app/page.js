@@ -13,14 +13,6 @@ const _cache = {
   stats:     null,
 };
 
-const lowStockFallback = [
-  { id: 1, name: 'Swift S-Hook',   quantity: 3, status: 'low' },
-  { id: 2, name: 'Modular Elbow',  quantity: 3, status: 'low' },
-  { id: 3, name: 'D-Shackle 8mm', quantity: 2, status: 'low' },
-  { id: 4, name: 'Chain Warranty', quantity: 0, status: 'out' },
-  { id: 5, name: 'Flexa Par 130',  quantity: 1, status: 'low' },
-];
-
 const vendorFallback = [
   { _id: '1', name: 'Paleo Enclosures',     type: 'Supplier' },
   { _id: '2', name: 'Forty Cities Pvt Ltd', type: 'Distributor' },
@@ -127,8 +119,8 @@ export default function Dashboard() {
   const [products,  setProducts]  = useState(_cache.products  ?? []);
   const [customers, setCustomers] = useState(_cache.customers ?? []);
   const [vendors,   setVendors]   = useState(_cache.vendors   ?? vendorFallback);
-  const [lowStock,  setLowStock]  = useState(_cache.lowStock  ?? lowStockFallback);
-  const [stats,     setStats]     = useState(_cache.stats     ?? { total: 18, lowStock: 5, outOfStock: 2, transactions: 47 });
+  const [lowStock,  setLowStock]  = useState(_cache.lowStock  ?? []);
+  const [stats,     setStats]     = useState(_cache.stats ?? null);
   const [loading,   setLoading]   = useState(_cache.products === null); // only show loading on first ever mount
 
   useEffect(() => {
@@ -239,10 +231,10 @@ export default function Dashboard() {
 
       {/* ── Stat Cards ── */}
       <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
-        <StatCard label="Total Products" value={String(stats.total)}        sublabel="Active lines"   dotColor="green"  />
-        <StatCard label="Low Stock"      value={String(stats.lowStock)}      sublabel="Need attention" dotColor="orange" />
-        <StatCard label="Out of Stock"   value={String(stats.outOfStock)}    sublabel="Depleted items" dotColor="red"    />
-        <StatCard label="Transactions"   value={String(stats.transactions)}  sublabel="This month"     dotColor="blue"   />
+        <StatCard label="Total Products" value={stats ? String(stats.total) : "—"}        sublabel="Active lines"   dotColor="green"  />
+        <StatCard label="Low Stock"      value={stats ? String(stats.lowStock) : "—"}      sublabel="Need attention" dotColor="orange" />
+        <StatCard label="Out of Stock"   value={stats ? String(stats.outOfStock) : "—"}    sublabel="Depleted items" dotColor="red"    />
+        <StatCard label="Transactions"   value={stats ? String(stats.transactions) : "—"}  sublabel="This month"     dotColor="blue"   />
       </div>
 
       {/* ── Reminder Widget ── */}
