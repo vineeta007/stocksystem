@@ -281,7 +281,7 @@ export default function Dashboard() {
             <ListRow
               key={v._id || i}
               primary={v.name || v.vendorName || '—'}
-              secondary={v.speciality || '—'}
+             secondary={`${v.phone || '—'} · ${v.address || '—'}`}
               dot={C.amber}
               last={i === vendors.length - 1}
             />
