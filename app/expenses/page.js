@@ -6,7 +6,16 @@ const BORDER = '#1e1e16';
 const TEXT = '#d8d4c8';
 const FAINT = '#3a3830';
 const MUTED = '#6a6658';
-const EMPTY_FORM = { date: '', name: '', amount: '', details: '' };
+
+const CATEGORIES = [
+  { key: 'bank_payment',  label: 'Pembayaran Bank',     emoji: '🏦' },
+  { key: 'transport',     label: 'Tiket & Transport',   emoji: '✈️' },
+  { key: 'trucking',      label: 'Trucking & Expedisi', emoji: '🚚' },
+  { key: 'scaffolding',   label: 'Sewa Scaffolding',    emoji: '🏗️' },
+  { key: 'motor_rental',  label: 'Sewa Motor',          emoji: '🛵' },
+];
+
+const EMPTY_FORM = { date: '', name: '', amount: '', details: '', category: CATEGORIES[0].key };
 
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState([]);
@@ -17,6 +26,7 @@ export default function ExpensesPage() {
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState('');
   const [monthFilter, setMonthFilter] = useState('All');
+  const [activeCategory, setActiveCategory] = useState(CATEGORIES[0].key);
 
   async function fetchExpenses() {
     setLoading(true);
@@ -30,20 +40,20 @@ export default function ExpensesPage() {
 
   function openAdd() {
     setEditExpense(null);
-    setForm({ ...EMPTY_FORM, date: new Date().toISOString().slice(0, 10) });
+    setForm({ ...EMPTY_FORM, date: new Date().toISOString().slice(0, 10), category: activeCategory });
     setShowModal(true);
   }
 
   function openEdit(e) {
     setEditExpense(e);
-    setForm({ date: e.date?.slice(0, 10) || '', name: e.name, amount: String(e.amount), details: e.details || '' });
+    setForm({ date: e.date?.slice(0, 10) || '', name: e.name, amount: String(e.amount), details: e.details || '', category: e.category || CATEGORIES[0].key });
     setShowModal(true);
   }
 
   async function handleSave() {
     if (!form.name.trim() || !form.date || !form.amount) return alert('Date, name and amount are required');
     setSaving(true);
-    const payload = { date: form.date, name: form.name, amount: Number(form.amount) || 0, details: form.details };
+    const payload = { date: form.date, name: form.name, amount: Number(form.amount) || 0, details: form.details, category: form.category };
 
     if (editExpense) {
       const res = await fetch(`/api/expenses/${editExpense._id}`, {
@@ -70,45 +80,78 @@ export default function ExpensesPage() {
     fetchExpenses();
   }
 
-  const months = ['All', ...new Set(expenses.map(e => e.date?.slice(0, 7)).filter(Boolean))].sort().reverse();
-  const filtered = expenses.filter(e => {
+  // Filter by active category first, then search + month
+  const categoryExpenses = expenses.filter(e => (e.category || CATEGORIES[0].key) === activeCategory);
+  const months = ['All', ...new Set(categoryExpenses.map(e => e.date?.slice(0, 7)).filter(Boolean))].sort().reverse();
+  const filtered = categoryExpenses.filter(e => {
     const matchSearch = e.name.toLowerCase().includes(search.toLowerCase()) || (e.details || '').toLowerCase().includes(search.toLowerCase());
     const matchMonth = monthFilter === 'All' || e.date?.startsWith(monthFilter);
     return matchSearch && matchMonth;
   });
   const total = filtered.reduce((sum, e) => sum + (e.amount || 0), 0);
+  const grandTotal = expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
 
   function fmt(n) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n); }
   function fmtDate(d) { if (!d) return '—'; return new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }); }
 
   return (
     <div style={{ minHeight: '100vh', color: TEXT }}>
+
       {/* Header */}
-      <div style={{ padding: '18px 28px 14px', borderBottom: `0.5px solid ${BORDER}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-  <div style={{ flex: 1, textAlign: 'center', display: 'flex', justifyContent: 'center' }}>
-  <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 40, fontWeight: 700, color: '#000000', letterSpacing: '0.02em', display: 'flex', alignItems: 'center', gap: '10px' }}>💸 Expenses</div>
-</div>
-  <div style={{ display: 'flex', alignItems: 'center', gap: 8, position: 'absolute', right: 28 }}>
-    <span style={{ fontSize: 11, color: MUTED }}>
-      Total: <span style={{ color: '#e05050', fontFamily: 'Space Mono, monospace', fontWeight: 700 }}>{fmt(total)}</span>
-    </span>
-  </div>
-</div>
+      <div style={{ padding: '18px 28px 14px', borderBottom: `0.5px solid ${BORDER}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
+        <div style={{ flex: 1, textAlign: 'center', display: 'flex', justifyContent: 'center' }}>
+          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 40, fontWeight: 700, color: '#000000', letterSpacing: '0.02em', display: 'flex', alignItems: 'center', gap: '10px' }}>💸 Expenses</div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, position: 'absolute', right: 28 }}>
+          <span style={{ fontSize: 11, color: MUTED }}>
+            Category: <span style={{ color: '#e05050', fontFamily: 'Space Mono, monospace', fontWeight: 700 }}>{fmt(total)}</span>
+          </span>
+          <span style={{ fontSize: 11, color: MUTED }}>
+            Grand Total: <span style={{ color: '#e05050', fontFamily: 'Space Mono, monospace', fontWeight: 700 }}>{fmt(grandTotal)}</span>
+          </span>
+        </div>
+      </div>
+
+      {/* Category Tabs */}
+      <div style={{ padding: '0 28px', borderBottom: `0.5px solid ${BORDER}`, display: 'flex', gap: 0, overflowX: 'auto' }}>
+        {CATEGORIES.map(cat => {
+          const catTotal = expenses.filter(e => (e.category || CATEGORIES[0].key) === cat.key).reduce((s, e) => s + (e.amount || 0), 0);
+          const isActive = activeCategory === cat.key;
+          return (
+            <button key={cat.key} onClick={() => { setActiveCategory(cat.key); setMonthFilter('All'); }}
+              style={{
+                padding: '12px 18px', fontSize: 11, fontWeight: isActive ? 700 : 400,
+                color: isActive ? GOLD : MUTED,
+                background: 'transparent', border: 'none',
+                borderBottom: isActive ? `2px solid ${GOLD}` : '2px solid transparent',
+                cursor: 'pointer', whiteSpace: 'nowrap',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+                transition: 'all 0.15s',
+              }}>
+              <span style={{ fontSize: 16 }}>{cat.emoji}</span>
+              <span style={{ letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: 9 }}>{cat.label}</span>
+              <span style={{ fontSize: 8, color: isActive ? GOLD : FAINT, fontFamily: 'Space Mono, monospace' }}>{fmt(catTotal)}</span>
+            </button>
+          );
+        })}
+      </div>
 
       {/* Filters */}
       <div style={{ padding: '14px 28px', borderBottom: `0.5px solid ${BORDER}`, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-  <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search expenses..."
-    style={{ background: '#111109', border: `0.5px solid ${BORDER}`, borderRadius: 3, padding: '7px 12px', color: TEXT, fontSize: 11, outline: 'none', width: 200 }} />
-  <div style={{ display: 'flex', gap: 4, marginLeft: 'auto', flexWrap: 'wrap', alignItems: 'center' }}>
-    <button onClick={openAdd}
-      style={{ padding: '5px 12px', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', background: GOLD, color: '#0a0a07', border: 'none', borderRadius: 3, cursor: 'pointer', fontWeight: 700 }}>
-      + Add Expense
-    </button>
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder={`Search ${CATEGORIES.find(c => c.key === activeCategory)?.label}...`}
+          style={{ background: '#111109', border: `0.5px solid ${BORDER}`, borderRadius: 3, padding: '7px 12px', color: TEXT, fontSize: 11, outline: 'none', width: 200 }} />
+        <div style={{ display: 'flex', gap: 4, marginLeft: 'auto', flexWrap: 'wrap', alignItems: 'center' }}>
+          <button onClick={openAdd}
+            style={{ padding: '5px 12px', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', background: GOLD, color: '#0a0a07', border: 'none', borderRadius: 3, cursor: 'pointer', fontWeight: 700 }}>
+            + Add Expense
+          </button>
           {months.map(m => (
             <button key={m} onClick={() => setMonthFilter(m)}
-              style={{ padding: '5px 10px', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', borderRadius: 3, cursor: 'pointer',
+              style={{
+                padding: '5px 10px', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', borderRadius: 3, cursor: 'pointer',
                 background: monthFilter === m ? GOLD : 'transparent', color: monthFilter === m ? '#0a0a07' : MUTED,
-                border: `0.5px solid ${monthFilter === m ? GOLD : BORDER}`, fontWeight: monthFilter === m ? 600 : 400 }}>
+                border: `0.5px solid ${monthFilter === m ? GOLD : BORDER}`, fontWeight: monthFilter === m ? 600 : 400,
+              }}>
               {m === 'All' ? 'All' : new Date(m + '-01').toLocaleDateString('id-ID', { month: 'short', year: 'numeric' })}
             </button>
           ))}
@@ -151,7 +194,7 @@ export default function ExpensesPage() {
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={6} style={{ textAlign: 'center', padding: 48, color: MUTED }}>No expenses found</td></tr>
+                <tr><td colSpan={6} style={{ textAlign: 'center', padding: 48, color: MUTED }}>No expenses found for this category</td></tr>
               )}
             </tbody>
             {filtered.length > 0 && (
@@ -174,9 +217,21 @@ export default function ExpensesPage() {
             <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, color: TEXT, marginBottom: 24 }}>
               {editExpense ? 'Edit Expense' : 'Add Expense'}
             </div>
+
+            {/* Category selector in modal */}
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ fontSize: 9, letterSpacing: '0.15em', color: MUTED, textTransform: 'uppercase', marginBottom: 5 }}>Category *</div>
+              <select value={form.category} onChange={ev => setForm(prev => ({ ...prev, category: ev.target.value }))}
+                style={{ width: '100%', background: '#0d0d0b', border: `0.5px solid ${BORDER}`, borderRadius: 3, padding: '8px 12px', color: TEXT, fontSize: 12, outline: 'none', boxSizing: 'border-box', colorScheme: 'dark' }}>
+                {CATEGORIES.map(c => (
+                  <option key={c.key} value={c.key}>{c.emoji} {c.label}</option>
+                ))}
+              </select>
+            </div>
+
             {[
               { label: 'Date *', key: 'date', type: 'date' },
-              { label: 'Name *', key: 'name', placeholder: 'e.g. Customer Name' },
+              { label: 'Name *', key: 'name', placeholder: 'e.g. Bank BCA Transfer' },
               { label: 'Amount (IDR) *', key: 'amount', placeholder: '0', type: 'number' },
               { label: 'Details', key: 'details', placeholder: 'Optional notes...' },
             ].map(f => (
@@ -187,6 +242,7 @@ export default function ExpensesPage() {
                   style={{ width: '100%', background: '#0d0d0b', border: `0.5px solid ${BORDER}`, borderRadius: 3, padding: '8px 12px', color: TEXT, fontSize: 12, outline: 'none', boxSizing: 'border-box', colorScheme: 'dark' }} />
               </div>
             ))}
+
             <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
               <button onClick={handleSave} disabled={saving}
                 style={{ flex: 1, padding: '9px 0', background: GOLD, color: '#0a0a07', border: 'none', borderRadius: 3, fontWeight: 700, fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}>
