@@ -153,7 +153,7 @@ export default function Dashboard() {
           total: prods.length,
           lowStock: lowProds.length,
           outOfStock: outProds.length,
-          transactions: 47,
+          
         };
 
         const sortedProds = [...prods].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 7);
@@ -234,7 +234,6 @@ export default function Dashboard() {
         <StatCard label="Total Products" value={stats ? String(stats.total) : "—"}        sublabel="Active lines"   dotColor="green"  />
         <StatCard label="Low Stock"      value={stats ? String(stats.lowStock) : "—"}      sublabel="Need attention" dotColor="orange" />
         <StatCard label="Out of Stock"   value={stats ? String(stats.outOfStock) : "—"}    sublabel="Depleted items" dotColor="red"    />
-        <StatCard label="Transactions"   value={stats ? String(stats.transactions) : "—"}  sublabel="This month"     dotColor="blue"   />
       </div>
 
       {/* ── Reminder Widget ── */}
