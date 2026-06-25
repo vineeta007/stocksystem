@@ -1,17 +1,9 @@
 'use client';
-import StatCard from '@/components/StatCard';
+import { useState, useEffect } from 'react';
 import StockTable from '@/components/StockTable';
 import LowStockAlert from '@/components/LowStockAlert';
 import ReminderWidget from '@/components/ReminderWidget';
 import Link from 'next/link';
-
-const stockItems = [
-  { name: 'D-Shackle', category: null, qty: 42, maxQty: 50, status: 'IN STOCK' },
-  { name: 'Modular E. 300', category: null, qty: 3, maxQty: 50, status: 'LOW STOCK' },
-  { name: 'Flexa Par 100', category: 'PPE / Health', qty: 18, maxQty: 50, status: 'IN STOCK' },
-  { name: 'Emergency Key', category: 'Swift Parts', qty: 2, maxQty: 50, status: 'LOW STOCK' },
-  { name: 'Solarcraft Coil', category: 'Chain Warranty', qty: 0, maxQty: 50, status: 'OUT OF STOCK' },
-];
 
 const recentTransactions = [
   { type: 'in',  label: 'Swift S-Hook — Paleo Enclosures',   delta: '+15', time: '6 hours ago' },
@@ -27,6 +19,14 @@ const categoryStock = [
   { name: 'Lifting (ODM)',       qty: 12, max: 30 },
   { name: 'PPE / Health',        qty: 20, max: 30 },
   { name: 'Station Buttons',     qty: 24, max: 30 },
+];
+
+const stockItems = [
+  { name: 'D-Shackle',       category: null,             qty: 42, maxQty: 50, status: 'IN STOCK' },
+  { name: 'Modular E. 300',  category: null,             qty: 3,  maxQty: 50, status: 'LOW STOCK' },
+  { name: 'Flexa Par 100',   category: 'PPE / Health',   qty: 18, maxQty: 50, status: 'IN STOCK' },
+  { name: 'Emergency Key',   category: 'Swift Parts',    qty: 2,  maxQty: 50, status: 'LOW STOCK' },
+  { name: 'Solarcraft Coil', category: 'Chain Warranty', qty: 0,  maxQty: 50, status: 'OUT OF STOCK' },
 ];
 
 const lowStockAlerts = [
@@ -58,7 +58,151 @@ const C = {
   amberDim:  'rgba(217,119,6,0.1)',
 };
 
+function fmt(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+// ── Mini list card used for the 4 top cards ───────────────────────────────────
+function MiniCard({ title, color, dotColor, href, children, actionLabel = 'View All' }) {
+  return (
+    <div style={{
+      background: C.card,
+      border: `1px solid ${C.border}`,
+      borderRadius: '12px',
+      overflow: 'hidden',
+      boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+      display: 'flex',
+      flexDirection: 'column',
+    }}>
+      {/* colour top bar */}
+      <div style={{ height: '3px', background: color }} />
+      <div style={{ padding: '14px 16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {/* header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: color, display: 'inline-block' }} />
+            <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.12em', color: C.dim, fontWeight: 700 }}>
+              {title}
+            </span>
+          </div>
+          {href && (
+            <Link href={href} style={{ fontSize: '10px', color: C.red, textDecoration: 'none', fontWeight: 600 }}>
+              {actionLabel} →
+            </Link>
+          )}
+        </div>
+        {/* content */}
+        <div style={{ flex: 1, overflowY: 'auto', maxHeight: '160px' }}>
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Row inside a mini card ────────────────────────────────────────────────────
+function MiniRow({ left, right, sub, dot, last }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '7px 0',
+      borderBottom: last ? 'none' : `1px solid ${C.border}`,
+      gap: '8px',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '7px', minWidth: 0 }}>
+        {dot && (
+          <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: dot, flexShrink: 0 }} />
+        )}
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontSize: '11.5px', fontWeight: 600, color: C.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {left}
+          </div>
+          {sub && <div style={{ fontSize: '9.5px', color: C.dim, marginTop: '1px' }}>{sub}</div>}
+        </div>
+      </div>
+      <div style={{ fontSize: '10px', color: C.dim, flexShrink: 0, whiteSpace: 'nowrap' }}>{right}</div>
+    </div>
+  );
+}
+
+// ── Low stock badge row ───────────────────────────────────────────────────────
+function LowRow({ name, qty, status, last }) {
+  const isOut  = status === 'out' || qty === 0;
+  const color  = isOut ? C.red : C.amber;
+  const label  = isOut ? 'OUT' : 'LOW';
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '7px 0',
+      borderBottom: last ? 'none' : `1px solid ${C.border}`,
+    }}>
+      <div>
+        <div style={{ fontSize: '11.5px', fontWeight: 600, color: C.text }}>{name}</div>
+        <div style={{ fontSize: '9.5px', color: C.dim, marginTop: '1px' }}>Qty: {qty} remaining</div>
+      </div>
+      <span style={{
+        fontSize: '9px', fontWeight: 700, padding: '3px 7px',
+        borderRadius: '20px', letterSpacing: '0.08em',
+        background: isOut ? C.redDim : C.amberDim,
+        color,
+        border: `1px solid ${isOut ? 'rgba(204,32,32,0.2)' : 'rgba(217,119,6,0.25)'}`,
+      }}>{label}</span>
+    </div>
+  );
+}
+
 export default function Dashboard() {
+  const [products,  setProducts]  = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [vendors,   setVendors]   = useState([]);
+  const [lowStock,  setLowStock]  = useState(lowStockAlerts);
+  const [loading,   setLoading]   = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const [pRes, cRes, vRes] = await Promise.all([
+          fetch('/api/products'),
+          fetch('/api/maintenance'),
+          fetch('/api/vendors').catch(() => null),
+        ]);
+
+        const pJson = await pRes.json();
+        const cJson = await cRes.json();
+
+        const prods = pJson.data || pJson.products || [];
+        const custs = cJson.data || cJson.customers || cJson || [];
+
+        setProducts(Array.isArray(prods) ? prods.slice(0, 6) : []);
+        setCustomers(Array.isArray(custs) ? custs.slice(0, 6) : []);
+
+        // vendors — optional endpoint
+        if (vRes && vRes.ok) {
+          const vJson = await vRes.json();
+          const vends = vJson.data || vJson.vendors || vJson || [];
+          setVendors(Array.isArray(vends) ? vends.slice(0, 6) : []);
+        }
+
+        // low stock from products
+        const lowProds = prods.filter(p => (p.quantity ?? p.stock ?? 0) <= (p.minStock ?? p.lowStockThreshold ?? 5));
+        if (lowProds.length > 0) {
+          setLowStock(lowProds.slice(0, 5).map((p, i) => ({
+            id: p._id || i,
+            name: p.name,
+            quantity: p.quantity ?? p.stock ?? 0,
+            status: (p.quantity ?? p.stock ?? 0) === 0 ? 'out' : 'low',
+          })));
+        }
+      } catch (e) {
+        console.error('Dashboard load error:', e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
   return (
     <div style={{ padding: '0 24px 32px', background: C.base, minHeight: '100vh' }}>
 
@@ -98,12 +242,89 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ── Stat Cards ── */}
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
-        <StatCard label="Total Products" value="18" sublabel="Active lines"   dotColor="green"  />
-        <StatCard label="Low Stock"      value="5"  sublabel="Need attention" dotColor="orange" />
-        <StatCard label="Out of Stock"   value="2"  sublabel="Depleted items" dotColor="red"    />
-        <StatCard label="Transactions"   value="47" sublabel="This month"     dotColor="blue"   />
+      {/* ── 4 Content Cards (replacing stat cards) ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '16px' }}>
+
+        {/* 1 — Products */}
+        <MiniCard title="Products" color={C.teal} href="/products" actionLabel="View All">
+          {loading ? (
+            <div style={{ fontSize: '11px', color: C.dim, padding: '8px 0' }}>Loading...</div>
+          ) : products.length === 0 ? (
+            <div style={{ fontSize: '11px', color: C.dim, padding: '8px 0' }}>No products found.</div>
+          ) : products.map((p, i) => (
+            <MiniRow
+              key={p._id || i}
+              left={p.name}
+              sub={p.category || p.tipeItem || '—'}
+              right={fmt(p.createdAt)}
+              last={i === products.length - 1}
+            />
+          ))}
+        </MiniCard>
+
+        {/* 2 — Recent Customers */}
+        <MiniCard title="Recent Customers" color="#3b82f6" href="/maintenance" actionLabel="View All">
+          {loading ? (
+            <div style={{ fontSize: '11px', color: C.dim, padding: '8px 0' }}>Loading...</div>
+          ) : customers.length === 0 ? (
+            <div style={{ fontSize: '11px', color: C.dim, padding: '8px 0' }}>No customers found.</div>
+          ) : customers.map((c, i) => (
+            <MiniRow
+              key={c._id || i}
+              left={c.customerName || c.name || '—'}
+              sub={c.kota || c.address || '—'}
+              right={fmt(c.createdAt)}
+              dot="#3b82f6"
+              last={i === customers.length - 1}
+            />
+          ))}
+        </MiniCard>
+
+        {/* 3 — Vendors */}
+        <MiniCard title="Vendors" color={C.amber} href="/vendors" actionLabel="View All">
+          {loading ? (
+            <div style={{ fontSize: '11px', color: C.dim, padding: '8px 0' }}>Loading...</div>
+          ) : vendors.length === 0 ? (
+            /* fallback static list if no /api/vendors endpoint */
+            [
+              { name: 'Paleo Enclosures',   type: 'Supplier' },
+              { name: 'Forty Cities Pvt Ltd', type: 'Distributor' },
+              { name: 'Online Minimum',      type: 'Online' },
+            ].map((v, i, arr) => (
+              <MiniRow
+                key={i}
+                left={v.name}
+                sub={v.type}
+                dot={C.amber}
+                last={i === arr.length - 1}
+              />
+            ))
+          ) : vendors.map((v, i) => (
+            <MiniRow
+              key={v._id || i}
+              left={v.name || v.vendorName || '—'}
+              sub={v.type || v.category || '—'}
+              dot={C.amber}
+              last={i === vendors.length - 1}
+            />
+          ))}
+        </MiniCard>
+
+        {/* 4 — Low Stock Alerts */}
+        <MiniCard title="Low Stock Alerts" color={C.red} href="/products" actionLabel="Manage">
+          {lowStock.length === 0 ? (
+            <div style={{ fontSize: '11px', color: C.dim, padding: '8px 0' }}>All stock levels OK.</div>
+          ) : lowStock.map((a, i) => (
+            <LowRow
+              key={a.id}
+              name={a.name}
+              qty={a.quantity}
+              status={a.status}
+              last={i === lowStock.length - 1}
+            />
+          ))}
+        </MiniCard>
+
       </div>
 
       {/* ── Reminder Widget ── */}
