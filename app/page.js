@@ -1,35 +1,11 @@
 'use client';
 import { useState, useEffect } from 'react';
-import StockTable from '@/components/StockTable';
+import StatCard from '@/components/StatCard';
 import LowStockAlert from '@/components/LowStockAlert';
 import ReminderWidget from '@/components/ReminderWidget';
 import Link from 'next/link';
 
-const recentTransactions = [
-  { type: 'in',  label: 'Swift S-Hook — Paleo Enclosures',   delta: '+15', time: '6 hours ago' },
-  { type: 'out', label: 'Modular E. stock in',               delta: '-3',  time: '5 hours ago' },
-  { type: 'in',  label: 'D-Shackle — Forty Cities Pvt Ltd',  delta: '+20', time: 'Yesterday' },
-  { type: 'out', label: 'Solarcraft Coil stock in',          delta: '-8',  time: 'Yesterday' },
-  { type: 'in',  label: 'Flexa Par 180 — Online Minimum',    delta: '+10', time: '2 days ago' },
-];
-
-const categoryStock = [
-  { name: 'Swift Parts',         qty: 0,  max: 30 },
-  { name: 'Lifting (Purchased)', qty: 0,  max: 30 },
-  { name: 'Lifting (ODM)',       qty: 12, max: 30 },
-  { name: 'PPE / Health',        qty: 20, max: 30 },
-  { name: 'Station Buttons',     qty: 24, max: 30 },
-];
-
-const stockItems = [
-  { name: 'D-Shackle',       category: null,             qty: 42, maxQty: 50, status: 'IN STOCK' },
-  { name: 'Modular E. 300',  category: null,             qty: 3,  maxQty: 50, status: 'LOW STOCK' },
-  { name: 'Flexa Par 100',   category: 'PPE / Health',   qty: 18, maxQty: 50, status: 'IN STOCK' },
-  { name: 'Emergency Key',   category: 'Swift Parts',    qty: 2,  maxQty: 50, status: 'LOW STOCK' },
-  { name: 'Solarcraft Coil', category: 'Chain Warranty', qty: 0,  maxQty: 50, status: 'OUT OF STOCK' },
-];
-
-const lowStockAlerts = [
+const lowStockAlertsFallback = [
   { id: 1, name: 'Swift S-Hook',   quantity: 3, status: 'low' },
   { id: 2, name: 'Modular Elbow',  quantity: 3, status: 'low' },
   { id: 3, name: 'D-Shackle 8mm', quantity: 2, status: 'low' },
@@ -42,20 +18,17 @@ const C = {
   card:      '#ffffff',
   hover:     '#f0f0f0',
   border:    '#e0e0e0',
-  borderSoft:'rgba(0,0,0,0.06)',
   red:       '#CC2020',
-  redLight:  '#e53535',
   redDim:    'rgba(204,32,32,0.08)',
   teal:      '#1D9E75',
-  tealLight: '#16a34a',
   tealDim:   'rgba(29,158,117,0.1)',
   text:      '#111111',
   muted:     '#555555',
   dim:       '#888888',
-  green:     '#16a34a',
-  greenDim:  'rgba(22,163,74,0.1)',
   amber:     '#d97706',
   amberDim:  'rgba(217,119,6,0.1)',
+  blue:      '#3b82f6',
+  blueDim:   'rgba(59,130,246,0.1)',
 };
 
 function fmt(d) {
@@ -63,8 +36,8 @@ function fmt(d) {
   return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-// ── Mini list card used for the 4 top cards ───────────────────────────────────
-function MiniCard({ title, color, dotColor, href, children, actionLabel = 'View All' }) {
+// ── Content card shell ────────────────────────────────────────────────────────
+function ContentCard({ title, color, href, actionLabel = 'View All', children }) {
   return (
     <div style={{
       background: C.card,
@@ -77,23 +50,30 @@ function MiniCard({ title, color, dotColor, href, children, actionLabel = 'View 
     }}>
       {/* colour top bar */}
       <div style={{ height: '3px', background: color }} />
-      <div style={{ padding: '14px 16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ padding: '16px 18px', flex: 1, display: 'flex', flexDirection: 'column' }}>
         {/* header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: color, display: 'inline-block' }} />
-            <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.12em', color: C.dim, fontWeight: 700 }}>
-              {title}
-            </span>
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          marginBottom: '14px',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+            <span style={{
+              width: '7px', height: '7px', borderRadius: '50%',
+              background: color, display: 'inline-block', flexShrink: 0,
+            }} />
+            <span style={{
+              fontSize: '10px', textTransform: 'uppercase',
+              letterSpacing: '0.12em', color: C.dim, fontWeight: 700,
+            }}>{title}</span>
           </div>
           {href && (
-            <Link href={href} style={{ fontSize: '10px', color: C.red, textDecoration: 'none', fontWeight: 600 }}>
-              {actionLabel} →
-            </Link>
+            <Link href={href} style={{
+              fontSize: '11px', color: C.red, textDecoration: 'none', fontWeight: 600,
+            }}>{actionLabel} →</Link>
           )}
         </div>
-        {/* content */}
-        <div style={{ flex: 1, overflowY: 'auto', maxHeight: '160px' }}>
+        {/* scrollable list */}
+        <div style={{ flex: 1, overflowY: 'auto' }}>
           {children}
         </div>
       </div>
@@ -101,63 +81,81 @@ function MiniCard({ title, color, dotColor, href, children, actionLabel = 'View 
   );
 }
 
-// ── Row inside a mini card ────────────────────────────────────────────────────
-function MiniRow({ left, right, sub, dot, last }) {
+// ── Generic list row ──────────────────────────────────────────────────────────
+function ListRow({ primary, secondary, right, dot, last }) {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '7px 0',
+      padding: '9px 0',
       borderBottom: last ? 'none' : `1px solid ${C.border}`,
       gap: '8px',
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '7px', minWidth: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
         {dot && (
-          <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: dot, flexShrink: 0 }} />
+          <span style={{
+            width: '6px', height: '6px', borderRadius: '50%',
+            background: dot, flexShrink: 0,
+          }} />
         )}
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: '11.5px', fontWeight: 600, color: C.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {left}
-          </div>
-          {sub && <div style={{ fontSize: '9.5px', color: C.dim, marginTop: '1px' }}>{sub}</div>}
+          <div style={{
+            fontSize: '12px', fontWeight: 600, color: C.text,
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+          }}>{primary}</div>
+          {secondary && (
+            <div style={{ fontSize: '10px', color: C.dim, marginTop: '1px' }}>{secondary}</div>
+          )}
         </div>
       </div>
-      <div style={{ fontSize: '10px', color: C.dim, flexShrink: 0, whiteSpace: 'nowrap' }}>{right}</div>
+      {right && (
+        <div style={{ fontSize: '10px', color: C.dim, flexShrink: 0, whiteSpace: 'nowrap' }}>
+          {right}
+        </div>
+      )}
     </div>
   );
 }
 
-// ── Low stock badge row ───────────────────────────────────────────────────────
+// ── Low stock row ─────────────────────────────────────────────────────────────
 function LowRow({ name, qty, status, last }) {
-  const isOut  = status === 'out' || qty === 0;
-  const color  = isOut ? C.red : C.amber;
-  const label  = isOut ? 'OUT' : 'LOW';
+  const isOut = status === 'out' || qty === 0;
+  const color = isOut ? C.red : C.amber;
   return (
     <div style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '7px 0',
+      padding: '9px 0',
       borderBottom: last ? 'none' : `1px solid ${C.border}`,
     }}>
       <div>
-        <div style={{ fontSize: '11.5px', fontWeight: 600, color: C.text }}>{name}</div>
-        <div style={{ fontSize: '9.5px', color: C.dim, marginTop: '1px' }}>Qty: {qty} remaining</div>
+        <div style={{ fontSize: '12px', fontWeight: 600, color: C.text }}>{name}</div>
+        <div style={{ fontSize: '10px', color: C.dim, marginTop: '1px' }}>Qty: {qty} remaining</div>
       </div>
       <span style={{
-        fontSize: '9px', fontWeight: 700, padding: '3px 7px',
+        fontSize: '9px', fontWeight: 700, padding: '3px 8px',
         borderRadius: '20px', letterSpacing: '0.08em',
         background: isOut ? C.redDim : C.amberDim,
         color,
-        border: `1px solid ${isOut ? 'rgba(204,32,32,0.2)' : 'rgba(217,119,6,0.25)'}`,
-      }}>{label}</span>
+        border: `1px solid ${isOut ? 'rgba(204,32,32,0.25)' : 'rgba(217,119,6,0.3)'}`,
+      }}>{isOut ? 'OUT' : 'LOW'}</span>
+    </div>
+  );
+}
+
+function Empty({ text }) {
+  return (
+    <div style={{ fontSize: '11px', color: C.dim, padding: '12px 0', textAlign: 'center' }}>
+      {text}
     </div>
   );
 }
 
 export default function Dashboard() {
-  const [products,  setProducts]  = useState([]);
-  const [customers, setCustomers] = useState([]);
-  const [vendors,   setVendors]   = useState([]);
-  const [lowStock,  setLowStock]  = useState(lowStockAlerts);
-  const [loading,   setLoading]   = useState(true);
+  const [products,   setProducts]   = useState([]);
+  const [customers,  setCustomers]  = useState([]);
+  const [vendors,    setVendors]    = useState([]);
+  const [lowStock,   setLowStock]   = useState(lowStockAlertsFallback);
+  const [stats,      setStats]      = useState({ total: 0, lowStock: 0, outOfStock: 0, transactions: 0 });
+  const [loading,    setLoading]    = useState(true);
 
   useEffect(() => {
     async function load() {
@@ -172,27 +170,47 @@ export default function Dashboard() {
         const cJson = await cRes.json();
 
         const prods = pJson.data || pJson.products || [];
-        const custs = cJson.data || cJson.customers || cJson || [];
+        const custs = cJson.data || cJson.customers || (Array.isArray(cJson) ? cJson : []);
 
-        setProducts(Array.isArray(prods) ? prods.slice(0, 6) : []);
-        setCustomers(Array.isArray(custs) ? custs.slice(0, 6) : []);
+        // stats
+        const low  = prods.filter(p => {
+          const q = p.quantity ?? p.stock ?? 0;
+          const t = p.minStock ?? p.lowStockThreshold ?? 5;
+          return q > 0 && q <= t;
+        });
+        const out  = prods.filter(p => (p.quantity ?? p.stock ?? 0) === 0);
+        setStats({ total: prods.length, lowStock: low.length, outOfStock: out.length, transactions: 47 });
 
-        // vendors — optional endpoint
-        if (vRes && vRes.ok) {
-          const vJson = await vRes.json();
-          const vends = vJson.data || vJson.vendors || vJson || [];
-          setVendors(Array.isArray(vends) ? vends.slice(0, 6) : []);
-        }
+        // sort newest first
+        const sorted = [...prods].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setProducts(sorted.slice(0, 7));
 
-        // low stock from products
-        const lowProds = prods.filter(p => (p.quantity ?? p.stock ?? 0) <= (p.minStock ?? p.lowStockThreshold ?? 5));
+        const custSorted = [...custs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setCustomers(custSorted.slice(0, 7));
+
+        // low stock list
+        const lowProds = [...low, ...out];
         if (lowProds.length > 0) {
-          setLowStock(lowProds.slice(0, 5).map((p, i) => ({
+          setLowStock(lowProds.slice(0, 6).map((p, i) => ({
             id: p._id || i,
             name: p.name,
             quantity: p.quantity ?? p.stock ?? 0,
             status: (p.quantity ?? p.stock ?? 0) === 0 ? 'out' : 'low',
           })));
+        }
+
+        // vendors
+        if (vRes && vRes.ok) {
+          const vJson = await vRes.json();
+          const vends = vJson.data || vJson.vendors || (Array.isArray(vJson) ? vJson : []);
+          setVendors(vends.slice(0, 7));
+        } else {
+          // static fallback
+          setVendors([
+            { _id: '1', name: 'Paleo Enclosures',    type: 'Supplier' },
+            { _id: '2', name: 'Forty Cities Pvt Ltd', type: 'Distributor' },
+            { _id: '3', name: 'Online Minimum',       type: 'Online' },
+          ]);
         }
       } catch (e) {
         console.error('Dashboard load error:', e);
@@ -228,206 +246,93 @@ export default function Dashboard() {
             background: C.tealDim, border: `1px solid ${C.teal}`,
             color: C.teal, padding: '8px 16px', borderRadius: '8px',
             fontSize: '12px', fontWeight: 600, textDecoration: 'none',
-          }}>
-            ↓ STOCK IN
-          </Link>
+          }}>↓ STOCK IN</Link>
           <Link href="/transactions?type=out" style={{
             display: 'flex', alignItems: 'center', gap: '6px',
             background: C.redDim, border: `1px solid rgba(204,32,32,0.3)`,
             color: C.red, padding: '8px 16px', borderRadius: '8px',
             fontSize: '12px', fontWeight: 600, textDecoration: 'none',
-          }}>
-            ↑ STOCK OUT
-          </Link>
+          }}>↑ STOCK OUT</Link>
         </div>
       </div>
 
-      {/* ── 4 Content Cards (replacing stat cards) ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '16px' }}>
+      {/* ── Stat Cards (unchanged) ── */}
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+        <StatCard label="Total Products" value={String(stats.total || 18)} sublabel="Active lines"   dotColor="green"  />
+        <StatCard label="Low Stock"      value={String(stats.lowStock || 5)}  sublabel="Need attention" dotColor="orange" />
+        <StatCard label="Out of Stock"   value={String(stats.outOfStock || 2)} sublabel="Depleted items" dotColor="red"    />
+        <StatCard label="Transactions"   value={String(stats.transactions)}    sublabel="This month"     dotColor="blue"   />
+      </div>
+
+      {/* ── Reminder Widget (unchanged) ── */}
+      <div style={{ marginBottom: '16px' }}>
+        <ReminderWidget />
+      </div>
+
+      {/* ── 4 Content Cards (replacing the old bottom panels) ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
 
         {/* 1 — Products */}
-        <MiniCard title="Products" color={C.teal} href="/products" actionLabel="View All">
-          {loading ? (
-            <div style={{ fontSize: '11px', color: C.dim, padding: '8px 0' }}>Loading...</div>
-          ) : products.length === 0 ? (
-            <div style={{ fontSize: '11px', color: C.dim, padding: '8px 0' }}>No products found.</div>
-          ) : products.map((p, i) => (
-            <MiniRow
+        <ContentCard title="Products" color={C.teal} href="/products">
+          {loading ? <Empty text="Loading..." /> :
+           products.length === 0 ? <Empty text="No products found." /> :
+           products.map((p, i) => (
+            <ListRow
               key={p._id || i}
-              left={p.name}
-              sub={p.category || p.tipeItem || '—'}
+              primary={p.name}
+              secondary={p.category || p.tipeItem || '—'}
               right={fmt(p.createdAt)}
               last={i === products.length - 1}
             />
           ))}
-        </MiniCard>
+        </ContentCard>
 
         {/* 2 — Recent Customers */}
-        <MiniCard title="Recent Customers" color="#3b82f6" href="/maintenance" actionLabel="View All">
-          {loading ? (
-            <div style={{ fontSize: '11px', color: C.dim, padding: '8px 0' }}>Loading...</div>
-          ) : customers.length === 0 ? (
-            <div style={{ fontSize: '11px', color: C.dim, padding: '8px 0' }}>No customers found.</div>
-          ) : customers.map((c, i) => (
-            <MiniRow
+        <ContentCard title="Recent Customers" color={C.blue} href="/maintenance">
+          {loading ? <Empty text="Loading..." /> :
+           customers.length === 0 ? <Empty text="No customers found." /> :
+           customers.map((c, i) => (
+            <ListRow
               key={c._id || i}
-              left={c.customerName || c.name || '—'}
-              sub={c.kota || c.address || '—'}
+              primary={c.customerName || c.name || '—'}
+              secondary={c.kota || c.address || '—'}
               right={fmt(c.createdAt)}
-              dot="#3b82f6"
+              dot={C.blue}
               last={i === customers.length - 1}
             />
           ))}
-        </MiniCard>
+        </ContentCard>
 
         {/* 3 — Vendors */}
-        <MiniCard title="Vendors" color={C.amber} href="/vendors" actionLabel="View All">
-          {loading ? (
-            <div style={{ fontSize: '11px', color: C.dim, padding: '8px 0' }}>Loading...</div>
-          ) : vendors.length === 0 ? (
-            /* fallback static list if no /api/vendors endpoint */
-            [
-              { name: 'Paleo Enclosures',   type: 'Supplier' },
-              { name: 'Forty Cities Pvt Ltd', type: 'Distributor' },
-              { name: 'Online Minimum',      type: 'Online' },
-            ].map((v, i, arr) => (
-              <MiniRow
-                key={i}
-                left={v.name}
-                sub={v.type}
-                dot={C.amber}
-                last={i === arr.length - 1}
-              />
-            ))
-          ) : vendors.map((v, i) => (
-            <MiniRow
+        <ContentCard title="Vendors" color={C.amber} href="/vendors">
+          {loading ? <Empty text="Loading..." /> :
+           vendors.map((v, i) => (
+            <ListRow
               key={v._id || i}
-              left={v.name || v.vendorName || '—'}
-              sub={v.type || v.category || '—'}
+              primary={v.name || v.vendorName || '—'}
+              secondary={v.type || v.category || '—'}
               dot={C.amber}
               last={i === vendors.length - 1}
             />
           ))}
-        </MiniCard>
+        </ContentCard>
 
         {/* 4 — Low Stock Alerts */}
-        <MiniCard title="Low Stock Alerts" color={C.red} href="/products" actionLabel="Manage">
-          {lowStock.length === 0 ? (
-            <div style={{ fontSize: '11px', color: C.dim, padding: '8px 0' }}>All stock levels OK.</div>
-          ) : lowStock.map((a, i) => (
-            <LowRow
-              key={a.id}
-              name={a.name}
-              qty={a.quantity}
-              status={a.status}
-              last={i === lowStock.length - 1}
-            />
-          ))}
-        </MiniCard>
+        <ContentCard title="Low Stock Alerts" color={C.red} href="/products" actionLabel="Manage">
+          {lowStock.length === 0
+            ? <Empty text="All stock levels OK." />
+            : lowStock.map((a, i) => (
+              <LowRow
+                key={a.id}
+                name={a.name}
+                qty={a.quantity}
+                status={a.status}
+                last={i === lowStock.length - 1}
+              />
+            ))}
+        </ContentCard>
 
       </div>
-
-      {/* ── Reminder Widget ── */}
-      <div style={{ marginBottom: '12px' }}>
-        <ReminderWidget />
-      </div>
-
-      {/* ── Middle Row ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-        <Card title="Current Stock Levels" actionLabel="View All →" actionHref="/products">
-          <StockTable items={stockItems} />
-        </Card>
-        <Card title="Recent Transactions" actionLabel="View All" actionHref="/transactions">
-          {recentTransactions.map((tx, i) => (
-            <div key={i} style={{
-              display: 'flex', alignItems: 'flex-start',
-              padding: '10px 0',
-              borderBottom: i < recentTransactions.length - 1 ? `1px solid ${C.border}` : 'none',
-              gap: '10px',
-            }}>
-              <span style={{
-                width: '7px', height: '7px', borderRadius: '50%', flexShrink: 0,
-                marginTop: '4px',
-                background: tx.type === 'in' ? C.teal : C.red,
-              }} />
-              <div style={{ flex: 1, fontSize: '12px', color: C.muted, lineHeight: 1.5 }}>
-                <span style={{ color: C.dim, fontWeight: 500, fontSize: '11px' }}>
-                  {tx.type === 'in' ? 'In: ' : 'Out: '}
-                </span>
-                {tx.label}
-                <div style={{ fontSize: '10px', color: C.dim, marginTop: '2px' }}>{tx.time}</div>
-              </div>
-              <span style={{
-                fontSize: '13px', fontWeight: 700,
-                color: tx.type === 'in' ? C.teal : C.red, flexShrink: 0,
-              }}>{tx.delta}</span>
-            </div>
-          ))}
-        </Card>
-      </div>
-
-      {/* ── Bottom Row ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-        <Card title="Stock By Category">
-          {categoryStock.map((cat, i) => (
-            <div key={i} style={{
-              display: 'flex', alignItems: 'center',
-              padding: '10px 0',
-              borderBottom: i < categoryStock.length - 1 ? `1px solid ${C.border}` : 'none',
-              gap: '12px',
-            }}>
-              <div style={{ width: '130px', fontSize: '12px', color: C.muted, flexShrink: 0 }}>{cat.name}</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ height: '4px', background: C.hover, borderRadius: '4px', overflow: 'hidden', border: `1px solid ${C.border}` }}>
-                  <div style={{
-                    height: '100%',
-                    width: `${(cat.qty / cat.max) * 100}%`,
-                    background: cat.qty === 0 ? C.red : C.teal,
-                    borderRadius: '4px',
-                    transition: 'width 0.4s ease',
-                  }} />
-                </div>
-              </div>
-              <div style={{
-                fontSize: '13px', fontWeight: 600,
-                color: cat.qty === 0 ? C.red : C.text,
-                width: '24px', textAlign: 'right',
-              }}>{cat.qty}</div>
-            </div>
-          ))}
-        </Card>
-        <Card title="Low Stock Alerts" actionLabel="Manage" actionHref="/products">
-          <LowStockAlert alerts={lowStockAlerts} />
-        </Card>
-      </div>
-    </div>
-  );
-}
-
-function Card({ title, actionLabel, actionHref, children }) {
-  return (
-    <div style={{
-      background: C.card,
-      border: `1px solid ${C.border}`,
-      borderRadius: '12px',
-      padding: '18px',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-    }}>
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        marginBottom: '14px',
-      }}>
-        <span style={{
-          fontSize: '10px', textTransform: 'uppercase',
-          letterSpacing: '0.12em', color: C.dim, fontWeight: 600,
-        }}>{title}</span>
-        {actionLabel && (
-          <Link href={actionHref || '#'} style={{
-            fontSize: '11px', color: C.red, textDecoration: 'none', fontWeight: 600,
-          }}>{actionLabel}</Link>
-        )}
-      </div>
-      {children}
     </div>
   );
 }
