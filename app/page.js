@@ -247,7 +247,7 @@ export default function Dashboard() {
               : products.map((p, i) => (
                 <ListRow
                   key={p._id || i}
-                  primary={p.name}
+                  primary={`${i + 1}. ${p.name}`}
                   secondary={p.category || p.tipeItem || '—'}
                   right={fmt(p.createdAt)}
                   last={i === products.length - 1}
@@ -265,7 +265,7 @@ export default function Dashboard() {
               : customers.map((c, i) => (
                 <ListRow
                   key={c._id || i}
-                  primary={c.customerName || c.name || '—'}
+                  primary={`${i + 1}. ${c.customerName || c.name || '—'}`}
                   secondary={c.kota || c.address || '—'}
                   right={fmt(c.createdAt)}
                   dot={C.blue}
@@ -280,7 +280,7 @@ export default function Dashboard() {
           {vendors.map((v, i) => (
             <ListRow
               key={v._id || i}
-              primary={v.name || v.vendorName || '—'}
+              primary={`${i + 1}. ${v.name || v.vendorName || '—'}`}
              secondary={`${v.phone || '—'} · ${v.address || '—'}`}
               dot={C.amber}
               last={i === vendors.length - 1}
@@ -293,7 +293,7 @@ export default function Dashboard() {
           {lowStock.map((a, i) => (
             <LowRow
               key={a.id}
-              name={a.name}
+              name={`${i + 1}. ${a.name}`}
               qty={a.quantity}
               status={a.status}
               last={i === lowStock.length - 1}
