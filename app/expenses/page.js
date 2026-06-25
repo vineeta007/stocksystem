@@ -139,9 +139,9 @@ export default function ExpensesPage() {
       {/* Filters */}
       <div style={{ padding: '14px 28px', borderBottom: `0.5px solid ${BORDER}`, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
         <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
-  <span style={{ position: 'absolute', left: 9, color: MUTED, fontSize: 12, pointerEvents: 'none' }}>🔍</span>
+  <span style={{ position: 'absolute', left: 9, color: MUTED, fontSize: 11, pointerEvents: 'none', lineHeight: 1 }}>🔍</span>
   <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search expenses..."
-    style={{ background: '#111109', border: `0.5px solid ${BORDER}`, borderRadius: 3, padding: '7px 12px 7px 28px', color: TEXT, fontSize: 11, outline: 'none', width: 200 }} />
+    style={{ background: '#111109', border: `0.5px solid ${BORDER}`, borderRadius: 3, padding: '7px 12px 7px 32px', color: TEXT, fontSize: 11, outline: 'none', width: 200 }} />
 </div>
         <div style={{ display: 'flex', gap: 4, marginLeft: 'auto', flexWrap: 'wrap', alignItems: 'center' }}>
           <button onClick={openAdd}
