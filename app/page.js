@@ -13,6 +13,13 @@ const _cache = {
   stats:     null,
 };
 
+if (typeof window !== 'undefined') {
+  try {
+    const saved = sessionStorage.getItem('dashboard_cache');
+    if (saved) Object.assign(_cache, JSON.parse(saved));
+  } catch {}
+}
+
 const C = {
   base:    '#f5f5f5',
   card:    '#ffffff',
@@ -171,8 +178,9 @@ export default function Dashboard() {
         _cache.customers = sortedCusts;
         _cache.vendors   = vends;
         _cache.lowStock  = lowList;
-
         _cache.stats     = newStats;
+
+        try { sessionStorage.setItem('dashboard_cache', JSON.stringify(_cache)); } catch {}
 
         // Update state
         setProducts(sortedProds);
