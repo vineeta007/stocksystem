@@ -47,7 +47,7 @@ export async function PATCH(request, { params }) {
     body.nextVisitDate = new Date(last.getTime() + 90 * 24 * 60 * 60 * 1000)
   }
 
-  const updated = await Maintenance.findByIdAndUpdate(id, body, { new: true })
+  const updated = await Maintenance.findByIdAndUpdate(id, { $set: body }, { new: true })
   return NextResponse.json({ success: true, data: updated })
 }
 
