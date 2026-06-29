@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import dbConnect from '@/lib/dbConnect'
 import Quotation from '@/models/Quotation'
+import mongoose from 'mongoose'
 
 export async function GET(req) {
   await dbConnect()
@@ -10,7 +11,13 @@ export async function GET(req) {
 
   const filter = {}
   if (status && status !== 'All') filter.status = status
-  if (customerId) filter.customerId = customerId
+  if (customerId) {
+    try {
+      filter.customerId = new mongoose.Types.ObjectId(customerId)
+    } catch (_) {
+      return NextResponse.json({ success: true, data: [] })
+    }
+  }
 
   const data = await Quotation.find(filter).sort({ createdAt: -1 }).lean()
   return NextResponse.json({ success: true, data })
@@ -21,7 +28,6 @@ export async function POST(req) {
     await dbConnect()
     const body = await req.json()
 
-    // Recalc biaya per item
     const items = (body.items || []).map((item, idx) => ({
       no:           idx + 1,
       nama:         item.nama,
@@ -35,7 +41,7 @@ export async function POST(req) {
     const ppnAmount  = Math.round(totalBiaya * 0.11)
     const grandTotal = totalBiaya + ppnAmount
 
-    const quotation = await Quotation.create({
+    const quotation = new Quotation({
       customerId:    body.customerId,
       clientName:    body.clientName,
       clientAddress: body.clientAddress || '',
@@ -46,6 +52,7 @@ export async function POST(req) {
       ppnAmount,
       grandTotal,
     })
+    await quotation.save()
 
     return NextResponse.json({ success: true, data: quotation }, { status: 201 })
   } catch (err) {
