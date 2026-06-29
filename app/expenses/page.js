@@ -8,11 +8,10 @@ const FAINT = '#3a3830';
 const MUTED = '#6a6658';
 
 const CATEGORIES = [
-  { key: 'bank_payment',  label: 'Pembayaran Bank',     emoji: '🏦' },
-  { key: 'transport',     label: 'Tiket & Transport',   emoji: '✈️' },
-  { key: 'trucking',      label: 'Trucking & Expedisi', emoji: '🚚' },
-  { key: 'scaffolding',   label: 'Sewa Scaffolding',    emoji: '🏗️' },
-  { key: 'motor_rental',  label: 'Sewa Motor',          emoji: '🛵' },
+  { key: 'biaya_operasional',   label: 'Biaya Operasional Proyek',          emoji: '⚙️' },
+  { key: 'biaya_akomodasi',     label: 'Biaya Akomodasi & Transportasi',    emoji: '🏨' },
+  { key: 'sewa_scaffolding',    label: 'Sewa Scaffolding',                  emoji: '🏗️' },
+  { key: 'biaya_perjalanan',    label: 'Biaya Perjalanan Dinas',            emoji: '🧳' },
 ];
 
 const EMPTY_FORM = { date: '', name: '', amount: '', details: '', category: CATEGORIES[0].key };
