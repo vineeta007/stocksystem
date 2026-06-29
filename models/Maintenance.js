@@ -30,7 +30,8 @@ const MaintenanceSchema = new mongoose.Schema(
       enum: ['Active', 'Inactive', 'New'],
       default: 'New',
     },
-    notes: { type: String },
+    notes:     { type: String },
+    draftCart: { type: Array, default: [] },
   },
   { timestamps: true }
 )
