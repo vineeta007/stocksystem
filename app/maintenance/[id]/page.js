@@ -1547,6 +1547,23 @@ export default function ClientDetailPage() {
                                 }}>
                                 {generatingPDF ? '...' : '📄 Confirm'}
                               </button>
+                              {/* Delete draft cart */}
+                              <button
+                                title="Clear cart"
+                                onClick={() => {
+                                  if (confirm('Clear the draft cart? This cannot be undone.')) {
+                                    markCartDirty([])
+                                    saveCart()
+                                  }
+                                }}
+                                style={{
+                                  display: 'inline-flex', alignItems: 'center', gap: '4px',
+                                  padding: '6px 10px', border: '1px solid #fecaca', borderRadius: '6px',
+                                  background: '#fff', color: '#dc2626', cursor: 'pointer',
+                                  fontSize: '0.75rem', fontWeight: 600, fontFamily: "'Sora', sans-serif",
+                                }}>
+                                🗑
+                              </button>
                             </div>
                           </td>
                         </tr>
