@@ -3,27 +3,31 @@ import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
 import { getSession } from '@/lib/session';
-import { hasPermission } from '@/lib/roles';
 
 export async function PATCH(request, { params }) {
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 });
   }
-  if (!hasPermission(session.role, 'edit_settings')) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
 
   const { id } = await params;
-  const { username, password } = await request.json();
 
+  // Users can only edit their own account
+  if (session.id !== id) {
+    return NextResponse.json(
+      { error: 'You can only edit your own account.' },
+      { status: 403 }
+    );
+  }
+
+  const { username, password } = await request.json();
   const update = {};
+
+  await dbConnect();
 
   if (username) {
     const clean = username.trim().toLowerCase();
-    const taken = await dbConnect().then(() =>
-      User.findOne({ username: clean, _id: { $ne: id } })
-    );
+    const taken = await User.findOne({ username: clean, _id: { $ne: id } });
     if (taken) {
       return NextResponse.json({ error: 'Username already taken.' }, { status: 409 });
     }
@@ -44,11 +48,24 @@ export async function PATCH(request, { params }) {
     return NextResponse.json({ error: 'Nothing to update.' }, { status: 400 });
   }
 
-  await dbConnect();
   const user = await User.findByIdAndUpdate(id, update, { new: true, select: '-passwordHash' });
 
   if (!user) {
     return NextResponse.json({ error: 'User not found.' }, { status: 404 });
+  }
+
+  // If they changed their own username, update the session cookie too
+  if (update.username) {
+    session.username = update.username;
+    const { cookies } = await import('next/headers');
+    const cookieStore = await cookies();
+    cookieStore.set('ss_session', JSON.stringify(session), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 8,
+      path: '/',
+    });
   }
 
   return NextResponse.json({ success: true, user });
