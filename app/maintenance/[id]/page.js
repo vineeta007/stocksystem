@@ -11,6 +11,14 @@ function fmtRp(n) {
   if (!n && n !== 0) return 'Rp 0'
   return 'Rp ' + Number(n).toLocaleString('id-ID')
 }
+function formatThousands(n) {
+  if (n === '' || n === null || n === undefined) return ''
+  return Number(n).toLocaleString('id-ID')
+}
+function parseThousands(str) {
+  const digits = str.replace(/[^\d]/g, '')
+  return digits ? parseInt(digits, 10) : 0
+}
 function toInputDate(d) {
   if (!d) return ''
   const dt = new Date(d)
@@ -1755,8 +1763,8 @@ export default function ClientDetailPage() {
                                     style={{ ...inputStyle, width: '70px' }} />
                                 </td>
                                 <td style={{ padding: '8px 10px' }}>
-                                  <input type="number" value={item.unitPrice}
-                                    onChange={e => updateInvoiceItem(idx, 'unitPrice', parseFloat(e.target.value) || 0)}
+                                  <input type="text" inputMode="numeric" value={formatThousands(item.unitPrice)}
+                                    onChange={e => updateInvoiceItem(idx, 'unitPrice', parseThousands(e.target.value))}
                                     style={{ ...inputStyle, width: '130px' }} />
                                 </td>
                                 <td style={{ padding: '8px 10px', fontWeight: 600, color: '#111', whiteSpace: 'nowrap' }}>
