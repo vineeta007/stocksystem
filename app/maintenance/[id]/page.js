@@ -977,6 +977,12 @@ export default function ClientDetailPage() {
     })
     fetchInvoices()
   }
+  async function deleteInvoice(invId) {
+    if (!confirm('Delete this invoice? This cannot be undone.')) return
+    await fetch(`/api/invoices/${invId}`, { method: 'DELETE' })
+    fetchInvoices()
+  }
+  
 
   if (loading) return (
     <div style={{ padding: '3rem', textAlign: 'center', color: '#9ca3af', fontFamily: "'Sora', sans-serif" }}>
@@ -1849,17 +1855,30 @@ export default function ClientDetailPage() {
                         </select>
                       </td>
                       <td style={{ padding: '13px 16px' }}>
-                        <button
-                          title="Download / Print PDF"
-                          onClick={() => reprintInvoice(inv)}
-                          style={{
-                            display: 'inline-flex', alignItems: 'center', gap: '5px',
-                            padding: '6px 12px', border: '1px solid #e5e7eb', borderRadius: '6px',
-                            background: '#fff', color: '#374151', cursor: 'pointer',
-                            fontSize: '0.75rem', fontWeight: 600, fontFamily: "'Sora', sans-serif",
-                          }}>
-                          ⬇ PDF
-                        </button>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button
+                            title="Download / Print PDF"
+                            onClick={() => reprintInvoice(inv)}
+                            style={{
+                              display: 'inline-flex', alignItems: 'center', gap: '5px',
+                              padding: '6px 12px', border: '1px solid #e5e7eb', borderRadius: '6px',
+                              background: '#fff', color: '#374151', cursor: 'pointer',
+                              fontSize: '0.75rem', fontWeight: 600, fontFamily: "'Sora', sans-serif",
+                            }}>
+                            ⬇ PDF
+                          </button>
+                          <button
+                            title="Delete invoice"
+                            onClick={() => deleteInvoice(inv._id)}
+                            style={{
+                              display: 'inline-flex', alignItems: 'center', gap: '5px',
+                              padding: '6px 12px', border: '1px solid #fecaca', borderRadius: '6px',
+                              background: '#fff', color: '#dc2626', cursor: 'pointer',
+                              fontSize: '0.75rem', fontWeight: 600, fontFamily: "'Sora', sans-serif",
+                            }}>
+                            🗑
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
