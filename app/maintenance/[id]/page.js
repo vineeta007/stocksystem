@@ -1727,18 +1727,18 @@ export default function ClientDetailPage() {
                                 <td style={{ padding: '8px 10px' }}>
                                   <input value={item.specification}
                                     onChange={e => updateInvoiceItem(idx, 'specification', e.target.value)}
-                                    placeholder="Pembayaran Term BL Pembelian 1 (Satu) unit Lift / Swift Pro"
+                                    placeholder=""
                                     style={{ ...inputStyle, minWidth: '180px' }} />
                                 </td>
                                 <td style={{ padding: '8px 10px' }}>
                                   <input value={item.serialNo}
                                     onChange={e => updateInvoiceItem(idx, 'serialNo', e.target.value)}
-                                    placeholder="SW111422" style={{ ...inputStyle, width: '100px' }} />
+                                    placeholder="" style={{ ...inputStyle, width: '100px' }} />
                                 </td>
                                 <td style={{ padding: '8px 10px' }}>
                                   <input value={item.stops}
                                     onChange={e => updateInvoiceItem(idx, 'stops', e.target.value)}
-                                    placeholder="3 Stops" style={{ ...inputStyle, width: '80px' }} />
+                                    placeholder="" style={{ ...inputStyle, width: '80px' }} />
                                 </td>
                                 <td style={{ padding: '8px 10px' }}>
                                   <input type="number" value={item.termPercent}
