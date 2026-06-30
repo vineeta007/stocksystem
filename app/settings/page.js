@@ -8,6 +8,17 @@ const TEXT = '#1a1a1a';
 const FAINT = '#888888';
 const ACCENT = '#c9a14a';
 
+const ROLE_OPTIONS = [
+  { value: 'admin', label: 'Admin' },
+  { value: 'after_sales_1', label: 'After Sales 1' },
+  { value: 'after_sales_2', label: 'After Sales 2' },
+  { value: 'finance', label: 'Finance' },
+  { value: 'finance_admin', label: 'Finance Admin' },
+  { value: 'director', label: 'Director' },
+  { value: 'logistic', label: 'Logistic' },
+  { value: 'admin_backup', label: 'Admin Backup' },
+];
+
 function roleLabel(role) {
   return role
     .split('_')
@@ -21,6 +32,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [editingUser, setEditingUser] = useState(null);
+  const [addingUser, setAddingUser] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -61,8 +73,27 @@ export default function SettingsPage() {
       </div>
 
       <div style={{ padding: '32px 40px', maxWidth: 900, margin: '0 auto' }}>
-        <div style={{ fontSize: 11, letterSpacing: '0.2em', color: FAINT, textTransform: 'uppercase', marginBottom: 18, fontWeight: 600 }}>
-          User Accounts
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+          <div style={{ fontSize: 11, letterSpacing: '0.2em', color: FAINT, textTransform: 'uppercase', fontWeight: 600 }}>
+            User Accounts
+          </div>
+          <button
+            onClick={() => setAddingUser(true)}
+            style={{
+              background: ACCENT,
+              border: 'none',
+              color: '#ffffff',
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              padding: '8px 18px',
+              borderRadius: 6,
+              cursor: 'pointer',
+            }}
+          >
+            + Add Member
+          </button>
         </div>
 
         {loading && <div style={{ color: FAINT, fontSize: 14 }}>Loading users...</div>}
@@ -165,9 +196,194 @@ export default function SettingsPage() {
           }}
         />
       )}
+
+      {addingUser && (
+        <AddUserModal
+          onClose={() => setAddingUser(false)}
+          onSaved={() => {
+            setAddingUser(false);
+            fetchUsers();
+          }}
+        />
+      )}
     </div>
   );
 }
+
+function AddUserModal({ onClose, onSaved }) {
+  const [username, setUsername] = useState('');
+  const [displayName, setDisplayName] = useState('');
+  const [role, setRole] = useState(ROLE_OPTIONS[0].value);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  async function handleCreate() {
+    setError('');
+
+    if (!username.trim() || !displayName.trim() || !password) {
+      setError('All fields are required.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const res = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, displayName, role, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create user');
+      onSaved();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(0,0,0,0.4)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 50,
+      }}
+      onClick={onClose}
+    >
+      <div
+        style={{
+          background: '#ffffff',
+          border: '1px solid #e0e0e0',
+          borderRadius: 10,
+          boxShadow: '0 12px 40px rgba(0,0,0,0.18)',
+          padding: 32,
+          width: 380,
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 24, fontWeight: 700, color: '#000000', marginBottom: 4 }}>
+          New Member
+        </div>
+        <div style={{ fontSize: 10, color: '#888888', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 22, fontWeight: 600 }}>
+          Add Account
+        </div>
+
+        <label style={labelStyle}>Display Name</label>
+        <input
+          value={displayName}
+          onChange={(e) => setDisplayName(e.target.value)}
+          placeholder="e.g. Wahyu"
+          style={inputStyle}
+        />
+
+        <label style={labelStyle}>Username</label>
+        <input
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="e.g. wahyu"
+          style={inputStyle}
+        />
+
+        <label style={labelStyle}>Designation</label>
+        <select value={role} onChange={(e) => setRole(e.target.value)} style={inputStyle}>
+          {ROLE_OPTIONS.map((r) => (
+            <option key={r.value} value={r.value}>{r.label}</option>
+          ))}
+        </select>
+
+        <label style={labelStyle}>Password</label>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          style={inputStyle}
+        />
+
+        <label style={labelStyle}>Confirm Password</label>
+        <input
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          style={inputStyle}
+        />
+
+        {error && <div style={{ color: '#c0392b', fontSize: 12, marginBottom: 14 }}>{error}</div>}
+
+        <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+          <button
+            onClick={handleCreate}
+            disabled={saving}
+            style={{
+              flex: 1,
+              background: ACCENT,
+              border: 'none',
+              color: '#ffffff',
+              fontSize: 12,
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              padding: '11px',
+              borderRadius: 6,
+              cursor: 'pointer',
+            }}
+          >
+            {saving ? 'Creating...' : 'Create'}
+          </button>
+          <button
+            onClick={onClose}
+            style={{
+              flex: 1,
+              background: '#f0f0f0',
+              border: '1px solid #dddddd',
+              color: '#333333',
+              fontSize: 12,
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              padding: '11px',
+              borderRadius: 6,
+              cursor: 'pointer',
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const labelStyle = {
+  fontSize: 11,
+  color: '#555555',
+  letterSpacing: '0.05em',
+  textTransform: 'uppercase',
+  fontWeight: 600,
+  display: 'block',
+};
+
+const inputStyle = {
+  width: '100%',
+  background: '#ffffff',
+  border: '1px solid #cccccc',
+  borderRadius: 6,
+  color: '#000000',
+  fontSize: 14,
+  padding: '10px 12px',
+  margin: '6px 0 18px',
+  boxSizing: 'border-box',
+};
 
 function EditUserModal({ user, onClose, onSaved }) {
   const [username, setUsername] = useState(user.username);
@@ -241,65 +457,29 @@ function EditUserModal({ user, onClose, onSaved }) {
           Edit Your Account
         </div>
 
-        <label style={{ fontSize: 11, color: '#555555', letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600 }}>
-          Username
-        </label>
+        <label style={labelStyle}>Username</label>
         <input
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          style={{
-            width: '100%',
-            background: '#ffffff',
-            border: '1px solid #cccccc',
-            borderRadius: 6,
-            color: '#000000',
-            fontSize: 14,
-            padding: '10px 12px',
-            margin: '6px 0 18px',
-            boxSizing: 'border-box',
-          }}
+          style={inputStyle}
         />
 
-        <label style={{ fontSize: 11, color: '#555555', letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600 }}>
-          New Password (leave blank to keep current)
-        </label>
+        <label style={labelStyle}>New Password (leave blank to keep current)</label>
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={{
-            width: '100%',
-            background: '#ffffff',
-            border: '1px solid #cccccc',
-            borderRadius: 6,
-            color: '#000000',
-            fontSize: 14,
-            padding: '10px 12px',
-            margin: '6px 0 18px',
-            boxSizing: 'border-box',
-          }}
+          style={inputStyle}
         />
 
         {password && (
           <>
-            <label style={{ fontSize: 11, color: '#555555', letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600 }}>
-              Confirm Password
-            </label>
+            <label style={labelStyle}>Confirm Password</label>
             <input
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              style={{
-                width: '100%',
-                background: '#ffffff',
-                border: '1px solid #cccccc',
-                borderRadius: 6,
-                color: '#000000',
-                fontSize: 14,
-                padding: '10px 12px',
-                margin: '6px 0 18px',
-                boxSizing: 'border-box',
-              }}
+              style={inputStyle}
             />
           </>
         )}
