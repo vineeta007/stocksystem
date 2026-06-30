@@ -187,7 +187,6 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
   <div class="footer-line"><span>Telp. 021 - 2452 0983</span><span>info@kreativlift.co.id</span></div>
 </body></html>`
 }
-// ── Invoice PDF generator ──────────────────────────────────────────────────────
 function generateInvoiceHTML(invoiceData, logoBase64) {
   const {
     invoiceNo, refNo, invoiceDate, clientName, clientAddress,
@@ -195,71 +194,80 @@ function generateInvoiceHTML(invoiceData, logoBase64) {
   } = invoiceData
 
   const dateStr = invoiceDate
-    ? new Date(invoiceDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-')
+    ? new Date(invoiceDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }).replace(/ /g, '-')
     : ''
 
   const termsRows = (paymentTerms || []).map(t => `
-    <tr style="${t.active ? 'background:#fff3cd;' : ''}">
-      <td style="padding:3px 0;font-size:11px;color:#000;">${t.percent}%</td>
-      <td style="padding:3px 0 3px 24px;font-size:11px;font-style:italic;color:#000;">${t.label}</td>
+    <tr style="${t.active ? 'background:#fdf0c8;' : ''}">
+      <td style="padding:2px 8px 2px 0;font-size:10px;color:#000;white-space:nowrap;">${t.percent}%</td>
+      <td style="padding:2px 0;font-size:10px;font-style:italic;color:#000;white-space:nowrap;">${t.label}</td>
     </tr>
   `).join('')
 
   const itemRows = (items || []).map(item => `
     <tr>
-      <td style="padding:8px 6px;border-top:2px solid #cc2020;font-size:11px;color:#000;vertical-align:top;">
-        ${item.specification}${item.serialNo ? `<br/><span style="font-size:10px;">${item.serialNo}</span>` : ''}${item.stops ? ` <span style="font-size:10px;">${item.stops}</span>` : ''}
+      <td style="padding:6px 4px;font-size:10px;color:#000;vertical-align:top;">
+        ${item.specification}
+        ${item.serialNo || item.stops ? `<div style="font-size:9px;margin-top:1px;"><span style="font-weight:600;">${item.serialNo || ''}</span>&nbsp;&nbsp;${item.stops || ''}</div>` : ''}
       </td>
-      <td style="padding:8px 6px;border-top:2px solid #cc2020;font-size:11px;color:#000;text-align:center;vertical-align:top;">${item.termPercent}%</td>
-      <td style="padding:8px 6px;border-top:2px solid #cc2020;font-size:11px;color:#000;text-align:right;vertical-align:top;">${Number(item.unitPrice).toLocaleString('id-ID')}</td>
-      <td style="padding:8px 6px;border-top:2px solid #cc2020;font-size:11px;color:#000;text-align:left;vertical-align:top;width:24px;">Rp</td>
-      <td style="padding:8px 6px;border-top:2px solid #cc2020;font-size:11px;color:#000;text-align:right;vertical-align:top;">${Number(item.amount).toLocaleString('id-ID')}</td>
+      <td style="padding:6px 4px;font-size:10px;color:#000;text-align:center;vertical-align:top;">${item.termPercent}%</td>
+      <td style="padding:6px 4px;font-size:10px;color:#000;text-align:right;vertical-align:top;">${Number(item.unitPrice).toLocaleString('id-ID')}</td>
+      <td style="padding:6px 4px;font-size:10px;color:#000;text-align:left;vertical-align:top;width:20px;">Rp</td>
+      <td style="padding:6px 4px;font-size:10px;color:#000;text-align:right;vertical-align:top;">${Number(item.amount).toLocaleString('id-ID')}</td>
     </tr>
   `).join('')
 
   const logoHTML = logoBase64
-    ? `<img src="${logoBase64}" style="height:60px;object-fit:contain;display:block;" />`
-    : `<div style="display:flex;align-items:center;gap:8px;">
-        <span style="color:#cc2020;font-size:24px;font-weight:900;line-height:1;">✕</span>
+    ? `<img src="${logoBase64}" style="height:42px;object-fit:contain;display:block;" />`
+    : `<div style="display:flex;align-items:center;gap:6px;">
+        <span style="color:#cc2020;font-size:20px;font-weight:900;line-height:1;">✕</span>
         <div>
-          <div style="font-size:14px;font-weight:900;color:#000;">KREATIV <span style="color:#cc2020;">LIFT</span></div>
-          <div style="font-size:7.5px;color:#888;letter-spacing:2px;">Elevate With Us</div>
+          <div style="font-size:12px;font-weight:900;color:#000;">KREATIV <span style="color:#cc2020;">LIFT</span></div>
+          <div style="font-size:6.5px;color:#888;letter-spacing:2px;">Elevate With Us</div>
         </div>
       </div>`
 
   const paidStamp = status === 'Paid'
-    ? `<div style="position:absolute;top:80px;left:50%;transform:translateX(-50%);font-size:34px;font-weight:900;color:#2563eb;border:4px solid #2563eb;border-radius:8px;padding:2px 24px;letter-spacing:4px;opacity:0.85;transform:translateX(-50%) rotate(0deg);">PAID</div>`
+    ? `<div style="position:absolute;top:108px;left:50%;transform:translateX(-50%);font-size:30px;font-weight:900;color:#3b6dc9;border:4px solid #3b6dc9;border-radius:6px;padding:0 20px;letter-spacing:4px;opacity:0.8;">PAID</div>`
     : ''
 
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"/>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;color:#000;}
-  body{font-family:Arial,sans-serif;font-size:11px;color:#000;padding:34px 44px;background:#fff;position:relative;}
-  .top-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
-  .invoice-title{font-size:13px;font-weight:700;text-align:right;}
-  .invoice-meta{font-size:10px;color:#999;text-align:right;margin-top:2px;}
-  .invoice-meta .val{color:#000;}
-  .cust-block{font-size:11px;line-height:1.7;margin-top:4px;}
+  body{font-family:Arial,sans-serif;font-size:10px;color:#000;padding:30px 40px;background:#fff;position:relative;}
+  .top-row{display:flex;justify-content:space-between;align-items:flex-start;}
+  .invoice-title{font-size:12px;font-weight:700;text-align:right;letter-spacing:0.5px;}
+  .invoice-meta-table{margin-left:auto;border-collapse:collapse;margin-top:6px;}
+  .invoice-meta-table td{font-size:9px;padding:0 0 2px 30px;vertical-align:top;}
+  .invoice-meta-table .lbl{color:#999;}
+  .invoice-meta-table .val{color:#000;font-weight:400;}
+  .cust-block{font-size:10px;line-height:1.55;margin-top:6px;}
   .cust-block .lbl{font-size:9px;color:#999;}
-  .ref-block{text-align:right;font-size:10px;color:#999;margin-top:6px;}
-  table.terms{border-collapse:collapse;margin-left:auto;margin-top:6px;}
-  table.terms th{font-size:9px;color:#999;font-weight:400;padding-bottom:4px;text-align:left;}
-  table.items{width:100%;border-collapse:collapse;margin-top:18px;}
-  table.items th{font-size:9px;color:#999;font-weight:400;text-align:left;padding:0 6px 6px;border-bottom:1px solid #cc2020;text-transform:uppercase;letter-spacing:0.05em;}
-  .totals{margin-left:auto;width:280px;margin-top:6px;}
-  .totals tr td{padding:4px 6px;font-size:11px;}
+  .ref-block{text-align:right;font-size:9px;color:#999;line-height:1.5;}
+  table.terms{border-collapse:collapse;}
+  table.terms th{font-size:9px;color:#999;font-weight:400;padding-bottom:3px;text-align:left;}
+  table.items{width:100%;border-collapse:collapse;margin-top:14px;}
+  table.items th{font-size:9px;color:#999;font-weight:400;text-align:left;padding:0 4px 5px;border-bottom:2px solid #cc2020;text-transform:uppercase;letter-spacing:0.03em;}
+  table.items tbody tr:first-child td{border-top:2px solid #cc2020;}
+  .totals{margin-left:auto;width:240px;margin-top:4px;}
+  .totals tr td{padding:3px 4px;font-size:10px;}
   .totals .label{color:#000;}
-  .totals .grand{border-top:2px solid #cc2020;font-weight:700;font-size:12px;}
-  .pay-info{margin-top:36px;font-size:10px;line-height:1.9;}
-  .pay-info .lbl{color:#999;display:inline-block;width:160px;}
-  .sign-block{margin-top:30px;text-align:right;}
-  .sign-block .company{font-size:10px;font-weight:700;margin-bottom:36px;}
-  .sign-block .name{font-size:10px;font-weight:700;text-decoration:underline;}
-  .sign-block .role{font-size:9px;color:#666;}
-  .footer{margin-top:32px;border-top:2px solid #cc2020;padding-top:6px;text-align:center;font-size:8px;color:#cc2020;font-weight:700;}
-  .footer .addr{color:#666;font-weight:400;margin-top:2px;}
-  @media print{body{padding:18px 28px;}}
+  .totals .grand{border-top:2px solid #cc2020;font-weight:700;font-size:10.5px;}
+  .pay-info{margin-top:30px;font-size:9px;line-height:1.7;}
+  .pay-info .lbl{color:#999;display:inline-block;width:155px;}
+  .sign-block{margin-top:6px;text-align:right;}
+  .sign-block .company{font-size:9.5px;font-weight:700;}
+  .sign-block .stamp-area{height:70px;}
+  .sign-block .name{font-size:9.5px;font-weight:700;text-decoration:underline;}
+  .sign-block .role{font-size:8.5px;color:#666;}
+  .footer{margin-top:24px;border-top:2px solid #cc2020;padding-top:8px;}
+  .footer-content{display:flex;justify-content:space-between;font-size:8.5px;}
+  .footer-content .co-name{color:#cc2020;font-weight:700;margin-bottom:2px;}
+  .footer-content .addr-block{line-height:1.6;color:#000;}
+  .footer-content .contact-block{line-height:1.6;color:#000;text-align:right;}
+  .footer-bottom{border-top:2px solid #cc2020;margin-top:8px;padding-top:6px;text-align:center;font-size:7.5px;color:#000;line-height:1.6;}
+  @media print{body{padding:18px 26px;}}
 </style>
 </head>
 <body>
@@ -275,19 +283,23 @@ function generateInvoiceHTML(invoiceData, logoBase64) {
     </div>
     <div>
       <div class="invoice-title">INVOICE</div>
-      <div class="invoice-meta">INVOICE<br/><span class="val">${invoiceNo || ''}</span></div>
-      <div class="invoice-meta" style="margin-top:6px;">Date<br/><span class="val">${dateStr}</span></div>
-      <div class="ref-block">Reference :<br/>${refNo || ''}</div>
+      <table class="invoice-meta-table">
+        <tr><td class="lbl">INVOICE</td><td class="lbl" style="padding-left:50px;">Date</td></tr>
+        <tr><td class="val">${invoiceNo || ''}</td><td class="val" style="padding-left:50px;">${dateStr}</td></tr>
+      </table>
+      <div class="ref-block" style="margin-top:10px;">
+        Reference :<br/>${refNo || ''}
+      </div>
     </div>
   </div>
 
-  <div style="display:flex;justify-content:space-between;margin-top:18px;">
-    <div style="font-size:11px;">
+  <div style="display:flex;justify-content:space-between;margin-top:16px;">
+    <div style="font-size:10px;">
       <div class="lbl" style="font-size:9px;color:#999;">Project Location</div>
-      <div>${(projectLocation || '').replace(/\n/g, '<br/>')}</div>
+      <div style="line-height:1.5;margin-top:2px;">${(projectLocation || '').replace(/\n/g, '<br/>')}</div>
     </div>
     <table class="terms">
-      <thead><tr><th colspan="2">Payment Terms</th></tr></thead>
+      <thead><tr><th colspan="2" style="text-align:right;padding-right:0;">Payment Terms</th></tr></thead>
       <tbody>${termsRows}</tbody>
     </table>
   </div>
@@ -297,15 +309,15 @@ function generateInvoiceHTML(invoiceData, logoBase64) {
       <tr>
         <th>Specification</th>
         <th style="text-align:center;">Term</th>
-        <th colspan="3" style="text-align:right;">Unit Price &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Amount</th>
+        <th colspan="3" style="text-align:right;">Unit Price&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Amount</th>
       </tr>
     </thead>
     <tbody>${itemRows}</tbody>
   </table>
 
   <table class="totals">
-    <tr><td class="label">Sub Total</td><td style="text-align:left;width:24px;">Rp</td><td style="text-align:right;">${Number(subTotal).toLocaleString('id-ID')}</td></tr>
-    <tr><td class="label">PPN ${ppnPercent}%</td><td style="text-align:left;">&nbsp;</td><td style="text-align:right;">${Number(ppnAmount).toLocaleString('id-ID')}</td></tr>
+    <tr><td class="label">Sub Total</td><td style="text-align:left;width:20px;">Rp</td><td style="text-align:right;">${Number(subTotal).toLocaleString('id-ID')}</td></tr>
+    <tr><td class="label">PPN ${ppnPercent}%</td><td style="text-align:left;"></td><td style="text-align:right;">${Number(ppnAmount).toLocaleString('id-ID')}</td></tr>
     <tr class="grand"><td>TOTAL AMOUNT</td><td style="text-align:left;">Rp</td><td style="text-align:right;">${Number(totalAmount).toLocaleString('id-ID')}</td></tr>
   </table>
 
@@ -319,14 +331,30 @@ function generateInvoiceHTML(invoiceData, logoBase64) {
 
   <div class="sign-block">
     <div class="company">PT. Inter Kreativ Lift Indonesia</div>
+    <div class="stamp-area"></div>
     <div class="name">Rohana</div>
     <div class="role">Finance Manager</div>
   </div>
 
   <div class="footer">
-    PT. Inter Kreativ Lift Indonesia
-    <div class="addr">The Kensington Commercial Blok C/09, Jl. Boulevard Raya, Kelapa Gading Timur, Jakarta Utara 14240 - Indonesia<br/>
-    Call Center: 021-2245-2623 | Hotline: 0811-129-8888 | E-mail: info@kreativlift.co.id</div>
+    <div class="footer-content">
+      <div class="addr-block">
+        <div class="co-name">PT. Inter Kreativ Lift Indonesia</div>
+        <div>The Kensington Commercial Blok C/09</div>
+        <div>Jl. Boulevard Raya,Kelapa Gading Timur</div>
+        <div>Jakarta Utara 14240 - Indonesia</div>
+      </div>
+      <div class="contact-block">
+        <div>&nbsp;</div>
+        <div><a href="mailto:info@kreativlift.co.id" style="color:#2563eb;text-decoration:underline;">Info@kreativlift.co.id</a></div>
+        <div><a href="https://www.kreativlift.co.id" style="color:#2563eb;text-decoration:underline;">www.kreativlift.co.id</a></div>
+        <div>021-22452623</div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      The Kensington Commercial Blok C no. 10, Jl Boulevard Raya, Kelapa Gading - Jakarta Utara 14240<br/>
+      Call Center: 021-2245-2623 | Hotline: 0811-129-9888 | E-mail: info@kreativlift.co.id
+    </div>
   </div>
 </body></html>`
 }
