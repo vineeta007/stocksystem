@@ -42,15 +42,20 @@ export default function SettingsPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#f5f5f5' }}>
-      <div style={{ padding: '40px 24px 30px', borderBottom: `1px solid ${BORDER}`, textAlign: 'center' }}>
+      <div style={{ padding: '24px', borderBottom: `1px solid ${BORDER}`, textAlign: 'center' }}>
         <div
           style={{
             fontFamily: "'Cormorant Garamond', serif",
-            fontSize: 50,
+            fontSize: 32,
             fontWeight: 700,
             color: '#000000',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 12,
           }}
         >
+          <span style={{ fontSize: 28 }}>⚙️</span>
           Settings
         </div>
       </div>
