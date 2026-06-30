@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
 
 const BORDER = '#1e1e16';
 const TEXT = '#d8d4c8';
@@ -15,6 +16,7 @@ function roleLabel(role) {
 }
 
 export default function SettingsPage() {
+  const { user: currentUser } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -59,59 +61,71 @@ export default function SettingsPage() {
 
         {!loading && !error && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            {users.map((u) => (
-              <div
-                key={u._id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '14px 16px',
-                  borderBottom: `0.5px solid ${BORDER}`,
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: '50%',
-                      border: `1px solid ${ACCENT}`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: 11,
-                      color: ACCENT,
-                      letterSpacing: '0.05em',
-                    }}
-                  >
-                    {u.initials || u.username.slice(0, 2).toUpperCase()}
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 13, color: TEXT }}>{u.displayName}</div>
-                    <div style={{ fontSize: 10, color: FAINT, marginTop: 2 }}>
-                      @{u.username} · {roleLabel(u.role)}
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => setEditingUser(u)}
+            {users.map((u) => {
+              const isSelf = currentUser?.id === u._id;
+              return (
+                <div
+                  key={u._id}
                   style={{
-                    background: 'transparent',
-                    border: `1px solid ${BORDER}`,
-                    color: TEXT,
-                    fontSize: 10,
-                    letterSpacing: '0.1em',
-                    textTransform: 'uppercase',
-                    padding: '6px 14px',
-                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '14px 16px',
+                    borderBottom: `0.5px solid ${BORDER}`,
                   }}
                 >
-                  Edit
-                </button>
-              </div>
-            ))}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div
+                      style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: '50%',
+                        border: `1px solid ${ACCENT}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 11,
+                        color: ACCENT,
+                        letterSpacing: '0.05em',
+                      }}
+                    >
+                      {u.initials || u.username.slice(0, 2).toUpperCase()}
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 13, color: TEXT }}>
+                        {u.displayName}
+                        {isSelf && (
+                          <span style={{ fontSize: 9, color: ACCENT, marginLeft: 8, letterSpacing: '0.1em' }}>
+                            YOU
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ fontSize: 10, color: FAINT, marginTop: 2 }}>
+                        @{u.username} · {roleLabel(u.role)}
+                      </div>
+                    </div>
+                  </div>
+
+                  {isSelf && (
+                    <button
+                      onClick={() => setEditingUser(u)}
+                      style={{
+                        background: 'transparent',
+                        border: `1px solid ${BORDER}`,
+                        color: TEXT,
+                        fontSize: 10,
+                        letterSpacing: '0.1em',
+                        textTransform: 'uppercase',
+                        padding: '6px 14px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Edit
+                    </button>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
@@ -197,7 +211,7 @@ function EditUserModal({ user, onClose, onSaved }) {
           {user.displayName}
         </div>
         <div style={{ fontSize: 9, color: FAINT, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 20 }}>
-          Edit Account
+          Edit Your Account
         </div>
 
         <label style={{ fontSize: 9, color: FAINT, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
