@@ -1648,9 +1648,9 @@ export default function ClientDetailPage() {
                           borderBottom: idx < invoiceForm.paymentTerms.length - 1 ? '1px solid #f3f4f6' : 'none',
                         }}>
                         <input type="number" value={t.percent}
-                          onClick={e => e.stopPropagation()}
-                          onChange={e => updateInvoiceTermLabel(idx, 'percent', parseFloat(e.target.value) || 0)}
-                          style={{ width: '52px', border: '1px solid #e5e7eb', borderRadius: '4px', padding: '3px 6px', fontSize: '0.78rem' }} />
+  onClick={e => e.stopPropagation()}
+  onChange={e => updateInvoiceTermLabel(idx, 'percent', parseFloat(e.target.value) || 0)}
+  style={{ width: '64px', border: '1px solid #e5e7eb', borderRadius: '4px', padding: '3px 6px', fontSize: '0.78rem', textAlign: 'center' }} />
                         <span style={{ fontSize: '0.78rem' }}>%</span>
                         <input value={t.label}
                           onClick={e => e.stopPropagation()}
