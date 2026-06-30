@@ -918,9 +918,9 @@ export default function ClientDetailPage() {
   }
 
   const invoiceItemsCalc = invoiceForm.items.map(item => ({
-    ...item,
-    amount: Math.round((item.unitPrice || 0) * (item.termPercent || 0) / 100),
-  }))
+  ...item,
+  amount: Math.round((item.unitPrice || 0) * (parseFloat(item.stops) || 0)),
+}))
   const invoiceSubTotal = invoiceItemsCalc.reduce((s, i) => s + i.amount, 0)
   const invoicePPN      = Math.round(invoiceSubTotal * 0.11)
   const invoiceTotal    = invoiceSubTotal + invoicePPN
@@ -1738,7 +1738,7 @@ export default function ClientDetailPage() {
                         </thead>
                         <tbody>
                           {invoiceForm.items.map((item, idx) => {
-                            const amount = Math.round((item.unitPrice || 0) * (item.termPercent || 0) / 100)
+  const amount = Math.round((item.unitPrice || 0) * (parseFloat(item.stops) || 0))
                             return (
                               <tr key={idx} style={{ borderBottom: idx < invoiceForm.items.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
                                 <td style={{ padding: '8px 10px' }}>
