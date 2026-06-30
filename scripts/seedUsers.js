@@ -6,7 +6,28 @@ const envPath = path.resolve(__dirname, '../.env.local');
 console.log('Looking for env file at:', envPath);
 console.log('File exists:', fs.existsSync(envPath));
 
-require('dotenv').config({ path: envPath });
+// Manually read and parse .env.local, bypassing dotenv's parser
+// so we don't get burned by UTF-16/BOM encoding issues again.
+let raw = fs.readFileSync(envPath);
+
+if (raw[0] === 0xFF && raw[1] === 0xFE) {
+  // UTF-16 LE BOM
+  raw = raw.toString('utf16le');
+} else {
+  raw = raw.toString('utf8');
+}
+raw = raw.replace(/^\uFEFF/, ''); // strip UTF-8 BOM if present
+
+const lines = raw.split(/\r?\n/);
+for (const line of lines) {
+  const trimmed = line.trim();
+  if (!trimmed || trimmed.startsWith('#')) continue;
+  const eqIndex = trimmed.indexOf('=');
+  if (eqIndex === -1) continue;
+  const key = trimmed.slice(0, eqIndex).trim();
+  const value = trimmed.slice(eqIndex + 1).trim();
+  process.env[key] = value;
+}
 
 console.log('MONGODB_URI loaded as:', process.env.MONGODB_URI);
 
