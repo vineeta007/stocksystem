@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 
-const BORDER = '#1e1e16';
-const TEXT = '#d8d4c8';
-const FAINT = '#3a3830';
+const BORDER = '#e0e0e0';
+const TEXT = '#1a1a1a';
+const FAINT = '#888888';
 const ACCENT = '#c9a14a';
 
 function roleLabel(role) {
@@ -41,27 +41,31 @@ export default function SettingsPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh' }}>
-      <div style={{ padding: '18px 24px 14px', borderBottom: `0.5px solid ${BORDER}` }}>
-        <div style={{ fontSize: 8, letterSpacing: '0.3em', color: FAINT, textTransform: 'uppercase', marginBottom: 3 }}>
-          Configuration
-        </div>
-        <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 400, color: TEXT }}>
+    <div style={{ minHeight: '100vh', background: '#f5f5f5' }}>
+      <div style={{ padding: '40px 24px 30px', borderBottom: `1px solid ${BORDER}`, textAlign: 'center' }}>
+        <div
+          style={{
+            fontFamily: "'Cormorant Garamond', serif",
+            fontSize: 50,
+            fontWeight: 700,
+            color: '#000000',
+          }}
+        >
           Settings
         </div>
       </div>
 
-      <div style={{ padding: '24px' }}>
-        <div style={{ fontSize: 9, letterSpacing: '0.25em', color: FAINT, textTransform: 'uppercase', marginBottom: 16 }}>
+      <div style={{ padding: '32px 40px', maxWidth: 900, margin: '0 auto' }}>
+        <div style={{ fontSize: 11, letterSpacing: '0.2em', color: FAINT, textTransform: 'uppercase', marginBottom: 18, fontWeight: 600 }}>
           User Accounts
         </div>
 
-        {loading && <div style={{ color: FAINT, fontSize: 13 }}>Loading users...</div>}
-        {error && <div style={{ color: '#c66', fontSize: 13 }}>{error}</div>}
+        {loading && <div style={{ color: FAINT, fontSize: 14 }}>Loading users...</div>}
+        {error && <div style={{ color: '#c0392b', fontSize: 14 }}>{error}</div>}
 
         {!loading && !error && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            {users.map((u) => {
+          <div style={{ display: 'flex', flexDirection: 'column', background: '#ffffff', border: `1px solid ${BORDER}`, borderRadius: 8, overflow: 'hidden' }}>
+            {users.map((u, idx) => {
               const isSelf = currentUser?.id === u._id;
               return (
                 <div
@@ -70,37 +74,51 @@ export default function SettingsPage() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    padding: '14px 16px',
-                    borderBottom: `0.5px solid ${BORDER}`,
+                    padding: '16px 20px',
+                    borderBottom: idx === users.length - 1 ? 'none' : `1px solid ${BORDER}`,
+                    background: isSelf ? '#fbf7ee' : 'transparent',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                     <div
                       style={{
-                        width: 32,
-                        height: 32,
+                        width: 38,
+                        height: 38,
                         borderRadius: '50%',
-                        border: `1px solid ${ACCENT}`,
+                        border: `1.5px solid ${ACCENT}`,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: 11,
+                        fontSize: 12,
+                        fontWeight: 600,
                         color: ACCENT,
                         letterSpacing: '0.05em',
+                        flexShrink: 0,
                       }}
                     >
                       {u.initials || u.username.slice(0, 2).toUpperCase()}
                     </div>
                     <div>
-                      <div style={{ fontSize: 13, color: TEXT }}>
+                      <div style={{ fontSize: 14, color: TEXT, fontWeight: 600 }}>
                         {u.displayName}
                         {isSelf && (
-                          <span style={{ fontSize: 9, color: ACCENT, marginLeft: 8, letterSpacing: '0.1em' }}>
+                          <span
+                            style={{
+                              fontSize: 10,
+                              color: '#ffffff',
+                              background: ACCENT,
+                              marginLeft: 10,
+                              padding: '2px 7px',
+                              borderRadius: 4,
+                              letterSpacing: '0.08em',
+                              fontWeight: 700,
+                            }}
+                          >
                             YOU
                           </span>
                         )}
                       </div>
-                      <div style={{ fontSize: 10, color: FAINT, marginTop: 2 }}>
+                      <div style={{ fontSize: 12, color: FAINT, marginTop: 3 }}>
                         @{u.username} · {roleLabel(u.role)}
                       </div>
                     </div>
@@ -110,13 +128,15 @@ export default function SettingsPage() {
                     <button
                       onClick={() => setEditingUser(u)}
                       style={{
-                        background: 'transparent',
-                        border: `1px solid ${BORDER}`,
-                        color: TEXT,
-                        fontSize: 10,
-                        letterSpacing: '0.1em',
+                        background: ACCENT,
+                        border: 'none',
+                        color: '#ffffff',
+                        fontSize: 11,
+                        fontWeight: 700,
+                        letterSpacing: '0.08em',
                         textTransform: 'uppercase',
-                        padding: '6px 14px',
+                        padding: '8px 18px',
+                        borderRadius: 6,
                         cursor: 'pointer',
                       }}
                     >
@@ -190,7 +210,7 @@ function EditUserModal({ user, onClose, onSaved }) {
       style={{
         position: 'fixed',
         inset: 0,
-        background: 'rgba(0,0,0,0.6)',
+        background: 'rgba(0,0,0,0.4)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -200,21 +220,23 @@ function EditUserModal({ user, onClose, onSaved }) {
     >
       <div
         style={{
-          background: '#161410',
-          border: `1px solid ${BORDER}`,
-          padding: 28,
-          width: 360,
+          background: '#ffffff',
+          border: '1px solid #e0e0e0',
+          borderRadius: 10,
+          boxShadow: '0 12px 40px rgba(0,0,0,0.18)',
+          padding: 32,
+          width: 380,
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 20, color: TEXT, marginBottom: 4 }}>
+        <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 24, fontWeight: 700, color: '#000000', marginBottom: 4 }}>
           {user.displayName}
         </div>
-        <div style={{ fontSize: 9, color: FAINT, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 20 }}>
+        <div style={{ fontSize: 10, color: '#888888', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 22, fontWeight: 600 }}>
           Edit Your Account
         </div>
 
-        <label style={{ fontSize: 9, color: FAINT, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+        <label style={{ fontSize: 11, color: '#555555', letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600 }}>
           Username
         </label>
         <input
@@ -222,16 +244,18 @@ function EditUserModal({ user, onClose, onSaved }) {
           onChange={(e) => setUsername(e.target.value)}
           style={{
             width: '100%',
-            background: 'transparent',
-            border: `1px solid ${BORDER}`,
-            color: TEXT,
-            fontSize: 13,
-            padding: '8px 10px',
-            margin: '6px 0 16px',
+            background: '#ffffff',
+            border: '1px solid #cccccc',
+            borderRadius: 6,
+            color: '#000000',
+            fontSize: 14,
+            padding: '10px 12px',
+            margin: '6px 0 18px',
+            boxSizing: 'border-box',
           }}
         />
 
-        <label style={{ fontSize: 9, color: FAINT, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+        <label style={{ fontSize: 11, color: '#555555', letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600 }}>
           New Password (leave blank to keep current)
         </label>
         <input
@@ -240,18 +264,20 @@ function EditUserModal({ user, onClose, onSaved }) {
           onChange={(e) => setPassword(e.target.value)}
           style={{
             width: '100%',
-            background: 'transparent',
-            border: `1px solid ${BORDER}`,
-            color: TEXT,
-            fontSize: 13,
-            padding: '8px 10px',
-            margin: '6px 0 16px',
+            background: '#ffffff',
+            border: '1px solid #cccccc',
+            borderRadius: 6,
+            color: '#000000',
+            fontSize: 14,
+            padding: '10px 12px',
+            margin: '6px 0 18px',
+            boxSizing: 'border-box',
           }}
         />
 
         {password && (
           <>
-            <label style={{ fontSize: 9, color: FAINT, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            <label style={{ fontSize: 11, color: '#555555', letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600 }}>
               Confirm Password
             </label>
             <input
@@ -260,20 +286,22 @@ function EditUserModal({ user, onClose, onSaved }) {
               onChange={(e) => setConfirmPassword(e.target.value)}
               style={{
                 width: '100%',
-                background: 'transparent',
-                border: `1px solid ${BORDER}`,
-                color: TEXT,
-                fontSize: 13,
-                padding: '8px 10px',
-                margin: '6px 0 16px',
+                background: '#ffffff',
+                border: '1px solid #cccccc',
+                borderRadius: 6,
+                color: '#000000',
+                fontSize: 14,
+                padding: '10px 12px',
+                margin: '6px 0 18px',
+                boxSizing: 'border-box',
               }}
             />
           </>
         )}
 
-        {error && <div style={{ color: '#c66', fontSize: 11, marginBottom: 12 }}>{error}</div>}
+        {error && <div style={{ color: '#c0392b', fontSize: 12, marginBottom: 14 }}>{error}</div>}
 
-        <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+        <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
           <button
             onClick={handleSave}
             disabled={saving}
@@ -281,11 +309,13 @@ function EditUserModal({ user, onClose, onSaved }) {
               flex: 1,
               background: ACCENT,
               border: 'none',
-              color: '#1e1e16',
-              fontSize: 10,
-              letterSpacing: '0.1em',
+              color: '#ffffff',
+              fontSize: 12,
+              fontWeight: 700,
+              letterSpacing: '0.08em',
               textTransform: 'uppercase',
-              padding: '10px',
+              padding: '11px',
+              borderRadius: 6,
               cursor: 'pointer',
             }}
           >
@@ -295,13 +325,15 @@ function EditUserModal({ user, onClose, onSaved }) {
             onClick={onClose}
             style={{
               flex: 1,
-              background: 'transparent',
-              border: `1px solid ${BORDER}`,
-              color: TEXT,
-              fontSize: 10,
-              letterSpacing: '0.1em',
+              background: '#f0f0f0',
+              border: '1px solid #dddddd',
+              color: '#333333',
+              fontSize: 12,
+              fontWeight: 700,
+              letterSpacing: '0.08em',
               textTransform: 'uppercase',
-              padding: '10px',
+              padding: '11px',
+              borderRadius: 6,
               cursor: 'pointer',
             }}
           >
