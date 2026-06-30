@@ -187,6 +187,149 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
   <div class="footer-line"><span>Telp. 021 - 2452 0983</span><span>info@kreativlift.co.id</span></div>
 </body></html>`
 }
+// ── Invoice PDF generator ──────────────────────────────────────────────────────
+function generateInvoiceHTML(invoiceData, logoBase64) {
+  const {
+    invoiceNo, refNo, invoiceDate, clientName, clientAddress,
+    projectLocation, paymentTerms, items, subTotal, ppnPercent, ppnAmount, totalAmount, status,
+  } = invoiceData
+
+  const dateStr = invoiceDate
+    ? new Date(invoiceDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-')
+    : ''
+
+  const termsRows = (paymentTerms || []).map(t => `
+    <tr style="${t.active ? 'background:#fff3cd;' : ''}">
+      <td style="padding:3px 0;font-size:11px;color:#000;">${t.percent}%</td>
+      <td style="padding:3px 0 3px 24px;font-size:11px;font-style:italic;color:#000;">${t.label}</td>
+    </tr>
+  `).join('')
+
+  const itemRows = (items || []).map(item => `
+    <tr>
+      <td style="padding:8px 6px;border-top:2px solid #cc2020;font-size:11px;color:#000;vertical-align:top;">
+        ${item.specification}${item.serialNo ? `<br/><span style="font-size:10px;">${item.serialNo}</span>` : ''}${item.stops ? ` <span style="font-size:10px;">${item.stops}</span>` : ''}
+      </td>
+      <td style="padding:8px 6px;border-top:2px solid #cc2020;font-size:11px;color:#000;text-align:center;vertical-align:top;">${item.termPercent}%</td>
+      <td style="padding:8px 6px;border-top:2px solid #cc2020;font-size:11px;color:#000;text-align:right;vertical-align:top;">${Number(item.unitPrice).toLocaleString('id-ID')}</td>
+      <td style="padding:8px 6px;border-top:2px solid #cc2020;font-size:11px;color:#000;text-align:left;vertical-align:top;width:24px;">Rp</td>
+      <td style="padding:8px 6px;border-top:2px solid #cc2020;font-size:11px;color:#000;text-align:right;vertical-align:top;">${Number(item.amount).toLocaleString('id-ID')}</td>
+    </tr>
+  `).join('')
+
+  const logoHTML = logoBase64
+    ? `<img src="${logoBase64}" style="height:60px;object-fit:contain;display:block;" />`
+    : `<div style="display:flex;align-items:center;gap:8px;">
+        <span style="color:#cc2020;font-size:24px;font-weight:900;line-height:1;">✕</span>
+        <div>
+          <div style="font-size:14px;font-weight:900;color:#000;">KREATIV <span style="color:#cc2020;">LIFT</span></div>
+          <div style="font-size:7.5px;color:#888;letter-spacing:2px;">Elevate With Us</div>
+        </div>
+      </div>`
+
+  const paidStamp = status === 'Paid'
+    ? `<div style="position:absolute;top:80px;left:50%;transform:translateX(-50%);font-size:34px;font-weight:900;color:#2563eb;border:4px solid #2563eb;border-radius:8px;padding:2px 24px;letter-spacing:4px;opacity:0.85;transform:translateX(-50%) rotate(0deg);">PAID</div>`
+    : ''
+
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8"/>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;color:#000;}
+  body{font-family:Arial,sans-serif;font-size:11px;color:#000;padding:34px 44px;background:#fff;position:relative;}
+  .top-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+  .invoice-title{font-size:13px;font-weight:700;text-align:right;}
+  .invoice-meta{font-size:10px;color:#999;text-align:right;margin-top:2px;}
+  .invoice-meta .val{color:#000;}
+  .cust-block{font-size:11px;line-height:1.7;margin-top:4px;}
+  .cust-block .lbl{font-size:9px;color:#999;}
+  .ref-block{text-align:right;font-size:10px;color:#999;margin-top:6px;}
+  table.terms{border-collapse:collapse;margin-left:auto;margin-top:6px;}
+  table.terms th{font-size:9px;color:#999;font-weight:400;padding-bottom:4px;text-align:left;}
+  table.items{width:100%;border-collapse:collapse;margin-top:18px;}
+  table.items th{font-size:9px;color:#999;font-weight:400;text-align:left;padding:0 6px 6px;border-bottom:1px solid #cc2020;text-transform:uppercase;letter-spacing:0.05em;}
+  .totals{margin-left:auto;width:280px;margin-top:6px;}
+  .totals tr td{padding:4px 6px;font-size:11px;}
+  .totals .label{color:#000;}
+  .totals .grand{border-top:2px solid #cc2020;font-weight:700;font-size:12px;}
+  .pay-info{margin-top:36px;font-size:10px;line-height:1.9;}
+  .pay-info .lbl{color:#999;display:inline-block;width:160px;}
+  .sign-block{margin-top:30px;text-align:right;}
+  .sign-block .company{font-size:10px;font-weight:700;margin-bottom:36px;}
+  .sign-block .name{font-size:10px;font-weight:700;text-decoration:underline;}
+  .sign-block .role{font-size:9px;color:#666;}
+  .footer{margin-top:32px;border-top:2px solid #cc2020;padding-top:6px;text-align:center;font-size:8px;color:#cc2020;font-weight:700;}
+  .footer .addr{color:#666;font-weight:400;margin-top:2px;}
+  @media print{body{padding:18px 28px;}}
+</style>
+</head>
+<body>
+  ${paidStamp}
+  <div class="top-row">
+    <div>
+      ${logoHTML}
+      <div class="cust-block">
+        <div class="lbl">Customer</div>
+        <div style="font-weight:700;">${clientName || ''}</div>
+        <div>${(clientAddress || '').replace(/\n/g, '<br/>')}</div>
+      </div>
+    </div>
+    <div>
+      <div class="invoice-title">INVOICE</div>
+      <div class="invoice-meta">INVOICE<br/><span class="val">${invoiceNo || ''}</span></div>
+      <div class="invoice-meta" style="margin-top:6px;">Date<br/><span class="val">${dateStr}</span></div>
+      <div class="ref-block">Reference :<br/>${refNo || ''}</div>
+    </div>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;margin-top:18px;">
+    <div style="font-size:11px;">
+      <div class="lbl" style="font-size:9px;color:#999;">Project Location</div>
+      <div>${(projectLocation || '').replace(/\n/g, '<br/>')}</div>
+    </div>
+    <table class="terms">
+      <thead><tr><th colspan="2">Payment Terms</th></tr></thead>
+      <tbody>${termsRows}</tbody>
+    </table>
+  </div>
+
+  <table class="items">
+    <thead>
+      <tr>
+        <th>Specification</th>
+        <th style="text-align:center;">Term</th>
+        <th colspan="3" style="text-align:right;">Unit Price &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Amount</th>
+      </tr>
+    </thead>
+    <tbody>${itemRows}</tbody>
+  </table>
+
+  <table class="totals">
+    <tr><td class="label">Sub Total</td><td style="text-align:left;width:24px;">Rp</td><td style="text-align:right;">${Number(subTotal).toLocaleString('id-ID')}</td></tr>
+    <tr><td class="label">PPN ${ppnPercent}%</td><td style="text-align:left;">&nbsp;</td><td style="text-align:right;">${Number(ppnAmount).toLocaleString('id-ID')}</td></tr>
+    <tr class="grand"><td>TOTAL AMOUNT</td><td style="text-align:left;">Rp</td><td style="text-align:right;">${Number(totalAmount).toLocaleString('id-ID')}</td></tr>
+  </table>
+
+  <div class="pay-info">
+    <div><span class="lbl">PAYMENT INFORMATION</span></div>
+    <div><span class="lbl">Beneficial Bank</span>BCA Cab Kelapa Gading</div>
+    <div><span class="lbl">Beneficial Account Number</span>831-0203-000</div>
+    <div><span class="lbl">Beneficial Account Name</span>PT. Inter Kreativ Lift Indonesia</div>
+    <div><span class="lbl">Beneficial Bank Swift</span>CENAIDJA</div>
+  </div>
+
+  <div class="sign-block">
+    <div class="company">PT. Inter Kreativ Lift Indonesia</div>
+    <div class="name">Rohana</div>
+    <div class="role">Finance Manager</div>
+  </div>
+
+  <div class="footer">
+    PT. Inter Kreativ Lift Indonesia
+    <div class="addr">The Kensington Commercial Blok C/09, Jl. Boulevard Raya, Kelapa Gading Timur, Jakarta Utara 14240 - Indonesia<br/>
+    Call Center: 021-2245-2623 | Hotline: 0811-129-8888 | E-mail: info@kreativlift.co.id</div>
+  </div>
+</body></html>`
+}
 
 // ── Catalog Product Picker Modal ──────────────────────────────────────────────
 function ProductCatalogModal({ products, onDone, onClose, initialSelected = [] }) {
@@ -419,6 +562,25 @@ export default function ClientDetailPage() {
   const [visitForm, setVisitForm]         = useState([])
   const [visitMeta, setVisitMeta]         = useState({ lastVisitDate: '', nextVisitDate: '' })
   const [savingVisits, setSavingVisits]   = useState(false)
+  // ── Invoice state ──────────────────────────────────────────────────────────
+  const [invoices, setInvoices]         = useState([])
+  const [invLoading, setInvLoading]     = useState(false)
+  const [showInvoiceForm, setShowInvoiceForm] = useState(false)
+  const [generatingInvoice, setGeneratingInvoice] = useState(false)
+  const DEFAULT_TERMS = [
+    { percent: 20, label: 'DP-1', active: false },
+    { percent: 40, label: 'OI part 1', active: false },
+    { percent: 30, label: 'Term BL', active: false },
+    { percent: 10, label: 'Final', active: false },
+  ]
+  const [invoiceForm, setInvoiceForm] = useState({
+    invoiceNo: '',
+    refNo: '',
+    invoiceDate: new Date().toISOString().slice(0, 10),
+    projectLocation: '',
+    paymentTerms: DEFAULT_TERMS.map(t => ({ ...t })),
+    items: [],
+  })
 
   const fetchCustomer = useCallback(async () => {
     setLoading(true)
@@ -438,9 +600,8 @@ export default function ClientDetailPage() {
     })
     setComments(c.comments     || [])
     setVisits(c.visitHistory   || [])
-    if (c.draftCart && c.draftCart.length > 0) {
-      setCartItems(c.draftCart)
-    }
+    setCartItems(c.draftCart || [])
+    setCartSaved(true)
     setLoading(false)
   }, [id])
 
@@ -458,10 +619,20 @@ export default function ClientDetailPage() {
     setQLoading(false)
   }, [id])
 
+  const fetchInvoices = useCallback(async () => {
+    setInvLoading(true)
+    const res  = await fetch(`/api/invoices?customerId=${id}`)
+    const json = await res.json()
+    setInvoices(json.data || [])
+    setInvLoading(false)
+  }, [id])
+
   useEffect(() => { fetchCustomer() }, [fetchCustomer])
   useEffect(() => { fetchProducts() }, [fetchProducts])
   useEffect(() => { fetchQuotations() }, [fetchQuotations])
+  useEffect(() => { fetchInvoices() }, [fetchInvoices])
   useEffect(() => { if (activeTab === 'quotations') fetchQuotations() }, [activeTab, fetchQuotations])
+  useEffect(() => { if (activeTab === 'invoice') fetchInvoices() }, [activeTab, fetchInvoices])
 
   function markCartDirty(newItems) {
     setCartItems(newItems)
@@ -667,6 +838,116 @@ export default function ClientDetailPage() {
     })
     fetchQuotations()
   }
+  // ── Invoice handlers ──────────────────────────────────────────────────────
+  function addInvoiceItem() {
+    setInvoiceForm(prev => ({
+      ...prev,
+      items: [...prev.items, { specification: '', serialNo: '', stops: '', termPercent: 0, unitPrice: 0 }],
+    }))
+  }
+
+  function updateInvoiceItem(idx, field, value) {
+    setInvoiceForm(prev => ({
+      ...prev,
+      items: prev.items.map((item, i) => i === idx ? { ...item, [field]: value } : item),
+    }))
+  }
+
+  function removeInvoiceItem(idx) {
+    setInvoiceForm(prev => ({ ...prev, items: prev.items.filter((_, i) => i !== idx) }))
+  }
+
+  function toggleInvoiceTerm(idx) {
+    setInvoiceForm(prev => ({
+      ...prev,
+      paymentTerms: prev.paymentTerms.map((t, i) => i === idx ? { ...t, active: !t.active } : t),
+    }))
+  }
+
+  function updateInvoiceTermLabel(idx, field, value) {
+    setInvoiceForm(prev => ({
+      ...prev,
+      paymentTerms: prev.paymentTerms.map((t, i) => i === idx ? { ...t, [field]: value } : t),
+    }))
+  }
+
+  const invoiceItemsCalc = invoiceForm.items.map(item => ({
+    ...item,
+    amount: Math.round((item.unitPrice || 0) * (item.termPercent || 0) / 100),
+  }))
+  const invoiceSubTotal = invoiceItemsCalc.reduce((s, i) => s + i.amount, 0)
+  const invoicePPN      = Math.round(invoiceSubTotal * 0.11)
+  const invoiceTotal    = invoiceSubTotal + invoicePPN
+
+  async function generateInvoice() {
+    if (!invoiceForm.invoiceNo.trim()) return alert('Invoice number is required')
+    if (invoiceForm.items.length === 0) return alert('Add at least one item')
+    setGeneratingInvoice(true)
+
+    const logoBase64 = await fetchLogoBase64()
+
+    const payload = {
+      customerId:      id,
+      invoiceNo:       invoiceForm.invoiceNo,
+      refNo:           invoiceForm.refNo,
+      invoiceDate:     invoiceForm.invoiceDate,
+      clientName:      customer.customerName,
+      clientAddress:   customer.address,
+      projectLocation: invoiceForm.projectLocation,
+      paymentTerms:    invoiceForm.paymentTerms,
+      items:           invoiceForm.items,
+    }
+
+    const res  = await fetch('/api/invoices', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+    const json = await res.json()
+    const inv  = json.data || {}
+
+    const html = generateInvoiceHTML(inv, logoBase64)
+    const win   = window.open('', '_blank')
+    if (!win) {
+      setGeneratingInvoice(false)
+      alert('Popup was blocked. Please allow popups for this site and try again.')
+      return
+    }
+    win.document.write(html)
+    win.document.close()
+    win.focus()
+    setTimeout(() => { win.print() }, 600)
+
+    setGeneratingInvoice(false)
+    setShowInvoiceForm(false)
+    setInvoiceForm({
+      invoiceNo: '',
+      refNo: '',
+      invoiceDate: new Date().toISOString().slice(0, 10),
+      projectLocation: '',
+      paymentTerms: DEFAULT_TERMS.map(t => ({ ...t })),
+      items: [],
+    })
+    fetchInvoices()
+  }
+
+  async function reprintInvoice(inv) {
+    const logoBase64 = await fetchLogoBase64()
+    const html = generateInvoiceHTML(inv, logoBase64)
+    const win  = window.open('', '_blank')
+    win.document.write(html)
+    win.document.close()
+    setTimeout(() => win.print(), 600)
+  }
+
+  async function updateInvoiceStatus(invId, status) {
+    await fetch(`/api/invoices/${invId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    })
+    fetchInvoices()
+  }
 
   if (loading) return (
     <div style={{ padding: '3rem', textAlign: 'center', color: '#9ca3af', fontFamily: "'Sora', sans-serif" }}>
@@ -680,7 +961,7 @@ export default function ClientDetailPage() {
     </div>
   )
 
-  const TABS = ['overview', 'cart', 'visit history', 'quotations']
+  const TABS = ['overview', 'cart', 'visit history', 'quotations', 'invoice']
 
   // ── Draft row: cart items shown in Quotations tab ─────────────────────────
   const hasDraftCart = cartItems.length > 0
@@ -755,7 +1036,9 @@ export default function ClientDetailPage() {
                 ? `QUOTATIONS${(quotations.length + (hasDraftCart ? 1 : 0)) > 0 ? ` (${quotations.length + (hasDraftCart ? 1 : 0)})` : ''}`
                 : tab === 'cart'
                   ? `CART${cartItems.length > 0 ? ` (${cartItems.length})` : ''}`
-                  : tab.toUpperCase()}
+                  : tab === 'invoice'
+                    ? `INVOICE${invoices.length > 0 ? ` (${invoices.length})` : ''}`
+                    : tab.toUpperCase()}
             </button>
           ))}
         </div>
@@ -1288,6 +1571,269 @@ export default function ClientDetailPage() {
                       ))}
                     </>
                   )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* ── INVOICE TAB ── */}
+        {activeTab === 'invoice' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <p style={{ color: '#6b7280', fontSize: '0.85rem', margin: 0 }}>
+                {invoices.length} invoice{invoices.length !== 1 ? 's' : ''} for <strong>{customer.customerName}</strong>
+              </p>
+              <button onClick={() => setShowInvoiceForm(s => !s)} style={darkBtn}>
+                {showInvoiceForm ? 'Cancel' : '+ Generate Invoice'}
+              </button>
+            </div>
+
+            {showInvoiceForm && (
+              <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '20px', marginBottom: '20px', background: '#fafafa' }}>
+
+                {/* Invoice meta */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px', marginBottom: '16px' }}>
+                  <div>
+                    <label style={labelStyle}>Invoice No. *</label>
+                    <input value={invoiceForm.invoiceNo}
+                      onChange={e => setInvoiceForm(p => ({ ...p, invoiceNo: e.target.value }))}
+                      placeholder="INV. KL 06-26/271" style={inputStyle} />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Reference</label>
+                    <input value={invoiceForm.refNo}
+                      onChange={e => setInvoiceForm(p => ({ ...p, refNo: e.target.value }))}
+                      placeholder="KL/PJB/25-06-2024/1A" style={inputStyle} />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Invoice Date</label>
+                    <input type="date" value={invoiceForm.invoiceDate}
+                      onChange={e => setInvoiceForm(p => ({ ...p, invoiceDate: e.target.value }))}
+                      style={inputStyle} />
+                  </div>
+                </div>
+
+                {/* Client info (read-only, from overview) */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '16px' }}>
+                  <div>
+                    <label style={labelStyle}>Customer</label>
+                    <input value={customer.customerName} readOnly style={{ ...inputStyle, background: '#f3f4f6', color: '#6b7280' }} />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Address</label>
+                    <input value={customer.address || ''} readOnly style={{ ...inputStyle, background: '#f3f4f6', color: '#6b7280' }} />
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={labelStyle}>Project Location</label>
+                  <textarea value={invoiceForm.projectLocation} rows={3}
+                    onChange={e => setInvoiceForm(p => ({ ...p, projectLocation: e.target.value }))}
+                    placeholder={"Rumah\nThe Spring Cluster Scarlet\nScarlet Timur 1 No 21\nGading Serpong\nPagedangan"}
+                    style={{ ...inputStyle, resize: 'vertical', fontFamily: "'Sora', sans-serif" }} />
+                </div>
+
+                {/* Payment terms */}
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={labelStyle}>Payment Terms (tap to highlight active term)</label>
+                  <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden', maxWidth: '420px' }}>
+                    {invoiceForm.paymentTerms.map((t, idx) => (
+                      <div key={idx}
+                        onClick={() => toggleInvoiceTerm(idx)}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: '10px',
+                          padding: '8px 14px', cursor: 'pointer',
+                          background: t.active ? '#fff3cd' : (idx % 2 === 0 ? '#fff' : '#fafafa'),
+                          borderBottom: idx < invoiceForm.paymentTerms.length - 1 ? '1px solid #f3f4f6' : 'none',
+                        }}>
+                        <input type="number" value={t.percent}
+                          onClick={e => e.stopPropagation()}
+                          onChange={e => updateInvoiceTermLabel(idx, 'percent', parseFloat(e.target.value) || 0)}
+                          style={{ width: '52px', border: '1px solid #e5e7eb', borderRadius: '4px', padding: '3px 6px', fontSize: '0.78rem' }} />
+                        <span style={{ fontSize: '0.78rem' }}>%</span>
+                        <input value={t.label}
+                          onClick={e => e.stopPropagation()}
+                          onChange={e => updateInvoiceTermLabel(idx, 'label', e.target.value)}
+                          style={{ flex: 1, border: '1px solid #e5e7eb', borderRadius: '4px', padding: '3px 8px', fontSize: '0.78rem', fontStyle: 'italic' }} />
+                        {t.active && <span style={{ fontSize: '0.7rem', color: '#92400e', fontWeight: 700 }}>● ACTIVE</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Line items */}
+                <div style={{ marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <label style={{ ...labelStyle, marginBottom: 0 }}>Line Items</label>
+                    <button onClick={addInvoiceItem} style={outlineBtn}>+ Add Item</button>
+                  </div>
+
+                  {invoiceForm.items.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '2rem', color: '#9ca3af', border: '1px dashed #e5e7eb', borderRadius: '8px', fontSize: '0.85rem' }}>
+                      No items yet. Click "+ Add Item" to add one.
+                    </div>
+                  ) : (
+                    <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
+                        <thead>
+                          <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+                            {['SPECIFICATION', 'SERIAL NO.', 'STOPS', 'TERM %', 'UNIT PRICE (Rp)', 'AMOUNT', ''].map(h => (
+                              <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: '#9ca3af',
+                                fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.06em' }}>{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {invoiceForm.items.map((item, idx) => {
+                            const amount = Math.round((item.unitPrice || 0) * (item.termPercent || 0) / 100)
+                            return (
+                              <tr key={idx} style={{ borderBottom: idx < invoiceForm.items.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
+                                <td style={{ padding: '8px 10px' }}>
+                                  <input value={item.specification}
+                                    onChange={e => updateInvoiceItem(idx, 'specification', e.target.value)}
+                                    placeholder="Pembayaran Term BL Pembelian 1 (Satu) unit Lift / Swift Pro"
+                                    style={{ ...inputStyle, minWidth: '180px' }} />
+                                </td>
+                                <td style={{ padding: '8px 10px' }}>
+                                  <input value={item.serialNo}
+                                    onChange={e => updateInvoiceItem(idx, 'serialNo', e.target.value)}
+                                    placeholder="SW111422" style={{ ...inputStyle, width: '100px' }} />
+                                </td>
+                                <td style={{ padding: '8px 10px' }}>
+                                  <input value={item.stops}
+                                    onChange={e => updateInvoiceItem(idx, 'stops', e.target.value)}
+                                    placeholder="3 Stops" style={{ ...inputStyle, width: '80px' }} />
+                                </td>
+                                <td style={{ padding: '8px 10px' }}>
+                                  <input type="number" value={item.termPercent}
+                                    onChange={e => updateInvoiceItem(idx, 'termPercent', parseFloat(e.target.value) || 0)}
+                                    style={{ ...inputStyle, width: '70px' }} />
+                                </td>
+                                <td style={{ padding: '8px 10px' }}>
+                                  <input type="number" value={item.unitPrice}
+                                    onChange={e => updateInvoiceItem(idx, 'unitPrice', parseFloat(e.target.value) || 0)}
+                                    style={{ ...inputStyle, width: '130px' }} />
+                                </td>
+                                <td style={{ padding: '8px 10px', fontWeight: 600, color: '#111', whiteSpace: 'nowrap' }}>
+                                  {fmtRp(amount)}
+                                </td>
+                                <td style={{ padding: '8px 10px' }}>
+                                  <button onClick={() => removeInvoiceItem(idx)}
+                                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontSize: '1rem' }}>✕</button>
+                                </td>
+                              </tr>
+                            )
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
+                {/* Totals preview */}
+                {invoiceForm.items.length > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+                    <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '14px 20px', minWidth: '260px' }}>
+                      {[
+                        { label: 'Sub Total', val: fmtRp(invoiceSubTotal) },
+                        { label: 'PPN 11%',   val: fmtRp(invoicePPN) },
+                      ].map(({ label, val }) => (
+                        <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', fontSize: '0.82rem', color: '#374151' }}>
+                          <span>{label}</span><span>{val}</span>
+                        </div>
+                      ))}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0 0', borderTop: '1px solid #f3f4f6', marginTop: '4px', fontSize: '0.92rem', fontWeight: 700, color: '#111' }}>
+                        <span>Total Amount</span><span>{fmtRp(invoiceTotal)}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <button onClick={generateInvoice} disabled={generatingInvoice}
+                  style={{ ...darkBtn, background: '#CC2020', width: '100%', padding: '12px' }}>
+                  {generatingInvoice ? 'Generating...' : '📄 Generate & Print Invoice'}
+                </button>
+              </div>
+            )}
+
+            {/* Saved invoices list */}
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', overflow: 'hidden' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                <thead>
+                  <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+                    {['INVOICE NO.', 'CLIENT', 'DATE', 'ITEMS', 'TOTAL', 'STATUS', 'ACTIONS'].map(h => (
+                      <th key={h} style={{
+                        padding: '11px 16px', textAlign: 'left', color: '#9ca3af',
+                        fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase',
+                      }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {invLoading ? (
+                    <tr><td colSpan={7} style={{ padding: '2.5rem', textAlign: 'center', color: '#9ca3af' }}>Loading...</td></tr>
+                  ) : invoices.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} style={{ padding: '3rem', textAlign: 'center', color: '#9ca3af' }}>
+                        <p style={{ margin: '0 0 6px', fontSize: '0.9rem' }}>No invoices yet.</p>
+                        <p style={{ margin: 0, fontSize: '0.8rem' }}>Click "+ Generate Invoice" to create one.</p>
+                      </td>
+                    </tr>
+                  ) : invoices.map((inv, i) => (
+                    <tr key={inv._id} style={{
+                      borderBottom: i < invoices.length - 1 ? '1px solid #f3f4f6' : 'none',
+                      background: i % 2 === 0 ? '#fff' : '#fafafa',
+                    }}>
+                      <td style={{ padding: '13px 16px' }}>
+                        <span style={{ fontFamily: 'monospace', fontSize: '0.82rem', color: '#b45309', fontWeight: 700 }}>
+                          {inv.invoiceNo || '—'}
+                        </span>
+                      </td>
+                      <td style={{ padding: '13px 16px', color: '#374151', fontSize: '0.84rem', fontWeight: 500 }}>
+                        {customer.customerName}
+                      </td>
+                      <td style={{ padding: '13px 16px', color: '#374151', fontSize: '0.84rem' }}>
+                        {fmt(inv.invoiceDate || inv.createdAt)}
+                      </td>
+                      <td style={{ padding: '13px 16px', color: '#6b7280', fontSize: '0.83rem' }}>
+                        {inv.items?.length || 0} item{(inv.items?.length || 0) !== 1 ? 's' : ''}
+                      </td>
+                      <td style={{ padding: '13px 16px' }}>
+                        <span style={{ fontWeight: 700, color: '#111', fontSize: '0.9rem' }}>
+                          {fmtRp(inv.totalAmount)}
+                        </span>
+                      </td>
+                      <td style={{ padding: '13px 16px' }}>
+                        <select
+                          value={inv.status || 'Draft'}
+                          onChange={e => updateInvoiceStatus(inv._id, e.target.value)}
+                          style={{
+                            padding: '4px 10px', borderRadius: '20px', fontSize: '0.73rem',
+                            fontWeight: 600, border: '1px solid', cursor: 'pointer',
+                            fontFamily: "'Sora', sans-serif",
+                            background: inv.status === 'Paid' ? '#f0fdf4' : inv.status === 'Sent' ? '#eff6ff' : inv.status === 'Cancelled' ? '#fef2f2' : '#f9fafb',
+                            color: inv.status === 'Paid' ? '#16a34a' : inv.status === 'Sent' ? '#2563eb' : inv.status === 'Cancelled' ? '#dc2626' : '#6b7280',
+                            borderColor: inv.status === 'Paid' ? '#bbf7d0' : inv.status === 'Sent' ? '#bfdbfe' : inv.status === 'Cancelled' ? '#fecaca' : '#e5e7eb',
+                          }}>
+                          {['Draft', 'Sent', 'Paid', 'Cancelled'].map(s => <option key={s}>{s}</option>)}
+                        </select>
+                      </td>
+                      <td style={{ padding: '13px 16px' }}>
+                        <button
+                          title="Download / Print PDF"
+                          onClick={() => reprintInvoice(inv)}
+                          style={{
+                            display: 'inline-flex', alignItems: 'center', gap: '5px',
+                            padding: '6px 12px', border: '1px solid #e5e7eb', borderRadius: '6px',
+                            background: '#fff', color: '#374151', cursor: 'pointer',
+                            fontSize: '0.75rem', fontWeight: 600, fontFamily: "'Sora', sans-serif",
+                          }}>
+                          ⬇ PDF
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
