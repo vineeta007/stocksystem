@@ -669,7 +669,7 @@ export default function ClientDetailPage() {
   useEffect(() => { fetchQuotations() }, [fetchQuotations])
   useEffect(() => { fetchInvoices() }, [fetchInvoices])
   useEffect(() => { if (activeTab === 'quotations') fetchQuotations() }, [activeTab, fetchQuotations])
-  useEffect(() => { if (activeTab === 'invoice') fetchInvoices() }, [activeTab, fetchInvoices])
+  useEffect(() => { if (activeTab === 'invoice' || activeTab === 'invoice details') fetchInvoices() }, [activeTab, fetchInvoices])
 
   function markCartDirty(newItems) {
     setCartItems(newItems)
@@ -966,6 +966,7 @@ export default function ClientDetailPage() {
 
     setGeneratingInvoice(false)
     setShowInvoiceForm(false)
+    setActiveTab('invoice details')
     setInvoiceForm({
       invoiceNo: '',
       refNo: '',
@@ -1013,7 +1014,7 @@ export default function ClientDetailPage() {
     </div>
   )
 
-  const TABS = ['overview', 'cart', 'visit history', 'quotations', 'invoice']
+  const TABS = ['overview', 'cart', 'visit history', 'quotations', 'invoice', 'invoice details']
 
   // ── Draft row: cart items shown in Quotations tab ─────────────────────────
   const hasDraftCart = cartItems.length > 0
@@ -1085,12 +1086,14 @@ export default function ClientDetailPage() {
               fontFamily: "'Sora', sans-serif", marginBottom: '-1px',
             }}>
               {tab === 'quotations'
-                ? `QUOTATIONS${(quotations.length + (hasDraftCart ? 1 : 0)) > 0 ? ` (${quotations.length + (hasDraftCart ? 1 : 0)})` : ''}`
-                : tab === 'cart'
-                  ? `CART${cartItems.length > 0 ? ` (${cartItems.length})` : ''}`
-                  : tab === 'invoice'
-                    ? `INVOICE${invoices.length > 0 ? ` (${invoices.length})` : ''}`
-                    : tab.toUpperCase()}
+  ? `QUOTATIONS${(quotations.length + (hasDraftCart ? 1 : 0)) > 0 ? ` (${quotations.length + (hasDraftCart ? 1 : 0)})` : ''}`
+  : tab === 'cart'
+    ? `CART${cartItems.length > 0 ? ` (${cartItems.length})` : ''}`
+    : tab === 'invoice'
+      ? 'INVOICE'
+      : tab === 'invoice details'
+        ? `INVOICE DETAILS${invoices.length > 0 ? ` (${invoices.length})` : ''}`
+        : tab.toUpperCase()}
             </button>
           ))}
         </div>
@@ -1809,7 +1812,19 @@ export default function ClientDetailPage() {
               </div>
             )}
 
-            {/* Saved invoices list */}
+            </div>
+        )}
+
+        {/* ── INVOICE DETAILS TAB ── */}
+        {activeTab === 'invoice details' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <p style={{ color: '#6b7280', fontSize: '0.85rem', margin: 0 }}>
+                {invoices.length} invoice{invoices.length !== 1 ? 's' : ''} for <strong>{customer.customerName}</strong>
+              </p>
+              <button onClick={() => setActiveTab('invoice')} style={darkBtn}>+ Generate Invoice</button>
+            </div>
+
             <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', overflow: 'hidden' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                 <thead>
@@ -1874,7 +1889,6 @@ export default function ClientDetailPage() {
                       <td style={{ padding: '13px 16px' }}>
                         <div style={{ display: 'flex', gap: '6px' }}>
                           <button
-                            title="Download / Print PDF"
                             onClick={() => reprintInvoice(inv)}
                             style={{
                               display: 'inline-flex', alignItems: 'center', gap: '5px',
@@ -1885,7 +1899,6 @@ export default function ClientDetailPage() {
                             ⬇ PDF
                           </button>
                           <button
-                            title="Delete invoice"
                             onClick={() => deleteInvoice(inv._id)}
                             style={{
                               display: 'inline-flex', alignItems: 'center', gap: '5px',
