@@ -296,11 +296,18 @@ function AddUserModal({ onClose, onSaved }) {
         />
 
         <label style={labelStyle}>Designation</label>
-        <select value={role} onChange={(e) => setRole(e.target.value)} style={inputStyle}>
+        <input
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+          placeholder="e.g. Admin"
+          list="role-suggestions"
+          style={inputStyle}
+        />
+        <datalist id="role-suggestions">
           {ROLE_OPTIONS.map((r) => (
-            <option key={r.value} value={r.value}>{r.label}</option>
+            <option key={r.value} value={r.value} />
           ))}
-        </select>
+        </datalist>
 
         <label style={labelStyle}>Password</label>
         <input
