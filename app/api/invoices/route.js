@@ -27,14 +27,14 @@ export async function POST(req) {
     const body = await req.json()
 
     const items = (body.items || []).map((item, idx) => ({
-      no:            idx + 1,
-      specification: item.specification,
-      serialNo:      item.serialNo || '',
-      stops:         item.stops || '',
-      termPercent:   item.termPercent || 0,
-      unitPrice:     item.unitPrice || 0,
-      amount:        Math.round((item.unitPrice || 0) * (item.termPercent || 0) / 100),
-    }))
+  no:            idx + 1,
+  specification: item.specification,
+  serialNo:      item.serialNo || '',
+  stops:         item.stops || '',
+  termPercent:   item.termPercent || 0,
+  unitPrice:     item.unitPrice || 0,
+  amount:        Math.round((item.unitPrice || 0) * (parseFloat(item.stops) || 0)),
+}))
 
     const subTotal    = items.reduce((s, i) => s + i.amount, 0)
     const ppnPercent  = body.ppnPercent ?? 11
