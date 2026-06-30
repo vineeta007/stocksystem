@@ -251,7 +251,7 @@ function generateInvoiceHTML(invoiceData, logoBase64) {
   table.items th{font-size:9.5px;color:#999;font-weight:600;text-align:left;padding:0 6px 8px;border-bottom:2px solid #cc2020;text-transform:uppercase;letter-spacing:0.04em;}
   table.items tbody tr:first-child td{border-top:2px solid #cc2020;}
   table.items tbody tr:last-child td{border-bottom:none !important;}
-  .totals{margin-left:auto;width:240px;margin-top:4px;}
+  .totals{margin-left:auto;width:240px;margin-top:4px;border-top:1.5px solid #cc2020;padding-top:4px;}
   .totals tr td{padding:3px 4px;font-size:10px;}
   .totals .label{color:#000;}
   .totals .grand{border-top:2px solid #cc2020;font-weight:700;font-size:10.5px;}
@@ -347,8 +347,8 @@ function generateInvoiceHTML(invoiceData, logoBase64) {
       </div>
       <div class="contact-block">
         <div>&nbsp;</div>
-        <div><a href="mailto:info@kreativlift.co.id" style="color:#2563eb;text-decoration:underline;">Info@kreativlift.co.id</a></div>
-        <div><a href="https://www.kreativlift.co.id" style="color:#2563eb;text-decoration:underline;">www.kreativlift.co.id</a></div>
+        <div><a href="mailto:info@kreativlift.co.id" target="_blank" style="color:#2563eb;text-decoration:underline;">Info@kreativlift.co.id</a></div>
+        <div><a href="https://www.kreativlift.co.id" target="_blank" rel="noopener noreferrer" style="color:#2563eb;text-decoration:underline;">www.kreativlift.co.id</a></div>
         <div>021-22452623</div>
       </div>
     </div>
