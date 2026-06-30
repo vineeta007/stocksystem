@@ -1,5 +1,15 @@
 // Run with: node scripts/seedUsers.js
-require('dotenv').config({ path: '.env.local' });
+const path = require('path');
+const fs = require('fs');
+
+const envPath = path.resolve(__dirname, '../.env.local');
+console.log('Looking for env file at:', envPath);
+console.log('File exists:', fs.existsSync(envPath));
+
+require('dotenv').config({ path: envPath });
+
+console.log('MONGODB_URI loaded as:', process.env.MONGODB_URI);
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
@@ -26,6 +36,10 @@ const STATIC_USERS = [
 ];
 
 async function seed() {
+  if (!process.env.MONGODB_URI) {
+    throw new Error('MONGODB_URI is undefined — check the path/contents of .env.local above.');
+  }
+
   await mongoose.connect(process.env.MONGODB_URI, { bufferCommands: false });
   console.log('Connected to MongoDB');
 
@@ -51,6 +65,6 @@ async function seed() {
 }
 
 seed().catch((err) => {
-  console.error(err);
+  console.error(err.message);
   process.exit(1);
 });
