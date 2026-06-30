@@ -347,7 +347,7 @@ function generateInvoiceHTML(invoiceData, logoBase64) {
       </div>
       <div class="contact-block">
         <div>&nbsp;</div>
-        <div><a href="mailto:info@kreativlift.co.id" target="_blank" style="color:#2563eb;text-decoration:underline;">Info@kreativlift.co.id</a></div>
+        <div><a href="mailto:info@kreativlift.co.id" style="color:#2563eb;text-decoration:underline;">Info@kreativlift.co.id</a></div>
         <div><a href="https://www.kreativlift.co.id" target="_blank" rel="noopener noreferrer" style="color:#2563eb;text-decoration:underline;">www.kreativlift.co.id</a></div>
         <div>021-22452623</div>
       </div>
@@ -869,9 +869,10 @@ export default function ClientDetailPage() {
   }
   // ── Invoice handlers ──────────────────────────────────────────────────────
   function addInvoiceItem() {
+    const activeTerm = invoiceForm.paymentTerms.find(t => t.active)
     setInvoiceForm(prev => ({
       ...prev,
-      items: [...prev.items, { specification: '', serialNo: '', stops: '', termPercent: 0, unitPrice: 0 }],
+      items: [...prev.items, { specification: '', serialNo: '', stops: '', termPercent: activeTerm ? activeTerm.percent : 0, unitPrice: 0 }],
     }))
   }
 
@@ -887,10 +888,18 @@ export default function ClientDetailPage() {
   }
 
   function toggleInvoiceTerm(idx) {
-    setInvoiceForm(prev => ({
-      ...prev,
-      paymentTerms: prev.paymentTerms.map((t, i) => i === idx ? { ...t, active: !t.active } : t),
-    }))
+    setInvoiceForm(prev => {
+      const updatedTerms = prev.paymentTerms.map((t, i) => i === idx ? { ...t, active: !t.active } : t)
+      const activeTerm = updatedTerms.find(t => t.active)
+      return {
+        ...prev,
+        paymentTerms: updatedTerms,
+        items: prev.items.map(item => ({
+          ...item,
+          termPercent: activeTerm ? activeTerm.percent : item.termPercent,
+        })),
+      }
+    })
   }
 
   function updateInvoiceTermLabel(idx, field, value) {
