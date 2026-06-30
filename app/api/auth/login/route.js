@@ -1,11 +1,8 @@
-// app/api/auth/login/route.js
-// POST /api/auth/login
-// Body: { username, password }
-// Returns: { success, user: { username, displayName, role } }
-
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { findUserByUsername } from '@/lib/users';
+import bcrypt from 'bcryptjs';
+import dbConnect from '@/lib/dbConnect';
+import User from '@/models/User';
 import { ROLE_PERMISSIONS } from '@/lib/roles';
 
 const SESSION_COOKIE = 'ss_session';
@@ -13,8 +10,7 @@ const SESSION_MAX_AGE = 60 * 60 * 8; // 8 hours
 
 export async function POST(request) {
   try {
-    const body = await request.json();
-    const { username, password } = body;
+    const { username, password } = await request.json();
 
     if (!username || !password) {
       return NextResponse.json(
@@ -23,7 +19,8 @@ export async function POST(request) {
       );
     }
 
-    const user = findUserByUsername(username.trim());
+    await dbConnect();
+    const user = await User.findOne({ username: username.trim().toLowerCase() });
 
     if (!user) {
       return NextResponse.json(
@@ -32,9 +29,7 @@ export async function POST(request) {
       );
     }
 
-    // Direct comparison (replace with bcrypt.compare in production)
-    // const isMatch = await bcrypt.compare(password, user.password);
-    const isMatch = password === user.password;
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
 
     if (!isMatch) {
       return NextResponse.json(
@@ -43,8 +38,8 @@ export async function POST(request) {
       );
     }
 
-    // Build session payload (never include password)
     const sessionPayload = {
+      id: user._id.toString(),
       username: user.username,
       displayName: user.displayName,
       role: user.role,
@@ -53,8 +48,6 @@ export async function POST(request) {
       loginTime: Date.now(),
     };
 
-    // Set session cookie
-    // In production, encrypt this with jose or iron-session
     const cookieStore = await cookies();
     cookieStore.set(SESSION_COOKIE, JSON.stringify(sessionPayload), {
       httpOnly: true,
@@ -64,10 +57,7 @@ export async function POST(request) {
       path: '/',
     });
 
-    return NextResponse.json({
-      success: true,
-      user: sessionPayload,
-    });
+    return NextResponse.json({ success: true, user: sessionPayload });
   } catch (err) {
     console.error('[login] error:', err);
     return NextResponse.json(
