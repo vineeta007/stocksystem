@@ -206,19 +206,19 @@ function generateInvoiceHTML(invoiceData, logoBase64) {
 
   const itemRows = (items || []).map(item => `
     <tr>
-      <td style="padding:6px 4px;font-size:10px;color:#000;vertical-align:top;">
+      <td style="padding:10px 6px;font-size:10.5px;color:#000;vertical-align:top;border-bottom:1px solid #f0f0f0;">
         ${item.specification}
-        ${item.serialNo || item.stops ? `<div style="font-size:9px;margin-top:1px;"><span style="font-weight:600;">${item.serialNo || ''}</span>&nbsp;&nbsp;${item.stops || ''}</div>` : ''}
+        ${item.serialNo || item.stops ? `<div style="font-size:9.5px;margin-top:2px;color:#444;"><span style="font-weight:600;">${item.serialNo || ''}</span>&nbsp;&nbsp;${item.stops || ''}</div>` : ''}
       </td>
-      <td style="padding:6px 4px;font-size:10px;color:#000;text-align:center;vertical-align:top;">${item.termPercent}%</td>
-      <td style="padding:6px 4px;font-size:10px;color:#000;text-align:right;vertical-align:top;">${Number(item.unitPrice).toLocaleString('id-ID')}</td>
-      <td style="padding:6px 4px;font-size:10px;color:#000;text-align:left;vertical-align:top;width:20px;">Rp</td>
-      <td style="padding:6px 4px;font-size:10px;color:#000;text-align:right;vertical-align:top;">${Number(item.amount).toLocaleString('id-ID')}</td>
+      <td style="padding:10px 6px;font-size:10.5px;color:#000;text-align:center;vertical-align:top;border-bottom:1px solid #f0f0f0;">${item.termPercent}%</td>
+      <td style="padding:10px 6px;font-size:10.5px;color:#000;text-align:right;vertical-align:top;border-bottom:1px solid #f0f0f0;">${Number(item.unitPrice).toLocaleString('id-ID')}</td>
+      <td style="padding:10px 6px;font-size:10.5px;color:#000;text-align:left;vertical-align:top;width:20px;border-bottom:1px solid #f0f0f0;">Rp</td>
+      <td style="padding:10px 6px;font-size:10.5px;color:#000;text-align:right;vertical-align:top;border-bottom:1px solid #f0f0f0;">${Number(item.amount).toLocaleString('id-ID')}</td>
     </tr>
   `).join('')
 
   const logoHTML = logoBase64
-    ? `<img src="${logoBase64}" style="height:42px;object-fit:contain;display:block;" />`
+    ? `<img src="${logoBase64}" style="height:130px;object-fit:contain;display:block;" />`
     : `<div style="display:flex;align-items:center;gap:6px;">
         <span style="color:#cc2020;font-size:20px;font-weight:900;line-height:1;">✕</span>
         <div>
@@ -248,8 +248,9 @@ function generateInvoiceHTML(invoiceData, logoBase64) {
   table.terms{border-collapse:collapse;}
   table.terms th{font-size:9px;color:#999;font-weight:400;padding-bottom:3px;text-align:left;}
   table.items{width:100%;border-collapse:collapse;margin-top:14px;}
-  table.items th{font-size:9px;color:#999;font-weight:400;text-align:left;padding:0 4px 5px;border-bottom:2px solid #cc2020;text-transform:uppercase;letter-spacing:0.03em;}
+  table.items th{font-size:9.5px;color:#999;font-weight:600;text-align:left;padding:0 6px 8px;border-bottom:2px solid #cc2020;text-transform:uppercase;letter-spacing:0.04em;}
   table.items tbody tr:first-child td{border-top:2px solid #cc2020;}
+  table.items tbody tr:last-child td{border-bottom:none !important;}
   .totals{margin-left:auto;width:240px;margin-top:4px;}
   .totals tr td{padding:3px 4px;font-size:10px;}
   .totals .label{color:#000;}
