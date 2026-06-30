@@ -124,23 +124,23 @@ tr:hover td { background: var(--bg-hover) !important; transition: background 0.1
 
 /* ── Inputs ── */
 input, select, textarea {
-  background: var(--input-bg) !important;
-  border: none !important;
+  background: #ffffff !important;
+  border: 1px solid var(--border) !important;
   border-radius: 6px !important;
-  color: #ffffff !important;
+  color: var(--text) !important;
   font-family: var(--font) !important;
   font-size: 14px !important;
   padding: 10px 14px !important;
   outline: none !important;
-  transition: background 0.15s !important;
-  -webkit-text-fill-color: #ffffff !important;
+  transition: border-color 0.15s !important;
+  -webkit-text-fill-color: var(--text) !important;
   width: 100%;
 }
 input:focus, select:focus, textarea:focus {
-  background: var(--input-focus) !important;
+  border-color: var(--red-accent) !important;
 }
-input::placeholder, textarea::placeholder { color: #8a9bb0 !important; }
-select option { background: var(--input-bg) !important; color: #ffffff !important; }
+input::placeholder, textarea::placeholder { color: #9ca3af !important; opacity: 1 !important; }
+select option { background: #ffffff !important; color: var(--text) !important; }
 
 /* ── Buttons ── */
 button { font-family: var(--font) !important; cursor: pointer !important; font-size: 14px !important; }
