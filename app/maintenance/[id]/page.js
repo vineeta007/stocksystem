@@ -1633,13 +1633,13 @@ export default function ClientDetailPage() {
                     <label style={labelStyle}>Invoice No. *</label>
                     <input value={invoiceForm.invoiceNo}
                       onChange={e => setInvoiceForm(p => ({ ...p, invoiceNo: e.target.value }))}
-                      placeholder="INV. KL 06-26/271" style={inputStyle} />
+                      placeholder="" style={inputStyle} />
                   </div>
                   <div>
                     <label style={labelStyle}>Reference</label>
                     <input value={invoiceForm.refNo}
                       onChange={e => setInvoiceForm(p => ({ ...p, refNo: e.target.value }))}
-                      placeholder="KL/PJB/25-06-2024/1A" style={inputStyle} />
+                      placeholder="" style={inputStyle} />
                   </div>
                   <div>
                     <label style={labelStyle}>Invoice Date</label>
@@ -1665,7 +1665,7 @@ export default function ClientDetailPage() {
                   <label style={labelStyle}>Project Location</label>
                   <textarea value={invoiceForm.projectLocation} rows={3}
                     onChange={e => setInvoiceForm(p => ({ ...p, projectLocation: e.target.value }))}
-                    placeholder={"Rumah\nThe Spring Cluster Scarlet\nScarlet Timur 1 No 21\nGading Serpong\nPagedangan"}
+                    placeholder=""
                     style={{ ...inputStyle, resize: 'vertical', fontFamily: "'Sora', sans-serif" }} />
                 </div>
 
