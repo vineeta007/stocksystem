@@ -13,9 +13,9 @@ export const metadata = {
   title: 'KreativLift',
   description: 'Kreativ Lift Inventory & Maintenance Management System',
   icons: {
-    icon: '/globe.svg',
-    shortcut: '/globe.svg',
-    apple: '/globe.svg',
+    icon: '/kreativlogo.png',
+    shortcut: '/kreativlogo.png',
+    apple: '/kreativlogo.png',
   },
 };
 
