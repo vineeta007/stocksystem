@@ -10,8 +10,13 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata = {
-  title: 'StockVault',
-  description: 'Inventory Management System',
+  title: 'Kreativ Lift',
+  description: 'Kreativ Lift Inventory & Maintenance Management System',
+  icons: {
+    icon: '/kreativlogo.png',
+    shortcut: '/kreativlogo.png',
+    apple: '/kreativlogo.png',
+  },
 };
 
 export default function RootLayout({ children }) {
