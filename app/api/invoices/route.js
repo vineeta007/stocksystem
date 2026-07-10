@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import dbConnect from '@/lib/dbConnect'
 import Invoice from '@/models/Invoice'
+import Counter from '@/models/Counter'
 import mongoose from 'mongoose'
 
 export async function GET(req) {
@@ -41,8 +42,20 @@ export async function POST(req) {
     const ppnAmount   = Math.round(subTotal * ppnPercent / 100)
     const totalAmount = subTotal + ppnAmount
 
+    const today     = new Date()
+    const mm        = String(today.getMonth() + 1).padStart(2, '0')
+    const yy        = String(today.getFullYear()).slice(-2)
+    const counterId = `invoice-${mm}-${yy}`
+
+    const counter = await Counter.findByIdAndUpdate(
+      counterId,
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    )
+    const invoiceNo = `INV.KL.${mm}-${yy}/${String(counter.seq).padStart(3, '0')}`
+
     const invoice = new Invoice({
-      invoiceNo:       body.invoiceNo,
+      invoiceNo,
       refNo:           body.refNo || '',
       invoiceDate:     body.invoiceDate || new Date(),
       customerId:      body.customerId,
