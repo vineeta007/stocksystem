@@ -1129,42 +1129,44 @@ export default function ClientDetailPage() {
                 )}
               </div>
 
-              {[
-                { label: 'NAME',   field: 'customerName' },
-                { label: 'PHONE',  field: 'phone' },
-                { label: 'EMAIL',  field: null },
-                { label: 'KOTA',   field: 'kota' },
-                { label: 'ADDRESS',field: 'address' },
-                { label: 'UNIT',   field: 'unitType' },
-                { label: 'SERIAL', field: 'serialNumber' },
-                { label: 'PERIHAL',field: 'perihal' },
-              ].map(({ label, field }) => (
-                <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #f3f4f6' }}>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#9ca3af', letterSpacing: '0.08em' }}>{label}</span>
-                  {editing && field ? (
-                    <input value={editForm[field] || ''}
-                      onChange={e => setEditForm({ ...editForm, [field]: e.target.value })}
-                      style={{ border: '1px solid #e5e7eb', borderRadius: '6px', padding: '4px 8px', fontSize: '0.82rem', color: '#111', textAlign: 'right', width: '55%' }} />
-                  ) : (
-                    <span style={{ fontSize: '0.85rem', color: field ? '#111' : '#9ca3af', fontWeight: field ? 500 : 400 }}>
-                      {field ? (customer[field] || '—') : '—'}
-                    </span>
-                  )}
-                </div>
-              ))}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '32px' }}>
+                {[
+                  { label: 'NAME',   field: 'customerName' },
+                  { label: 'PHONE',  field: 'phone' },
+                  { label: 'EMAIL',  field: null },
+                  { label: 'KOTA',   field: 'kota' },
+                  { label: 'ADDRESS',field: 'address' },
+                  { label: 'UNIT',   field: 'unitType' },
+                  { label: 'SERIAL', field: 'serialNumber' },
+                  { label: 'PERIHAL',field: 'perihal' },
+                ].map(({ label, field }) => (
+                  <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #f3f4f6' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#9ca3af', letterSpacing: '0.08em' }}>{label}</span>
+                    {editing && field ? (
+                      <input value={editForm[field] || ''}
+                        onChange={e => setEditForm({ ...editForm, [field]: e.target.value })}
+                        style={{ border: '1px solid #e5e7eb', borderRadius: '6px', padding: '4px 8px', fontSize: '0.82rem', color: '#111', textAlign: 'right', width: '55%' }} />
+                    ) : (
+                      <span style={{ fontSize: '0.85rem', color: field ? '#111' : '#9ca3af', fontWeight: field ? 500 : 400 }}>
+                        {field ? (customer[field] || '—') : '—'}
+                      </span>
+                    )}
+                  </div>
+                ))}
 
-              {[
-                { label: 'NO. PENAWARAN', value: quotations[0]?.refNo || nextRefNo || '—' },
-                { label: 'BAST DATE',      value: fmt(customer.bastDate) },
-                { label: 'LAST VISIT',     value: fmt(customer.lastVisitDate) },
-                { label: 'NEXT VISIT',     value: fmt(customer.nextVisitDate) },
-                { label: 'STATUS',         value: customer.status },
-              ].map(({ label, value }) => (
-                <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #f3f4f6' }}>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#9ca3af', letterSpacing: '0.08em' }}>{label}</span>
-                  <span style={{ fontSize: '0.85rem', color: '#111', fontWeight: 500 }}>{value}</span>
-                </div>
-              ))}
+                {[
+                  { label: 'NO. PENAWARAN', value: quotations[0]?.refNo || nextRefNo || '—' },
+                  { label: 'BAST DATE',      value: fmt(customer.bastDate) },
+                  { label: 'LAST VISIT',     value: fmt(customer.lastVisitDate) },
+                  { label: 'NEXT VISIT',     value: fmt(customer.nextVisitDate) },
+                  { label: 'STATUS',         value: customer.status },
+                ].map(({ label, value }) => (
+                  <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #f3f4f6' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#9ca3af', letterSpacing: '0.08em' }}>{label}</span>
+                    <span style={{ fontSize: '0.85rem', color: '#111', fontWeight: 500 }}>{value}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '20px' }}>
