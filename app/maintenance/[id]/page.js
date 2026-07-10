@@ -1140,10 +1140,11 @@ export default function ClientDetailPage() {
               ))}
 
               {[
-                { label: 'BAST DATE',  value: fmt(customer.bastDate) },
-                { label: 'LAST VISIT', value: fmt(customer.lastVisitDate) },
-                { label: 'NEXT VISIT', value: fmt(customer.nextVisitDate) },
-                { label: 'STATUS',     value: customer.status },
+                { label: 'NO. PENAWARAN', value: quotations[0]?.refNo || '—' },
+                { label: 'BAST DATE',      value: fmt(customer.bastDate) },
+                { label: 'LAST VISIT',     value: fmt(customer.lastVisitDate) },
+                { label: 'NEXT VISIT',     value: fmt(customer.nextVisitDate) },
+                { label: 'STATUS',         value: customer.status },
               ].map(({ label, value }) => (
                 <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #f3f4f6' }}>
                   <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#9ca3af', letterSpacing: '0.08em' }}>{label}</span>
