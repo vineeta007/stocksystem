@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import dbConnect from '@/lib/dbConnect'
 import Quotation from '@/models/Quotation'
+import Counter from '@/models/Counter'
 import mongoose from 'mongoose'
 
 export async function GET(req) {
@@ -41,12 +42,26 @@ export async function POST(req) {
     const ppnAmount  = Math.round(totalBiaya * 0.11)
     const grandTotal = totalBiaya + ppnAmount
 
+    // Atomically get the next global sequence number (1P, 2P, 3P, ...)
+    const counter = await Counter.findOneAndUpdate(
+      { _id: 'quotationRefNo' },
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    )
+
+    const today = new Date()
+    const dd    = String(today.getDate()).padStart(2, '0')
+    const mm    = String(today.getMonth() + 1).padStart(2, '0')
+    const yy    = String(today.getFullYear()).slice(-2)
+    const refNo = `KL-Quote/${dd}-${mm}-${yy}/${counter.seq}P`
+
     const quotation = new Quotation({
       customerId:    body.customerId,
       clientName:    body.clientName,
       clientAddress: body.clientAddress || '',
       clientPhone:   body.clientPhone   || '',
       project:       body.project       || '',
+      refNo,
       items,
       totalBiaya,
       ppnAmount,
