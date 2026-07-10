@@ -31,6 +31,7 @@ const MaintenanceSchema = new mongoose.Schema(
       default: 'New',
     },
     notes:     { type: String },
+    perihal:   { type: String },
     draftCart: { type: Array, default: [] },
   },
   { timestamps: true }
