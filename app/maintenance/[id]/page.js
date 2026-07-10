@@ -620,6 +620,7 @@ export default function ClientDetailPage() {
   })
 
    const [nextRefNo, setNextRefNo] = useState('')
+   const [nextInvoiceNo, setNextInvoiceNo] = useState('')
 
   const fetchCustomer = useCallback(async () => {
     setLoading(true)
@@ -673,11 +674,18 @@ export default function ClientDetailPage() {
     setNextRefNo(json.refNo || '')
   }, [])
 
+  const fetchNextInvoiceNo = useCallback(async () => {
+    const res  = await fetch('/api/invoices/next-ref')
+    const json = await res.json()
+    setNextInvoiceNo(json.invoiceNo || '')
+  }, [])
+
   useEffect(() => { fetchCustomer() }, [fetchCustomer])
   useEffect(() => { fetchProducts() }, [fetchProducts])
   useEffect(() => { fetchQuotations() }, [fetchQuotations])
   useEffect(() => { fetchInvoices() }, [fetchInvoices])
   useEffect(() => { fetchNextRefNo() }, [fetchNextRefNo])
+  useEffect(() => { fetchNextInvoiceNo() }, [fetchNextInvoiceNo])
   useEffect(() => { if (activeTab === 'quotations') fetchQuotations() }, [activeTab, fetchQuotations])
   useEffect(() => { if (activeTab === 'invoice' || activeTab === 'invoice details') fetchInvoices() }, [activeTab, fetchInvoices])
 
@@ -939,7 +947,6 @@ export default function ClientDetailPage() {
   const invoiceTotal    = invoiceSubTotal + invoicePPN
 
   async function generateInvoice() {
-    if (!invoiceForm.invoiceNo.trim()) return alert('Invoice number is required')
     if (invoiceForm.items.length === 0) return alert('Add at least one item')
     setGeneratingInvoice(true)
 
@@ -947,7 +954,6 @@ export default function ClientDetailPage() {
 
     const payload = {
       customerId:      id,
-      invoiceNo:       invoiceForm.invoiceNo,
       refNo:           invoiceForm.refNo,
       invoiceDate:     invoiceForm.invoiceDate,
       clientName:      customer.customerName,
@@ -989,6 +995,7 @@ export default function ClientDetailPage() {
       items: [],
     })
     fetchInvoices()
+    fetchNextInvoiceNo()
   }
 
   async function reprintInvoice(inv) {
@@ -1684,10 +1691,9 @@ export default function ClientDetailPage() {
                 {/* Invoice meta */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px', marginBottom: '16px' }}>
                   <div>
-                    <label style={labelStyle}>Invoice No. *</label>
-                    <input value={invoiceForm.invoiceNo}
-                      onChange={e => setInvoiceForm(p => ({ ...p, invoiceNo: e.target.value }))}
-                      placeholder="" style={inputStyle} />
+                    <label style={labelStyle}>Invoice No.</label>
+                    <input value={nextInvoiceNo} readOnly
+                      style={{ ...inputStyle, background: '#f3f4f6', color: '#6b7280', fontWeight: 700 }} />
                   </div>
                   <div>
                     <label style={labelStyle}>Reference</label>
