@@ -780,6 +780,7 @@ export default function ClientDetailPage() {
     })
     const json = await res.json()
     const quot = json.data || {}
+    if (!quot.refNo) quot.refNo = nextRefNo
 
     const html = generatePDFHTML(customer, cartItems, quot, logoBase64)
     const win  = window.open('', '_blank')
@@ -815,7 +816,9 @@ export default function ClientDetailPage() {
 
   async function reprintPDF(q) {
     const logoBase64 = await fetchLogoBase64()
-    const html = generatePDFHTML(customer, q.items, q, logoBase64)
+    const quot = { ...q }
+    if (!quot.refNo) quot.refNo = nextRefNo
+    const html = generatePDFHTML(customer, q.items, quot, logoBase64)
     const win  = window.open('', '_blank')
     win.document.write(html)
     win.document.close()
