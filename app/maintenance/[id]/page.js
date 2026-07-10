@@ -619,6 +619,8 @@ export default function ClientDetailPage() {
     items: [],
   })
 
+   const [nextRefNo, setNextRefNo] = useState('')
+
   const fetchCustomer = useCallback(async () => {
     setLoading(true)
     const res  = await fetch(`/api/maintenance/${id}`)
@@ -664,10 +666,17 @@ export default function ClientDetailPage() {
     setInvLoading(false)
   }, [id])
 
+  const fetchNextRefNo = useCallback(async () => {
+    const res  = await fetch('/api/quotations/next-ref')
+    const json = await res.json()
+    setNextRefNo(json.refNo || '')
+  }, [])
+
   useEffect(() => { fetchCustomer() }, [fetchCustomer])
   useEffect(() => { fetchProducts() }, [fetchProducts])
   useEffect(() => { fetchQuotations() }, [fetchQuotations])
   useEffect(() => { fetchInvoices() }, [fetchInvoices])
+  useEffect(() => { fetchNextRefNo() }, [fetchNextRefNo])
   useEffect(() => { if (activeTab === 'quotations') fetchQuotations() }, [activeTab, fetchQuotations])
   useEffect(() => { if (activeTab === 'invoice' || activeTab === 'invoice details') fetchInvoices() }, [activeTab, fetchInvoices])
 
@@ -796,7 +805,7 @@ export default function ClientDetailPage() {
   async function generateDraftPDF() {
     if (cartItems.length === 0) return
     const logoBase64 = await fetchLogoBase64()
-    const html = generatePDFHTML(customer, cartItems, { refNo: 'DRAFT' }, logoBase64)
+    const html = generatePDFHTML(customer, cartItems, { refNo: nextRefNo || 'DRAFT' }, logoBase64)
     const win  = window.open('', '_blank')
     if (!win) { alert('Popup was blocked.'); return }
     win.document.write(html)
@@ -1140,7 +1149,7 @@ export default function ClientDetailPage() {
               ))}
 
               {[
-                { label: 'NO. PENAWARAN', value: quotations[0]?.refNo || '—' },
+                { label: 'NO. PENAWARAN', value: quotations[0]?.refNo || nextRefNo || '—' },
                 { label: 'BAST DATE',      value: fmt(customer.bastDate) },
                 { label: 'LAST VISIT',     value: fmt(customer.lastVisitDate) },
                 { label: 'NEXT VISIT',     value: fmt(customer.nextVisitDate) },
