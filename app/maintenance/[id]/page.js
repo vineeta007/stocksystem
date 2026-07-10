@@ -129,7 +129,7 @@ function generatePDFHTML(customer, items, quotation, logoBase64) {
       <tbody><tr><td>${refNo}</td><td>${dateStr}</td></tr></tbody>
     </table>
   </div>
-  <div class="perihal">Perihal: Penawaran Biaya Maintenance Per Kunjungan</div>
+  <div class="perihal">Perihal: ${customer.perihal || 'Penawaran Biaya Maintenance Per Kunjungan'}</div>
   <div class="intro">Dengan Hormat,<br/>Berikut kami sertakan &nbsp; rincian biaya untuk maitenance perkunjungan:</div>
   <table class="items">
     <thead>
@@ -636,6 +636,7 @@ export default function ClientDetailPage() {
       serialNumber: c.serialNumber || '',
       status:       c.status       || 'New',
       notes:        c.notes        || '',
+      perihal:      c.perihal      || '',
     })
     setComments(c.comments     || [])
     setVisits(c.visitHistory   || [])
@@ -1136,6 +1137,7 @@ export default function ClientDetailPage() {
                 { label: 'ADDRESS',field: 'address' },
                 { label: 'UNIT',   field: 'unitType' },
                 { label: 'SERIAL', field: 'serialNumber' },
+                { label: 'PERIHAL',field: 'perihal' },
               ].map(({ label, field }) => (
                 <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #f3f4f6' }}>
                   <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#9ca3af', letterSpacing: '0.08em' }}>{label}</span>
