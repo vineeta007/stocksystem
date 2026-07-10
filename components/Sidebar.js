@@ -40,7 +40,7 @@ export default function Sidebar() {
   const user = auth?.user ?? null;
   const logout = auth?.logout ?? (() => {});
 
-  const displayName = user?.name || user?.username || 'User';
+  const displayName = user?.displayName || user?.username || 'User';
   const role = user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : '';
   const initials = getInitials(displayName);
 
