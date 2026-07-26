@@ -13,18 +13,21 @@ export async function POST(request, context) {
       return NextResponse.json({ success: false, error: 'Customer name is required' }, { status: 400 });
     }
 
+    const qtySold = Number(body.quantitySold) || 0;
+
     const updated = await Product.findByIdAndUpdate(
       id,
       {
         $push: {
           remarks: {
             customerName: body.customerName,
-            quantitySold: Number(body.quantitySold) || 0,
+            quantitySold: qtySold,
             amount:       Number(body.amount) || 0,
             note:         body.note || '',
             date:         new Date(),
           },
         },
+        $inc: { quantity: -qtySold },
       },
       { new: true }
     );
