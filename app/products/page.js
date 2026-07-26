@@ -85,6 +85,20 @@ export default function ProductsPage() {
     }
   }
 
+  async function handleDeleteRemark(remarkId) {
+    if (!confirm('Cancel this sale? Stock will be added back.')) return;
+    const res = await fetch(`/api/products/${remarksProduct._id}/remarks/${remarkId}`, {
+      method: 'DELETE',
+    });
+    const json = await res.json();
+    if (json.success) {
+      setRemarksProduct(json.data);
+      fetchProducts();
+    } else {
+      alert('Failed: ' + json.error);
+    }
+  }
+
   async function handleSave() {
     if (!form.name.trim() || !form.category.trim()) return alert('Name and category are required');
     setSaving(true);
@@ -473,10 +487,22 @@ export default function ProductsPage() {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {(remarksProduct.remarks || []).slice().reverse().map((r, idx) => (
-                <div key={idx} style={{ border: '1px solid #eeeeee', borderRadius: 8, padding: '10px 14px', background: '#fafafa' }}>
+                <div key={r._id || idx} style={{ border: '1px solid #eeeeee', borderRadius: 8, padding: '10px 14px', background: '#fafafa' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                     <span style={{ fontWeight: 700, fontSize: 13, color: '#111111' }}>{r.customerName}</span>
-                    <span style={{ fontSize: 11, color: '#aaaaaa' }}>{new Date(r.date).toLocaleDateString('id-ID')}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <span style={{ fontSize: 11, color: '#aaaaaa' }}>{new Date(r.date).toLocaleDateString('id-ID')}</span>
+                      <span
+                        onClick={() => handleDeleteRemark(r._id)}
+                        title="Cancel this sale"
+                        style={{
+                          cursor: 'pointer', color: '#CC2020', fontWeight: 700,
+                          fontSize: 14, lineHeight: 1, padding: '2px 4px',
+                        }}
+                      >
+                        ✕
+                      </span>
+                    </div>
                   </div>
                   <div style={{ fontSize: 12, color: '#555555', marginTop: 4 }}>
                     Qty: {r.quantitySold || 0} {r.amount ? `• Rp ${Number(r.amount).toLocaleString('id-ID')}` : ''}
