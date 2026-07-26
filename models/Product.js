@@ -11,6 +11,14 @@ const KlaimSchema = new mongoose.Schema({
   catatanAdmin: { type: String },
 }, { _id: true, timestamps: true });
 
+const RemarkSchema = new mongoose.Schema({
+  customerName: { type: String, required: true, trim: true },
+  quantitySold: { type: Number, default: 0, min: 0 },
+  amount:       { type: Number, default: 0, min: 0 },
+  note:         { type: String, default: '' },
+  date:         { type: Date, default: Date.now },
+}, { _id: true, timestamps: true });
+
 const ProductSchema = new mongoose.Schema({
   name:         { type: String, required: true, trim: true },
   category:     { type: String, trim: true },
@@ -31,6 +39,7 @@ const ProductSchema = new mongoose.Schema({
   stokDiHold:   { type: Number, default: 0, min: 0 },
   lokasiGudang: { type: String },
   riwayatKlaim: { type: [KlaimSchema], default: [] },
+  remarks:      { type: [RemarkSchema], default: [] },
   isActive:     { type: Boolean, default: true },
 }, { timestamps: true });
 
