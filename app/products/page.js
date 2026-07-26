@@ -21,6 +21,10 @@ export default function ProductsPage() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [openStatusId, setOpenStatusId] = useState(null);
+  const [showRemarksModal, setShowRemarksModal] = useState(false);
+  const [remarksProduct, setRemarksProduct] = useState(null);
+  const [remarkForm, setRemarkForm] = useState({ customerName: '', quantitySold: '', note: '', amount: '' });
+  const [addingRemark, setAddingRemark] = useState(false);
 
   async function fetchProducts() {
     setLoading(true);
@@ -49,6 +53,36 @@ export default function ProductsPage() {
       sku: p.sku || '',
     });
     setShowModal(true);
+  }
+
+  function openRemarks(p) {
+    setRemarksProduct(p);
+    setRemarkForm({ customerName: '', quantitySold: '', note: '', amount: '' });
+    setShowRemarksModal(true);
+  }
+
+  async function handleAddRemark() {
+    if (!remarkForm.customerName.trim()) return alert('Customer name is required');
+    setAddingRemark(true);
+    const res = await fetch(`/api/products/${remarksProduct._id}/remarks`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customerName: remarkForm.customerName,
+        quantitySold: Number(remarkForm.quantitySold) || 0,
+        amount: Number(remarkForm.amount) || 0,
+        note: remarkForm.note,
+      }),
+    });
+    const json = await res.json();
+    setAddingRemark(false);
+    if (json.success) {
+      setRemarksProduct(json.data);
+      setRemarkForm({ customerName: '', quantitySold: '', note: '', amount: '' });
+      fetchProducts();
+    } else {
+      alert('Failed: ' + json.error);
+    }
   }
 
   async function handleSave() {
@@ -217,9 +251,10 @@ export default function ProductsPage() {
                 {filtered.map((p, i) => {
                   const st = statusStyle(p.quantity ?? 0, p.minStock ?? 0);
                   return (
-                    <tr key={p._id} style={{
+                    <tr key={p._id} onClick={() => openRemarks(p)} style={{
                       borderBottom: '1px solid #f0f0f0',
                       background: i % 2 === 0 ? '#ffffff' : '#fafafa',
+                      cursor: 'pointer',
                     }}>
                       <td style={{ padding: '13px 16px', color: '#aaaaaa', fontSize: 13 }}>{i + 1}</td>
                       <td style={{ padding: '13px 16px', color: '#111111', fontWeight: 600, fontSize: 14 }}>{p.name}</td>
@@ -237,7 +272,7 @@ export default function ProductsPage() {
                       <td style={{ padding: '13px 16px' }}>
                         <div style={{ position: 'relative', display: 'inline-block' }}>
                           <span
-                            onClick={() => setOpenStatusId(openStatusId === p._id ? null : p._id)}
+                            onClick={(e) => { e.stopPropagation(); setOpenStatusId(openStatusId === p._id ? null : p._id); }}
                             style={{
                               fontSize: 10, padding: '4px 10px', borderRadius: 6,
                               background: st.bg, color: st.color,
@@ -262,7 +297,8 @@ export default function ProductsPage() {
                               ].map(opt => (
                                 <div
                                   key={opt.label}
-                                  onClick={async () => {
+                                  onClick={async (e) => {
+                                    e.stopPropagation();
                                     setOpenStatusId(null);
                                     await fetch(`/api/products/${p._id}`, {
                                       method: 'PATCH',
@@ -287,7 +323,7 @@ export default function ProductsPage() {
                         </div>
                       </td>
                       <td style={{ padding: '13px 16px' }}>
-                        <button onClick={() => openEdit(p)} style={{
+                        <button onClick={(e) => { e.stopPropagation(); openEdit(p); }} style={{
                           padding: '5px 14px', fontSize: 11, letterSpacing: '0.08em',
                           textTransform: 'uppercase', background: 'transparent',
                           color: '#CC2020', border: '1px solid rgba(204,32,32,0.3)',
@@ -362,6 +398,104 @@ export default function ProductsPage() {
                 Cancel
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Remarks Modal */}
+      {showRemarksModal && remarksProduct && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
+          zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
+        }}>
+          <div style={{
+            background: '#ffffff', border: '1px solid #e0e0e0',
+            borderRadius: 12, width: '100%', maxWidth: 520, padding: 32,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.12)', maxHeight: '85vh', overflowY: 'auto',
+          }}>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: '#111111', margin: '0 0 4px' }}>
+              {remarksProduct.name}
+            </h2>
+            <p style={{ fontSize: 12, color: '#888888', margin: '0 0 24px' }}>Sale remarks & history</p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+              <div>
+                <div style={{ fontSize: 10, letterSpacing: '0.15em', color: '#888888', textTransform: 'uppercase', marginBottom: 6, fontWeight: 600 }}>Customer Name *</div>
+                <input
+                  value={remarkForm.customerName}
+                  onChange={e => setRemarkForm(prev => ({ ...prev, customerName: e.target.value }))}
+                  placeholder="e.g. Budi Santoso"
+                  style={{ width: '100%', background: '#3d4a5c', border: 'none', borderRadius: 6, padding: '10px 14px', color: '#ffffff', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: "'Sora', sans-serif" }}
+                />
+              </div>
+              <div>
+                <div style={{ fontSize: 10, letterSpacing: '0.15em', color: '#888888', textTransform: 'uppercase', marginBottom: 6, fontWeight: 600 }}>Quantity Sold</div>
+                <input
+                  type="number"
+                  value={remarkForm.quantitySold}
+                  onChange={e => setRemarkForm(prev => ({ ...prev, quantitySold: e.target.value }))}
+                  placeholder="0"
+                  style={{ width: '100%', background: '#3d4a5c', border: 'none', borderRadius: 6, padding: '10px 14px', color: '#ffffff', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: "'Sora', sans-serif" }}
+                />
+              </div>
+              <div>
+                <div style={{ fontSize: 10, letterSpacing: '0.15em', color: '#888888', textTransform: 'uppercase', marginBottom: 6, fontWeight: 600 }}>Amount (Rp)</div>
+                <input
+                  type="number"
+                  value={remarkForm.amount}
+                  onChange={e => setRemarkForm(prev => ({ ...prev, amount: e.target.value }))}
+                  placeholder="0"
+                  style={{ width: '100%', background: '#3d4a5c', border: 'none', borderRadius: 6, padding: '10px 14px', color: '#ffffff', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: "'Sora', sans-serif" }}
+                />
+              </div>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <div style={{ fontSize: 10, letterSpacing: '0.15em', color: '#888888', textTransform: 'uppercase', marginBottom: 6, fontWeight: 600 }}>Note</div>
+                <input
+                  value={remarkForm.note}
+                  onChange={e => setRemarkForm(prev => ({ ...prev, note: e.target.value }))}
+                  placeholder="optional note"
+                  style={{ width: '100%', background: '#3d4a5c', border: 'none', borderRadius: 6, padding: '10px 14px', color: '#ffffff', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: "'Sora', sans-serif" }}
+                />
+              </div>
+            </div>
+
+            <button onClick={handleAddRemark} disabled={addingRemark} style={{
+              width: '100%', padding: '11px 0', background: '#000000', color: '#ffffff',
+              border: 'none', borderRadius: 6, fontWeight: 700, fontSize: 13,
+              letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer',
+              fontFamily: "'Sora', sans-serif", marginBottom: 24,
+            }}>
+              {addingRemark ? 'Adding...' : '+ Add Remark'}
+            </button>
+
+            <div style={{ fontSize: 10, letterSpacing: '0.15em', color: '#888888', textTransform: 'uppercase', marginBottom: 10, fontWeight: 600 }}>
+              History ({(remarksProduct.remarks || []).length})
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {(remarksProduct.remarks || []).slice().reverse().map((r, idx) => (
+                <div key={idx} style={{ border: '1px solid #eeeeee', borderRadius: 8, padding: '10px 14px', background: '#fafafa' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                    <span style={{ fontWeight: 700, fontSize: 13, color: '#111111' }}>{r.customerName}</span>
+                    <span style={{ fontSize: 11, color: '#aaaaaa' }}>{new Date(r.date).toLocaleDateString('id-ID')}</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: '#555555', marginTop: 4 }}>
+                    Qty: {r.quantitySold || 0} {r.amount ? `• Rp ${Number(r.amount).toLocaleString('id-ID')}` : ''}
+                  </div>
+                  {r.note && <div style={{ fontSize: 12, color: '#777777', marginTop: 4, fontStyle: 'italic' }}>{r.note}</div>}
+                </div>
+              ))}
+              {(remarksProduct.remarks || []).length === 0 && (
+                <div style={{ textAlign: 'center', padding: 20, color: '#aaaaaa', fontSize: 13 }}>No remarks yet</div>
+              )}
+            </div>
+
+            <button onClick={() => setShowRemarksModal(false)} style={{
+              marginTop: 20, width: '100%', padding: '10px 0', background: 'transparent',
+              color: '#555555', border: '1px solid #dddddd', borderRadius: 6, fontSize: 13,
+              cursor: 'pointer', fontFamily: "'Sora', sans-serif",
+            }}>
+              Close
+            </button>
           </div>
         </div>
       )}
