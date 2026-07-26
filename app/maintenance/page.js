@@ -29,6 +29,7 @@ export default function MaintenancePage() {
   const [showForm, setShowForm]         = useState(false)
   const [editTarget, setEditTarget]     = useState(null)
   const [reminderOnly, setReminderOnly] = useState(false)
+  const [search, setSearch]             = useState('')
 
   const [form, setForm] = useState({
     customerName:'', address:'', kota:'', phone:'', unitType:'',
@@ -48,6 +49,17 @@ export default function MaintenancePage() {
   }, [kotaFilter, statusFilter, reminderOnly])
 
   useEffect(() => { fetchData() }, [fetchData])
+
+  // Search by customer name, then sort so customers with a visit date
+  // (Kunjungan Terakhir or Berikutnya) show first, undated ones after.
+  const displayedCustomers = customers
+    .filter((c) => c.customerName?.toLowerCase().includes(search.toLowerCase()))
+    .slice()
+    .sort((a, b) => {
+      const aHasDate = a.lastVisitDate || a.nextVisitDate ? 1 : 0
+      const bHasDate = b.lastVisitDate || b.nextVisitDate ? 1 : 0
+      return bHasDate - aHasDate
+    })
 
   const needAttention = customers.filter(
     (c) => c.daysUntilNextVisit !== null && c.daysUntilNextVisit <= 14
@@ -112,14 +124,23 @@ export default function MaintenancePage() {
           fontFamily: "'Cormorant Garamond', serif",
           position: 'absolute', left: '50%', transform: 'translateX(-50%)',
         }}>Customer List</h1>
-        <button className="btn-primary" style={{ marginLeft: 'auto' }} onClick={() => { setEditTarget(null); setShowForm(true) }}>
-          + Tambah Customer
-        </button>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="🔍 Cari customer..."
+            className="search-input"
+          />
+          <button className="btn-primary" onClick={() => { setEditTarget(null); setShowForm(true) }}>
+            + Tambah Customer
+          </button>
+        </div>
       </div>
 
       {/* Subtitle */}
       <p className="subtitle" style={{ marginBottom: '1rem' }}>
-        {customers.length} customer aktif
+        {displayedCustomers.length} customer aktif
         {needAttention > 0 && (
           <span className="badge badge-warning ml-2">⚠ {needAttention} perlu perhatian</span>
         )}
@@ -160,10 +181,10 @@ export default function MaintenancePage() {
       {/* Table */}
       {loading ? (
         <p className="loading-text">Memuat data...</p>
-      ) : customers.length === 0 ? (
+      ) : displayedCustomers.length === 0 ? (
         <div className="empty-state">
-          <p>Tidak ada data{kotaFilter !== 'Semua Kota' ? ` untuk kota ${kotaFilter}` : ''}.</p>
-          <button className="btn-primary" onClick={() => setShowForm(true)}>+ Tambah Customer</button>
+          <p>Tidak ada data{search ? ` untuk pencarian "${search}"` : kotaFilter !== 'Semua Kota' ? ` untuk kota ${kotaFilter}` : ''}.</p>
+          {!search && <button className="btn-primary" onClick={() => setShowForm(true)}>+ Tambah Customer</button>}
         </div>
       ) : (
         <div className="table-wrapper">
@@ -184,7 +205,7 @@ export default function MaintenancePage() {
               </tr>
             </thead>
             <tbody>
-              {customers.map((c, i) => (
+              {displayedCustomers.map((c, i) => (
                 <tr key={c._id} className={c.daysUntilNextVisit !== null && c.daysUntilNextVisit <= 14 ? 'row-warning' : ''}>
                   <td>{i + 1}</td>
                   <td>
@@ -291,6 +312,13 @@ export default function MaintenancePage() {
           font-family: 'Sora', sans-serif;
         }
         .subtitle { color: #6b7280; margin: 4px 0 0; font-size: 0.9rem; }
+
+        .search-input {
+          padding: 9px 14px; border: 1px solid #e5e7eb; border-radius: 8px;
+          font-size: 0.875rem; background: #ffffff; color: #111111;
+          outline: none; width: 220px; font-family: 'Sora', sans-serif;
+        }
+        .search-input:focus { border-color: #111111; }
 
         .reminder-banner {
           background: #fffbeb; border: 1px solid #f59e0b; border-radius: 8px;
