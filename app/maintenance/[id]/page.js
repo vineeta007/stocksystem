@@ -25,6 +25,12 @@ function toInputDate(d) {
   if (isNaN(dt.getTime())) return ''
   return dt.toISOString().slice(0, 10)
 }
+function addMonths(dateStr, months) {
+  if (!dateStr) return null
+  const d = new Date(dateStr)
+  d.setMonth(d.getMonth() + months)
+  return d.toISOString().slice(0, 10)
+}
 
 async function fetchLogoBase64() {
   try {
@@ -872,6 +878,7 @@ export default function ClientDetailPage() {
     const cleanedVisits = visitForm.filter(v => v.date).map(v => ({ date: v.date, notes: v.notes || '' }))
     const sorted = [...cleanedVisits].sort((a, b) => new Date(b.date) - new Date(a.date))
     const derivedLastVisit = sorted[0]?.date || visitMeta.lastVisitDate || null
+    const derivedNextVisit = derivedLastVisit ? addMonths(derivedLastVisit, 6) : null
 
     await fetch(`/api/maintenance/${id}`, {
       method: 'PATCH',
@@ -880,7 +887,7 @@ export default function ClientDetailPage() {
         visitHistory:  cleanedVisits,
         visitCount:    cleanedVisits.length,
         lastVisitDate: derivedLastVisit,
-        nextVisitDate: visitMeta.nextVisitDate || null,
+        nextVisitDate: derivedNextVisit,
       }),
     })
     setSavingVisits(false)
@@ -1448,9 +1455,15 @@ export default function ClientDetailPage() {
                 {!editingVisits ? (
                   <p style={{ fontSize: '1rem', fontWeight: 700, color: '#111', margin: 0 }}>{fmt(customer.nextVisitDate)}</p>
                 ) : (
-                  <input type="date" value={visitMeta.nextVisitDate}
-                    onChange={e => setVisitMeta({ ...visitMeta, nextVisitDate: e.target.value })}
-                    style={{ ...inputStyle, fontWeight: 700 }} />
+                  <p style={{ fontSize: '1rem', fontWeight: 700, color: '#111', margin: 0 }}>
+                    {(() => {
+                      const sortedForm = [...visitForm].filter(v => v.date).sort((a, b) => new Date(b.date) - new Date(a.date))
+                      const previewLast = sortedForm[0]?.date || visitMeta.lastVisitDate
+                      const previewNext = previewLast ? addMonths(previewLast, 6) : null
+                      return previewNext ? fmt(previewNext) : '—'
+                    })()}
+                    <span style={{ fontSize: '0.65rem', color: '#9ca3af', fontWeight: 400, display: 'block', marginTop: '2px' }}>auto: +6 months</span>
+                  </p>
                 )}
               </div>
             </div>
