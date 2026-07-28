@@ -2,6 +2,13 @@ import { NextResponse } from 'next/server'
 import dbConnect from '@/lib/dbConnect'
 import Maintenance from '@/models/Maintenance'
 
+// Adds exactly 6 calendar months to a date (matches the visit-history tab's logic)
+function addSixMonths(date) {
+  const d = new Date(date)
+  d.setMonth(d.getMonth() + 6)
+  return d
+}
+
 // GET /api/maintenance
 export async function GET(request) {
   try {
@@ -46,8 +53,7 @@ export async function POST(request) {
     const body = await request.json()
 
     if (body.lastVisitDate && !body.nextVisitDate) {
-      const last = new Date(body.lastVisitDate)
-      body.nextVisitDate = new Date(last.getTime() + 90 * 24 * 60 * 60 * 1000)
+      body.nextVisitDate = addSixMonths(body.lastVisitDate)
     }
 
     const customer = await Maintenance.create(body)
