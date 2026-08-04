@@ -3,8 +3,31 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 
 const KOTA_LIST = [
-  'Semua Kota','Jakarta','Surabaya','Bandung','Medan','Semarang',
-  'Bekasi','Depok','Tangerang','Makassar','Palembang',
+  'Semua Kota',
+  // Sumatra
+  'Banda Aceh','Sabang','Langsa','Lhokseumawe','Subulussalam',
+  'Medan','Binjai','Tebing Tinggi','Pematangsiantar','Tanjungbalai','Sibolga','Padangsidimpuan','Gunungsitoli',
+  'Padang','Bukittinggi','Padang Panjang','Payakumbuh','Sawahlunto','Solok','Pariaman',
+  'Pekanbaru','Dumai','Batam','Tanjungpinang','Jambi','Sungai Penuh',
+  'Palembang','Pagar Alam','Lubuklinggau','Prabumulih','Bengkulu','Bandar Lampung','Metro','Pangkal Pinang',
+  // Jawa
+  'Jakarta Pusat','Jakarta Utara','Jakarta Barat','Jakarta Selatan','Jakarta Timur',
+  'Bandung','Bogor','Sukabumi','Cirebon','Bekasi','Depok','Cimahi','Tasikmalaya','Banjar',
+  'Semarang','Surakarta','Salatiga','Pekalongan','Tegal','Magelang','Yogyakarta',
+  'Surabaya','Malang','Madiun','Kediri','Blitar','Mojokerto','Pasuruan','Probolinggo','Batu',
+  'Tangerang','Cilegon','Serang','Tangerang Selatan',
+  // Kalimantan
+  'Pontianak','Singkawang','Palangka Raya','Banjarmasin','Banjarbaru',
+  'Samarinda','Balikpapan','Bontang','Tarakan',
+  // Sulawesi
+  'Manado','Bitung','Tomohon','Kotamobagu','Palu',
+  'Makassar','Parepare','Palopo','Kendari','Baubau','Gorontalo',
+  // Bali & Nusa Tenggara
+  'Denpasar','Mataram','Bima','Kupang',
+  // Maluku
+  'Ambon','Tual','Ternate','Tidore Kepulauan',
+  // Papua
+  'Jayapura','Sorong',
 ]
 
 function daysBadge(days) {
