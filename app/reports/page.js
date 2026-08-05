@@ -170,183 +170,202 @@ export default function ReportsPage() {
   /* ---------- Excel export ---------- */
   const downloadExcel = async () => {
     setDownloading(true);
-    const { products: freshProducts, customers: freshCustomers } = await fetchData(true);
-    const XLSX = await import('xlsx');
+    try {
+      const { products: freshProducts, customers: freshCustomers } = await fetchData(true);
+      const XLSX = await import('xlsx');
 
-    if (tab === 'products') {
-      const productRows = freshProducts.map((p, i) => ({
-        '#': i + 1,
-        'Product Name': p.name,
-        'Category': p.category || '',
-        'Stock': p.quantity,
-        'Min Stock': p.minStock,
-        'Price': p.price,
-        'Status': statusOf(p),
-      }));
+      if (tab === 'products') {
+        const productRows = freshProducts.map((p, i) => ({
+          '#': i + 1,
+          'Product Name': p.name,
+          'Category': p.category || '',
+          'Stock': p.quantity,
+          'Min Stock': p.minStock,
+          'Price': p.price,
+          'Status': statusOf(p),
+        }));
 
-      const remarkRows = [];
-      freshProducts.forEach((p) => {
-        (p.remarks || []).forEach((r) => {
-          remarkRows.push({
-            'Product Name': p.name,
-            'Customer Name': r.customerName,
-            'Quantity Sold': r.quantitySold,
-            'Amount (Rp)': r.amount,
-            'Note': r.note || '',
-            'Date': fmtDate(r.date),
+        const remarkRows = [];
+        freshProducts.forEach((p) => {
+          (p.remarks || []).forEach((r) => {
+            remarkRows.push({
+              'Product Name': p.name,
+              'Customer Name': r.customerName,
+              'Quantity Sold': r.quantitySold,
+              'Amount (Rp)': r.amount,
+              'Note': r.note || '',
+              'Date': fmtDate(r.date),
+            });
           });
         });
-      });
 
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(productRows), 'Products');
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(remarkRows), 'Sales Remarks');
-      XLSX.writeFile(wb, `products-report-${Date.now()}.xlsx`);
-    } else {
-      const rows = freshCustomers.map((c, i) => ({
-        '#': i + 1,
-        'Customer Name': c.customerName,
-        'Address': c.address || '',
-        'Kota': c.kota || '',
-        'Phone': c.phone || '',
-        'Unit Type': c.unitType || '',
-        'Serial Number': c.serialNumber || '',
-        'Last Visit': fmtDate(c.lastVisitDate),
-        'Next Visit': fmtDate(c.nextVisitDate),
-        'Visit Count': c.visitCount,
-        'Status': c.status,
-      }));
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(productRows), 'Products');
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(remarkRows.length ? remarkRows : [{ 'No remarks yet': '' }]), 'Sales Remarks');
+        XLSX.writeFile(wb, `products-report-${Date.now()}.xlsx`);
+      } else {
+        const rows = freshCustomers.map((c, i) => ({
+          '#': i + 1,
+          'Customer Name': c.customerName,
+          'Address': c.address || '',
+          'Kota': c.kota || '',
+          'Phone': c.phone || '',
+          'Unit Type': c.unitType || '',
+          'Serial Number': c.serialNumber || '',
+          'Last Visit': fmtDate(c.lastVisitDate),
+          'Next Visit': fmtDate(c.nextVisitDate),
+          'Visit Count': c.visitCount,
+          'Status': c.status,
+        }));
 
-      const visitRows = [];
-      freshCustomers.forEach((c) => {
-        (c.visitHistory || []).forEach((v, i) => {
-          visitRows.push({
-            'Customer Name': c.customerName,
-            'Visit #': i + 1,
-            'Date': fmtDate(v.date),
-            'Notes': v.notes || '',
+        const visitRows = [];
+        freshCustomers.forEach((c) => {
+          (c.visitHistory || []).forEach((v, i) => {
+            visitRows.push({
+              'Customer Name': c.customerName,
+              'Visit #': i + 1,
+              'Date': fmtDate(v.date),
+              'Notes': v.notes || '',
+            });
           });
         });
-      });
 
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), 'Customer List');
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(visitRows), 'Visit History');
-      XLSX.writeFile(wb, `customer-list-${Date.now()}.xlsx`);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), 'Customer List');
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(visitRows.length ? visitRows : [{ 'No visit history yet': '' }]), 'Visit History');
+        XLSX.writeFile(wb, `customer-list-${Date.now()}.xlsx`);
+      }
+    } catch (err) {
+      console.error('Excel export failed:', err);
+      alert('Excel export failed: ' + (err?.message || 'Unknown error') + '\n\nCheck the console for the full stack trace.');
+    } finally {
+      setDownloading(false);
     }
-    setDownloading(false);
   };
 
   /* ---------- PDF export ---------- */
   const downloadPDF = async () => {
     setDownloading(true);
-    const { products: freshProducts, customers: freshCustomers } = await fetchData(true);
-    const { jsPDF } = await import('jspdf');
-    const autoTable = (await import('jspdf-autotable')).default;
+    try {
+      const { products: freshProducts, customers: freshCustomers } = await fetchData(true);
+      const { jsPDF } = await import('jspdf');
+      const autoTable = (await import('jspdf-autotable')).default;
 
-    const doc = new jsPDF({ orientation: 'landscape' });
+      const doc = new jsPDF({ orientation: 'landscape' });
 
-    if (tab === 'products') {
-      doc.setFontSize(14);
-      doc.text('Products Report', 14, 14);
-
-      autoTable(doc, {
-        startY: 20,
-        head: [['#', 'Product Name', 'Category', 'Stock', 'Min Stock', 'Price', 'Status']],
-        body: freshProducts.map((p, i) => [
-          i + 1,
-          p.name,
-          p.category || '-',
-          p.quantity,
-          p.minStock,
-          fmtRp(p.price),
-          statusOf(p),
-        ]),
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: [30, 30, 22] },
-      });
-
-      let y = doc.lastAutoTable.finY + 10;
-      freshProducts.forEach((p) => {
-        if (!p.remarks || p.remarks.length === 0) return;
-        if (y > 180) { doc.addPage(); y = 14; }
-
-        doc.setFontSize(10);
-        doc.text(String(p.name || 'Unnamed Product'), 14, y);
-        y += 4;
+      if (tab === 'products') {
+        doc.setFontSize(14);
+        doc.text('Products Report', 14, 14);
 
         autoTable(doc, {
-          startY: y,
-          head: [['Customer Name', 'Qty Sold', 'Amount', 'Note', 'Date']],
-          body: p.remarks.map((r) => [
-            r.customerName,
-            r.quantitySold,
-            fmtRp(r.amount),
-            r.note || '-',
-            fmtDate(r.date),
+          startY: 20,
+          head: [['#', 'Product Name', 'Category', 'Stock', 'Min Stock', 'Price', 'Status']],
+          body: freshProducts.map((p, i) => [
+            i + 1,
+            String(p.name || '-'),
+            String(p.category || '-'),
+            Number(p.quantity) || 0,
+            Number(p.minStock) || 0,
+            fmtRp(p.price),
+            statusOf(p),
+          ]),
+          styles: { fontSize: 8 },
+          headStyles: { fillColor: [30, 30, 22] },
+        });
+
+        let y = doc.lastAutoTable.finY + 10;
+        freshProducts.forEach((p) => {
+          if (!p.remarks || p.remarks.length === 0) return;
+          if (y > 180) { doc.addPage(); y = 14; }
+
+          doc.setFontSize(10);
+          doc.text(String(p.name || 'Unnamed Product'), 14, y);
+          y += 4;
+
+          autoTable(doc, {
+            startY: y,
+            head: [['Customer Name', 'Qty Sold', 'Amount', 'Note', 'Date']],
+            body: p.remarks.map((r) => [
+              String(r.customerName || '-'),
+              Number(r.quantitySold) || 0,
+              fmtRp(r.amount),
+              String(r.note || '-'),
+              fmtDate(r.date),
+            ]),
+            styles: { fontSize: 7 },
+            headStyles: { fillColor: [70, 70, 60] },
+            margin: { left: 14 },
+          });
+
+          y = doc.lastAutoTable.finY + 10;
+        });
+
+        doc.save(`products-report-${Date.now()}.pdf`);
+      } else {
+        doc.setFontSize(14);
+        doc.text('Customer List', 14, 14);
+
+        autoTable(doc, {
+          startY: 20,
+          head: [['#', 'Customer Name', 'Address', 'Kota', 'Phone', 'Unit Type', 'Serial Number', 'Last Visit', 'Next Visit', 'Visit Count', 'Status']],
+          body: freshCustomers.map((c, i) => [
+            i + 1,
+            String(c.customerName || '-'),
+            String(c.address || '-'),
+            String(c.kota || '-'),
+            String(c.phone || '-'),
+            String(c.unitType || '-'),
+            String(c.serialNumber || '-'),
+            fmtDate(c.lastVisitDate),
+            fmtDate(c.nextVisitDate),
+            Number(c.visitCount) || 0,
+            String(c.status || '-'),
           ]),
           styles: { fontSize: 7 },
-          headStyles: { fillColor: [70, 70, 60] },
-          margin: { left: 14 },
+          headStyles: { fillColor: [30, 30, 22] },
         });
 
-        y = doc.lastAutoTable.finY + 10;
-      });
+        const customersWithHistory = freshCustomers.filter((c) => (c.visitHistory || []).length > 0);
 
-      doc.save(`products-report-${Date.now()}.pdf`);
-    } else {
-      doc.setFontSize(14);
-      doc.text('Customer List', 14, 14);
+        if (customersWithHistory.length > 0) {
+          doc.addPage();
+          doc.setFontSize(14);
+          doc.text('Visit History', 14, 14);
 
-      autoTable(doc, {
-        startY: 20,
-        head: [['#', 'Customer Name', 'Address', 'Kota', 'Phone', 'Unit Type', 'Serial Number', 'Last Visit', 'Next Visit', 'Visit Count', 'Status']],
-        body: freshCustomers.map((c, i) => [
-          i + 1,
-          c.customerName,
-          c.address || '-',
-          c.kota || '-',
-          c.phone || '-',
-          c.unitType || '-',
-          c.serialNumber || '-',
-          fmtDate(c.lastVisitDate),
-          fmtDate(c.nextVisitDate),
-          c.visitCount ?? 0,
-          c.status,
-        ]),
-        styles: { fontSize: 7 },
-        headStyles: { fillColor: [30, 30, 22] },
-      });
+          let y = 22;
+          customersWithHistory.forEach((c) => {
+            const history = c.visitHistory || [];
+            if (y > 175) { doc.addPage(); y = 14; }
 
-      doc.addPage();
-      doc.setFontSize(14);
-      doc.text('Visit History', 14, 14);
+            doc.setFontSize(10);
+            doc.text(String(c.customerName || 'Unnamed Customer'), 14, y);
+            y += 4;
 
-      let y = 22;
-      freshCustomers.forEach((c) => {
-        const history = c.visitHistory || [];
-        if (history.length === 0) return;
-        if (y > 175) { doc.addPage(); y = 14; }
+            autoTable(doc, {
+              startY: y,
+              head: [['#', 'Date', 'Notes']],
+              body: history.map((v, i) => [
+                i + 1,
+                fmtDate(v.date),
+                String(v.notes || '-'),
+              ]),
+              styles: { fontSize: 7 },
+              headStyles: { fillColor: [70, 70, 60] },
+              margin: { left: 14 },
+            });
 
-        doc.setFontSize(10);
-        doc.text(String(c.customerName || 'Unnamed Customer'), 14, y);
-        y += 4;
+            y = doc.lastAutoTable.finY + 10;
+          });
+        }
 
-        autoTable(doc, {
-          startY: y,
-          head: [['#', 'Date', 'Notes']],
-          body: history.map((v, i) => [i + 1, fmtDate(v.date), v.notes || '-']),
-          styles: { fontSize: 7 },
-          headStyles: { fillColor: [70, 70, 60] },
-          margin: { left: 14 },
-        });
-
-        y = doc.lastAutoTable.finY + 10;
-      });
-
-      doc.save(`customer-list-${Date.now()}.pdf`);
+        doc.save(`customer-list-${Date.now()}.pdf`);
+      }
+    } catch (err) {
+      console.error('PDF export failed:', err);
+      alert('PDF export failed: ' + (err?.message || 'Unknown error') + '\n\nCheck the console for the full stack trace.');
+    } finally {
+      setDownloading(false);
     }
-    setDownloading(false);
   };
 
   const isEmpty = tab === 'products' ? products.length === 0 : customers.length === 0;
@@ -366,9 +385,11 @@ export default function ReportsPage() {
           <TabButton active={tab === 'customers'} onClick={() => setTab('customers')}>Customer List</TabButton>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <ActionButton onClick={downloadPDF} disabled={loading || downloading || isEmpty}>
-            {downloading ? 'Fetching Latest…' : 'Download PDF'}
-          </ActionButton>
+          {tab === 'products' && (
+            <ActionButton onClick={downloadPDF} disabled={loading || downloading || isEmpty}>
+              {downloading ? 'Fetching Latest…' : 'Download PDF'}
+            </ActionButton>
+          )}
           <ActionButton onClick={downloadExcel} disabled={loading || downloading || isEmpty}>
             {downloading ? 'Fetching Latest…' : 'Download Excel'}
           </ActionButton>
