@@ -27,9 +27,9 @@ function statusOf(product) {
 }
 
 const statusColor = {
-  'Low Stock':   { bg: '#3a2a10', fg: '#e0a94a' },
-  'In Stock':    { bg: '#12301f', fg: '#5ec98a' },
-  'Out of Stock':{ bg: '#3a1414', fg: '#e05c5c' },
+  'Low Stock':    { bg: '#a1631c', fg: '#ffffff' },
+  'In Stock':     { bg: '#1f6b3f', fg: '#ffffff' },
+  'Out of Stock': { bg: '#9a2b2b', fg: '#ffffff' },
 };
 
 /* ---------------- Small UI bits ---------------- */
@@ -83,10 +83,12 @@ function StatusPill({ status }) {
       background: c.bg,
       color: c.fg,
       fontSize: 8,
+      fontWeight: 700,
       letterSpacing: '0.1em',
       textTransform: 'uppercase',
       padding: '3px 8px',
       borderRadius: 3,
+      whiteSpace: 'nowrap',
     }}>
       {status}
     </span>
