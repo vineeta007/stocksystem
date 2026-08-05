@@ -39,11 +39,12 @@ function TabButton({ active, children, onClick }) {
     <button
       onClick={onClick}
       style={{
-        background: active ? TEXT : 'transparent',
-        color: active ? DARK : TEXT,
+        background: active ? DARK : 'transparent',
+        color: active ? '#ffffff' : DARK,
         border: `0.5px solid ${BORDER}`,
         padding: '7px 16px',
         fontSize: 9,
+        fontWeight: active ? 700 : 500,
         letterSpacing: '0.2em',
         textTransform: 'uppercase',
         cursor: 'pointer',
@@ -62,10 +63,11 @@ function ActionButton({ children, onClick, disabled }) {
       disabled={disabled}
       style={{
         background: 'transparent',
-        color: disabled ? FAINT : TEXT,
+        color: disabled ? FAINT : DARK,
         border: `0.5px solid ${BORDER}`,
         padding: '7px 14px',
         fontSize: 8,
+        fontWeight: 600,
         letterSpacing: '0.15em',
         textTransform: 'uppercase',
         cursor: disabled ? 'not-allowed' : 'pointer',
@@ -298,18 +300,21 @@ export default function ReportsPage() {
 
       autoTable(doc, {
         startY: 20,
-        head: [['#', 'Customer Name', 'Kota', 'Phone', 'Unit Type', 'Last Visit', 'Next Visit', 'Status']],
+        head: [['#', 'Customer Name', 'Address', 'Kota', 'Phone', 'Unit Type', 'Serial Number', 'Last Visit', 'Next Visit', 'Visit Count', 'Status']],
         body: freshCustomers.map((c, i) => [
           i + 1,
           c.customerName,
+          c.address || '-',
           c.kota || '-',
           c.phone || '-',
           c.unitType || '-',
+          c.serialNumber || '-',
           fmtDate(c.lastVisitDate),
           fmtDate(c.nextVisitDate),
+          c.visitCount ?? 0,
           c.status,
         ]),
-        styles: { fontSize: 8 },
+        styles: { fontSize: 7 },
         headStyles: { fillColor: [30, 30, 22] },
       });
 
