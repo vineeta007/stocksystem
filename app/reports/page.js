@@ -102,29 +102,64 @@ export default function ReportsPage() {
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState(null);
   const [expanded, setExpanded] = useState({});
 
-  useEffect(() => {
-    async function load() {
-      setLoading(true);
-      setError(null);
-      try {
-        const [pRes, cRes] = await Promise.all([
-          fetch('/api/products'),
-          fetch('/api/maintenance'),
-        ]);
-        const pJson = await pRes.json();
-        const cJson = await cRes.json();
-        setProducts(pJson.data || []);
-        setCustomers(cJson.data || []);
-      } catch (err) {
-        setError(err.message || 'Failed to load data');
-      } finally {
-        setLoading(false);
-      }
+  // Fetches the latest products + customers, updates state, and returns them
+  // directly so callers (like the export buttons) can use the fresh data
+  // right away without waiting on a state update.
+  async function fetchData(isBackground = false) {
+    if (!isBackground) setLoading(true);
+    setError(null);
+    try {
+      const [pRes, cRes] = await Promise.all([
+        fetch('/api/products', { cache: 'no-store' }),
+        fetch('/api/maintenance', { cache: 'no-store' }),
+      ]);
+      const pJson = await pRes.json();
+      const cJson = await cRes.json();
+      const freshProducts = pJson.data || [];
+      const freshCustomers = cJson.data || [];
+      setProducts(freshProducts);
+      setCustomers(freshCustomers);
+      return { products: freshProducts, customers: freshCustomers };
+    } catch (err) {
+      setError(err.message || 'Failed to load data');
+      return { products, customers };
+    } finally {
+      if (!isBackground) setLoading(false);
     }
-    load();
+  }
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load(isBackground = false) {
+      if (cancelled) return;
+      await fetchData(isBackground);
+    }
+
+    // initial load (shows the loading state)
+    load(false);
+
+    // quiet background refresh every 5s
+    const interval = setInterval(() => load(true), 5000);
+
+    // instant refresh whenever the tab regains focus/visibility
+    const onFocus = () => load(true);
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') load(true);
+    };
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onVisibility);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
   }, []);
 
   const toggleExpand = (id) =>
@@ -132,10 +167,12 @@ export default function ReportsPage() {
 
   /* ---------- Excel export ---------- */
   const downloadExcel = async () => {
+    setDownloading(true);
+    const { products: freshProducts, customers: freshCustomers } = await fetchData(true);
     const XLSX = await import('xlsx');
 
     if (tab === 'products') {
-      const productRows = products.map((p, i) => ({
+      const productRows = freshProducts.map((p, i) => ({
         '#': i + 1,
         'Product Name': p.name,
         'Category': p.category || '',
@@ -146,7 +183,7 @@ export default function ReportsPage() {
       }));
 
       const remarkRows = [];
-      products.forEach((p) => {
+      freshProducts.forEach((p) => {
         (p.remarks || []).forEach((r) => {
           remarkRows.push({
             'Product Name': p.name,
@@ -164,7 +201,7 @@ export default function ReportsPage() {
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(remarkRows), 'Sales Remarks');
       XLSX.writeFile(wb, `products-report-${Date.now()}.xlsx`);
     } else {
-      const rows = customers.map((c, i) => ({
+      const rows = freshCustomers.map((c, i) => ({
         '#': i + 1,
         'Customer Name': c.customerName,
         'Address': c.address || '',
@@ -179,7 +216,7 @@ export default function ReportsPage() {
       }));
 
       const visitRows = [];
-      customers.forEach((c) => {
+      freshCustomers.forEach((c) => {
         (c.visitHistory || []).forEach((v, i) => {
           visitRows.push({
             'Customer Name': c.customerName,
@@ -195,10 +232,13 @@ export default function ReportsPage() {
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(visitRows), 'Visit History');
       XLSX.writeFile(wb, `customer-list-${Date.now()}.xlsx`);
     }
+    setDownloading(false);
   };
 
   /* ---------- PDF export ---------- */
   const downloadPDF = async () => {
+    setDownloading(true);
+    const { products: freshProducts, customers: freshCustomers } = await fetchData(true);
     const { jsPDF } = await import('jspdf');
     const autoTable = (await import('jspdf-autotable')).default;
 
@@ -211,7 +251,7 @@ export default function ReportsPage() {
       autoTable(doc, {
         startY: 20,
         head: [['#', 'Product Name', 'Category', 'Stock', 'Min Stock', 'Price', 'Status']],
-        body: products.map((p, i) => [
+        body: freshProducts.map((p, i) => [
           i + 1,
           p.name,
           p.category || '-',
@@ -225,7 +265,7 @@ export default function ReportsPage() {
       });
 
       let y = doc.lastAutoTable.finY + 10;
-      products.forEach((p) => {
+      freshProducts.forEach((p) => {
         if (!p.remarks || p.remarks.length === 0) return;
         if (y > 180) { doc.addPage(); y = 14; }
 
@@ -259,7 +299,7 @@ export default function ReportsPage() {
       autoTable(doc, {
         startY: 20,
         head: [['#', 'Customer Name', 'Kota', 'Phone', 'Unit Type', 'Last Visit', 'Next Visit', 'Status']],
-        body: customers.map((c, i) => [
+        body: freshCustomers.map((c, i) => [
           i + 1,
           c.customerName,
           c.kota || '-',
@@ -278,7 +318,7 @@ export default function ReportsPage() {
       doc.text('Visit History', 14, 14);
 
       let y = 22;
-      customers.forEach((c) => {
+      freshCustomers.forEach((c) => {
         const history = c.visitHistory || [];
         if (history.length === 0) return;
         if (y > 175) { doc.addPage(); y = 14; }
@@ -301,9 +341,11 @@ export default function ReportsPage() {
 
       doc.save(`customer-list-${Date.now()}.pdf`);
     }
+    setDownloading(false);
   };
 
   const isEmpty = tab === 'products' ? products.length === 0 : customers.length === 0;
+
 
   return (
     <div style={{ minHeight: '100vh' }}>
@@ -319,8 +361,12 @@ export default function ReportsPage() {
           <TabButton active={tab === 'customers'} onClick={() => setTab('customers')}>Customer List</TabButton>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <ActionButton onClick={downloadPDF} disabled={loading || isEmpty}>Download PDF</ActionButton>
-          <ActionButton onClick={downloadExcel} disabled={loading || isEmpty}>Download Excel</ActionButton>
+          <ActionButton onClick={downloadPDF} disabled={loading || downloading || isEmpty}>
+            {downloading ? 'Fetching Latest…' : 'Download PDF'}
+          </ActionButton>
+          <ActionButton onClick={downloadExcel} disabled={loading || downloading || isEmpty}>
+            {downloading ? 'Fetching Latest…' : 'Download Excel'}
+          </ActionButton>
         </div>
       </div>
 
