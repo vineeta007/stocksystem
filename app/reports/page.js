@@ -272,7 +272,7 @@ export default function ReportsPage() {
         if (y > 180) { doc.addPage(); y = 14; }
 
         doc.setFontSize(10);
-        doc.text(p.name, 14, y);
+        doc.text(String(p.name || 'Unnamed Product'), 14, y);
         y += 4;
 
         autoTable(doc, {
@@ -329,7 +329,7 @@ export default function ReportsPage() {
         if (y > 175) { doc.addPage(); y = 14; }
 
         doc.setFontSize(10);
-        doc.text(c.customerName, 14, y);
+        doc.text(String(c.customerName || 'Unnamed Customer'), 14, y);
         y += 4;
 
         autoTable(doc, {
