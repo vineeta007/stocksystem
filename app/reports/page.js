@@ -169,7 +169,6 @@ export default function ReportsPage() {
         'Customer Name': c.customerName,
         'Address': c.address || '',
         'Kota': c.kota || '',
-        'Wilayah': c.wilayah || '',
         'Phone': c.phone || '',
         'Unit Type': c.unitType || '',
         'Serial Number': c.serialNumber || '',
@@ -178,8 +177,22 @@ export default function ReportsPage() {
         'Visit Count': c.visitCount,
         'Status': c.status,
       }));
+
+      const visitRows = [];
+      customers.forEach((c) => {
+        (c.visitHistory || []).forEach((v, i) => {
+          visitRows.push({
+            'Customer Name': c.customerName,
+            'Visit #': i + 1,
+            'Date': fmtDate(v.date),
+            'Notes': v.notes || '',
+          });
+        });
+      });
+
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), 'Customer List');
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(visitRows), 'Visit History');
       XLSX.writeFile(wb, `customer-list-${Date.now()}.xlsx`);
     }
   };
@@ -258,6 +271,32 @@ export default function ReportsPage() {
         ]),
         styles: { fontSize: 8 },
         headStyles: { fillColor: [30, 30, 22] },
+      });
+
+      doc.addPage();
+      doc.setFontSize(14);
+      doc.text('Visit History', 14, 14);
+
+      let y = 22;
+      customers.forEach((c) => {
+        const history = c.visitHistory || [];
+        if (history.length === 0) return;
+        if (y > 175) { doc.addPage(); y = 14; }
+
+        doc.setFontSize(10);
+        doc.text(c.customerName, 14, y);
+        y += 4;
+
+        autoTable(doc, {
+          startY: y,
+          head: [['#', 'Date', 'Notes']],
+          body: history.map((v, i) => [i + 1, fmtDate(v.date), v.notes || '-']),
+          styles: { fontSize: 7 },
+          headStyles: { fillColor: [70, 70, 60] },
+          margin: { left: 14 },
+        });
+
+        y = doc.lastAutoTable.finY + 10;
       });
 
       doc.save(`customer-list-${Date.now()}.pdf`);
