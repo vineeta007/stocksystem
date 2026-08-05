@@ -269,10 +269,7 @@ export default function ReportsPage() {
   return (
     <div style={{ minHeight: '100vh' }}>
       <div style={{ padding: '18px 24px 14px', borderBottom: `0.5px solid ${BORDER}` }}>
-        <div style={{ fontSize: 8, letterSpacing: '0.3em', color: FAINT, textTransform: 'uppercase', marginBottom: 3 }}>
-          Analytics
-        </div>
-        <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 400, color: TEXT }}>
+        <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 600, color: DARK }}>
           Reports
         </div>
       </div>
