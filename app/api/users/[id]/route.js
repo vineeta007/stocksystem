@@ -48,7 +48,7 @@ export async function PATCH(request, { params }) {
     return NextResponse.json({ error: 'Nothing to update.' }, { status: 400 });
   }
 
-  const user = await User.findByIdAndUpdate(id, update, { new: true, select: '-passwordHash' });
+  const user = await User.findByIdAndUpdate(id, update, { returnDocument: 'after', select: '-passwordHash' });
 
   if (!user) {
     return NextResponse.json({ error: 'User not found.' }, { status: 404 });

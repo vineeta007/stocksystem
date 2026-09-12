@@ -4,13 +4,15 @@ import Quotation from '@/models/Quotation'
 
 export async function GET(req, { params }) {
   await dbConnect()
-  const q = await Quotation.findById(params.id).lean()
+  const { id } = await params
+  const q = await Quotation.findById(id).lean()
   if (!q) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   return NextResponse.json({ data: q })
 }
 
 export async function PATCH(req, { params }) {
   await dbConnect()
+  const { id } = await params
   const body = await req.json()
 
   if (body.items) {
@@ -26,12 +28,13 @@ export async function PATCH(req, { params }) {
     body.grandTotal  = totalBiaya + body.ppnAmount
   }
 
-  const q = await Quotation.findByIdAndUpdate(params.id, body, { new: true })
+  const q = await Quotation.findByIdAndUpdate(id, body, { returnDocument: 'after' })
   return NextResponse.json({ data: q })
 }
 
 export async function DELETE(req, { params }) {
   await dbConnect()
-  await Quotation.findByIdAndDelete(params.id)
+  const { id } = await params
+  await Quotation.findByIdAndDelete(id)
   return NextResponse.json({ success: true })
 }

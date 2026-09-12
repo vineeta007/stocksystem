@@ -22,7 +22,7 @@ export async function DELETE(request, context) {
         $pull: { remarks: { _id: remarkId } },
         $inc: { quantity: qtyToRestore },
       },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     return NextResponse.json({ success: true, data: updated });

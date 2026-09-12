@@ -6,7 +6,7 @@ export async function PATCH(request, { params }) {
   await dbConnect()
   const { id } = await params
   const body = await request.json()
-  const updated = await Klaim.findByIdAndUpdate(id, body, { new: true })
+  const updated = await Klaim.findByIdAndUpdate(id, body, { returnDocument: 'after' })
   return NextResponse.json({ success: true, data: updated })
 }
 

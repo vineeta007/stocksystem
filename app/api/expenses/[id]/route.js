@@ -10,7 +10,7 @@ export async function PATCH(request, context) {
     const updated = await Expense.findByIdAndUpdate(
       id,
       { $set: { date: body.date, name: body.name, amount: Number(body.amount) || 0, details: body.details || '' } },
-      { new: true }
+      { returnDocument: 'after' }
     );
     if (!updated) return NextResponse.json({ success: false, error: 'Not found' }, { status: 404 });
     return NextResponse.json({ success: true, data: updated });

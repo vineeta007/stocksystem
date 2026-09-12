@@ -46,7 +46,7 @@ export async function POST(req) {
     const counter = await Counter.findOneAndUpdate(
       { _id: 'quotationRefNo' },
       { $inc: { seq: 1 } },
-      { new: true, upsert: true }
+      { returnDocument: 'after', upsert: true }
     )
 
     const today = new Date()

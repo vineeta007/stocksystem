@@ -29,7 +29,7 @@ export async function POST(request, context) {
         },
         $inc: { quantity: -qtySold },
       },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     if (!updated) return NextResponse.json({ success: false, error: 'Not found' }, { status: 404 });

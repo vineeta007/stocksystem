@@ -50,7 +50,7 @@ export async function POST(req) {
     const counter = await Counter.findByIdAndUpdate(
       counterId,
       { $inc: { seq: 1 } },
-      { new: true, upsert: true }
+      { returnDocument: 'after', upsert: true }
     )
     const invoiceNo = `INV.KL.${mm}-${yy}/${String(counter.seq).padStart(3, '0')}`
 

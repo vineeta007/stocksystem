@@ -41,7 +41,7 @@ const QuotationSchema = new mongoose.Schema({
 }, { timestamps: true })
 
 // Auto-generate refNo before save
-QuotationSchema.pre('save', async function (next) {
+QuotationSchema.pre('save', async function () {
   if (!this.refNo) {
     const year = new Date().getFullYear()
     const count = await mongoose.models.Quotation.countDocuments()
@@ -51,7 +51,6 @@ QuotationSchema.pre('save', async function (next) {
   this.totalBiaya = this.items.reduce((s, i) => s + (i.biaya || 0), 0)
   this.ppnAmount  = Math.round(this.totalBiaya * (this.ppnPercent / 100))
   this.grandTotal = this.totalBiaya + this.ppnAmount
-  next()
 })
 
 export default mongoose.models.Quotation || mongoose.model('Quotation', QuotationSchema)

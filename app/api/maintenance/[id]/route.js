@@ -53,7 +53,7 @@ export async function PATCH(request, { params }) {
     body.nextVisitDate = addSixMonths(body.lastVisitDate)
   }
 
-  const updated = await Maintenance.findByIdAndUpdate(id, { $set: body }, { new: true })
+  const updated = await Maintenance.findByIdAndUpdate(id, { $set: body }, { returnDocument: 'after' })
   return NextResponse.json({ success: true, data: updated })
 }
 

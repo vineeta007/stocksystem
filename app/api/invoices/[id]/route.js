@@ -28,7 +28,7 @@ export async function PATCH(req, { params }) {
     body.totalAmount = subTotal + body.ppnAmount
   }
 
-  const updated = await Invoice.findByIdAndUpdate(id, { $set: body }, { new: true })
+  const updated = await Invoice.findByIdAndUpdate(id, { $set: body }, { returnDocument: 'after' })
   return NextResponse.json({ success: true, data: updated })
 }
 

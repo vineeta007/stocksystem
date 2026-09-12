@@ -16,7 +16,7 @@ export async function PATCH(request, { params }) {
   await dbConnect()
   const { id } = await params
   const body = await request.json()
-  const updated = await Vendor.findByIdAndUpdate(id, body, { new: true })
+  const updated = await Vendor.findByIdAndUpdate(id, body, { returnDocument: 'after' })
   if (!updated) return NextResponse.json({ success: false }, { status: 404 })
   return NextResponse.json({ success: true, data: updated })
 }

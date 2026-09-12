@@ -1,12 +1,13 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { fetchLogoBase64, generateQuotationPDFHTML } from '@/lib/pdfTemplates'
 
 const STATUS_TABS = ['All', 'Draft', 'Sent', 'Paid', 'Cancelled']
 
 function formatRupiah(n) {
   if (!n && n !== 0) return '—'
-  return '₹' + Number(n).toLocaleString('en-IN', { minimumFractionDigits: 2 })
+  return 'Rp ' + Number(n).toLocaleString('id-ID')
 }
 
 function formatDate(d) {
@@ -19,6 +20,7 @@ export default function QuotationPage() {
   const [quotations, setQuotations] = useState([])
   const [loading, setLoading]       = useState(true)
   const [activeTab, setActiveTab]   = useState('All')
+  const [downloadingId, setDownloadingId] = useState(null)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -45,6 +47,27 @@ export default function QuotationPage() {
     if (!confirm('Delete this quotation?')) return
     await fetch(`/api/quotations/${id}`, { method: 'DELETE' })
     fetchData()
+  }
+
+  async function downloadPDF(q) {
+    setDownloadingId(q._id)
+    const logoBase64 = await fetchLogoBase64()
+    const customer = {
+      customerName: q.clientName,
+      address:      q.clientAddress,
+      perihal:      q.perihal,
+    }
+    const html = generateQuotationPDFHTML(customer, q.items || [], q, logoBase64)
+    const win  = window.open('', '_blank')
+    setDownloadingId(null)
+    if (!win) {
+      alert('Popup was blocked. Please allow popups for this site and try again.')
+      return
+    }
+    win.document.write(html)
+    win.document.close()
+    win.focus()
+    setTimeout(() => { win.print() }, 600)
   }
 
   return (
@@ -142,7 +165,8 @@ export default function QuotationPage() {
                     >👁</button>
                     <button
                       title="Download PDF"
-                      onClick={() => window.open(`/api/quotations/${q._id}/pdf`, '_blank')}
+                      disabled={downloadingId === q._id}
+                      onClick={() => downloadPDF(q)}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', fontSize: '1rem' }}
                     >⬇</button>
                     <button

@@ -255,6 +255,8 @@ export default function MaintenancePage() {
                   <td>
                     <div className="action-btns">
                       <button className="btn-sm btn-visit" onClick={() => recordVisit(c._id)}>✓ Kunjungan</button>
+                      <button className="btn-sm btn-edit"  onClick={() => router.push(`/maintenance/${c._id}?tab=quotations`)} title="Lihat & cetak quotation">📄 Quotes</button>
+                      <button className="btn-sm btn-edit"  onClick={() => router.push(`/maintenance/${c._id}?tab=${encodeURIComponent('invoice details')}`)} title="Lihat & cetak invoice">🧾 Invoices</button>
                       <button className="btn-sm btn-edit"  onClick={() => openEdit(c)}>Edit</button>
                       <button className="btn-sm btn-del"   onClick={() => deleteCustomer(c._id)}>Hapus</button>
                     </div>
